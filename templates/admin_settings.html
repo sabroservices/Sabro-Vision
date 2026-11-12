@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Platform Settings - Sabro Vision Admin{% endblock %}
+
+{% block content %}
+<div class="space-y-6 max-w-4xl mx-auto">
+
+    <!-- Admin Nav Tabs -->
+    <div class="flex items-center justify-between border-b border-slate-800 pb-4 flex-wrap gap-4">
+        <div class="flex items-center gap-2 overflow-x-auto scrollbar-none">
+            <a href="{{ url_for('admin_dashboard') }}" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Overview</span>
+            </a>
+            <a href="{{ url_for('admin_resellers') }}" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-handshake text-cyan-300"></i>
+                <span>Resellers & B2B</span>
+            </a>
+            <a href="{{ url_for('admin_keys') }}" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-key text-amber-400"></i>
+                <span>Access Keys</span>
+            </a>
+            <a href="{{ url_for('admin_channels') }}" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-tv text-sky-400"></i>
+                <span>Channels</span>
+            </a>
+            <a href="{{ url_for('admin_playlists') }}" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-list-ul text-emerald-400"></i>
+                <span>Playlists & M3U</span>
+            </a>
+            <a href="{{ url_for('admin_settings') }}" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-md shadow-indigo-600/30 flex items-center gap-2">
+                <i class="fa-solid fa-gear text-slate-200"></i>
+                <span>Settings</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Settings Form -->
+    <form action="{{ url_for('admin_settings') }}" method="POST" class="space-y-6">
+
+        <!-- 1. Platform Branding & Contact -->
+        <div class="glass-panel rounded-2xl p-6 border border-slate-800 space-y-4">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-paintbrush text-sky-400"></i>
+                <span>Branding & Contact Info</span>
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Platform Name</label>
+                    <input type="text" name="platform_name" value="{{ settings.platform_name }}" required class="w-full bg-slate-900 text-xs text-white px-3.5 py-2.5 rounded-xl border border-slate-700">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Tagline</label>
+                    <input type="text" name="tagline" value="{{ settings.tagline }}" class="w-full bg-slate-900 text-xs text-white px-3.5 py-2.5 rounded-xl border border-slate-700">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Support Phone</label>
+                    <input type="text" name="phone" value="{{ settings.phone }}" class="w-full bg-slate-900 text-xs text-white px-3.5 py-2.5 rounded-xl border border-slate-700">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">WhatsApp Helpline (with country code e.g. 92300...)</label>
+                    <input type="text" name="whatsapp" value="{{ settings.whatsapp }}" class="w-full bg-slate-900 text-xs text-white px-3.5 py-2.5 rounded-xl border border-slate-700 font-mono">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Announcement Message</label>
+                <input type="text" name="announcement" value="{{ settings.announcement }}" class="w-full bg-slate-900 text-xs text-white px-3.5 py-2.5 rounded-xl border border-slate-700">
+            </div>
+        </div>
+
+        <!-- 2. Outsider Payment Gateways (JazzCash, EasyPaisa, Bank) -->
+        <div class="glass-panel rounded-2xl p-6 border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-wallet text-amber-400"></i>
+                    <span>Outsider Monetization & Payment Accounts</span>
+                </h3>
+                <span class="text-xs text-slate-400 font-mono">Displayed on Gatekeeper Lock Screen</span>
+            </div>
+
+            <!-- Price -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Monthly Pass Price</label>
+                    <input type="number" name="monthly_price" value="{{ settings.monthly_price }}" required class="w-full bg-slate-900 text-xs text-white px-3.5 py-2.5 rounded-xl border border-slate-700 font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Currency Code</label>
+                    <input type="text" name="currency" value="{{ settings.currency }}" required class="w-full bg-slate-900 text-xs text-white px-3.5 py-2.5 rounded-xl border border-slate-700 uppercase">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                <!-- JazzCash -->
+                <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+                    <span class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                        <i class="fa-solid fa-mobile-screen"></i> JazzCash Account
+                    </span>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase">Account Title</label>
+                        <input type="text" name="jazzcash_title" value="{{ settings.jazzcash_title }}" class="w-full bg-slate-950 text-xs text-white px-2.5 py-1.5 rounded-lg border border-slate-700">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase">Account Number</label>
+                        <input type="text" name="jazzcash_number" value="{{ settings.jazzcash_number }}" class="w-full bg-slate-950 text-xs text-white px-2.5 py-1.5 rounded-lg border border-slate-700 font-mono">
+                    </div>
+                </div>
+
+                <!-- EasyPaisa -->
+                <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+                    <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                        <i class="fa-solid fa-mobile-screen"></i> EasyPaisa Account
+                    </span>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase">Account Title</label>
+                        <input type="text" name="easypaisa_title" value="{{ settings.easypaisa_title }}" class="w-full bg-slate-950 text-xs text-white px-2.5 py-1.5 rounded-lg border border-slate-700">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase">Account Number</label>
+                        <input type="text" name="easypaisa_number" value="{{ settings.easypaisa_number }}" class="w-full bg-slate-950 text-xs text-white px-2.5 py-1.5 rounded-lg border border-slate-700 font-mono">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bank -->
+            <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+                <span class="text-xs font-bold text-sky-400 flex items-center gap-1.5">
+                    <i class="fa-solid fa-building-columns"></i> Bank Account Information
+                </span>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase">Bank Name</label>
+                        <input type="text" name="bank_name" value="{{ settings.bank_name }}" class="w-full bg-slate-950 text-xs text-white px-2.5 py-1.5 rounded-lg border border-slate-700">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase">Account Title</label>
+                        <input type="text" name="bank_account_title" value="{{ settings.bank_account_title }}" class="w-full bg-slate-950 text-xs text-white px-2.5 py-1.5 rounded-lg border border-slate-700">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase">Account Number / IBAN</label>
+                        <input type="text" name="bank_account_number" value="{{ settings.bank_account_number }}" class="w-full bg-slate-950 text-xs text-white px-2.5 py-1.5 rounded-lg border border-slate-700 font-mono">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Security & Admin Password -->
+        <div class="glass-panel rounded-2xl p-6 border border-slate-800 space-y-4">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-lock text-rose-400"></i>
+                <span>Admin Password</span>
+            </h3>
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">New Admin Password (leave blank to keep current)</label>
+                <input type="password" name="new_admin_password" placeholder="Enter new password if changing..." class="w-full bg-slate-900 text-xs text-white px-3.5 py-2.5 rounded-xl border border-slate-700">
+            </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="pt-2">
+            <button type="submit" class="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-check"></i>
+                <span>Save All Platform Settings</span>
+            </button>
+        </div>
+
+    </form>
+</div>
+{% endblock %}

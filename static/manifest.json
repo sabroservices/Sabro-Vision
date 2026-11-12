@@ -1,0 +1,49 @@
+{
+  "name": "Sabro Vision - Smart TV & IPTV",
+  "short_name": "Sabro Vision",
+  "description": "High-Definition 24/7 IPTV Streaming Platform for Smart TV, Mobile, and Web",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#03060d",
+  "theme_color": "#06b6d4",
+  "orientation": "any",
+  "categories": ["entertainment", "video", "tv"],
+  "icons": [
+    {
+      "src": "/static/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Watch Live TV",
+      "url": "/",
+      "description": "Stream live sports, news, and entertainment channels"
+    },
+    {
+      "name": "Smart TV Mode",
+      "url": "/tv",
+      "description": "Launch 10-foot Smart TV interface with D-pad navigation"
+    },
+    {
+      "name": "My Account & Vault",
+      "url": "/my-account",
+      "description": "View access key, credentials, and package expiry"
+    }
+  ]
+}

@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block title %}VIP Access - {{ settings.platform_name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-[75vh] flex flex-col items-center justify-center py-6 sm:py-10 px-4">
+
+    <!-- Ambient Glowing Backdrop -->
+    <div class="relative w-full max-w-lg">
+        <div class="absolute -top-16 left-1/2 -translate-x-1/2 w-80 h-80 bg-brand-600/15 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Cinema Direct Login Card -->
+        <div class="cinema-glass-card relative rounded-3xl p-6 sm:p-9 border border-white/[0.1] shadow-2xl backdrop-blur-2xl bg-obsidian-900/90 overflow-hidden">
+            
+            <!-- Sleek Top Header -->
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-600 via-sky-500 to-indigo-600 shadow-xl shadow-brand-500/25 mb-3 border border-white/20">
+                    <i class="fa-solid fa-tv text-white text-xl"></i>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                    {{ settings.platform_name }}
+                </h1>
+                <p class="text-xs text-slate-400 mt-1 font-medium">
+                    Direct VIP Access • 11,459+ Live Channels & Movies
+                </p>
+            </div>
+
+            <!-- Tab Switcher (Direct Key vs Account Login) -->
+            <div class="flex rounded-2xl bg-obsidian-950/80 p-1 mb-6 border border-white/[0.06]">
+                <button type="button" onclick="switchGatekeeperTab('keyTab', this)" id="btnTabKey" 
+                        class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 bg-brand-600 text-white shadow-md shadow-brand-500/30">
+                    <i class="fa-solid fa-bolt text-xs text-amber-300"></i>
+                    <span>Put Key & Get Auto Login</span>
+                </button>
+                <button type="button" onclick="switchGatekeeperTab('loginTab', this)" id="btnTabLogin"
+                        class="flex-1 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-user-shield text-xs"></i>
+                    <span>Login with Username & Password</span>
+                </button>
+            </div>
+
+            <!-- Tab 1: Direct Access Key Input (Primary & Focused) -->
+            <div id="keyTab" class="space-y-4">
+                <form action="{{ url_for('activate') }}" method="POST" class="space-y-4">
+                    <div>
+                        <label for="key_code" class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-2 text-center">
+                            <i class="fa-solid fa-key text-brand-400 mr-1.5"></i> Enter Monthly Access Key
+                        </label>
+                        <div class="relative">
+                            <input type="text" name="key_code" id="key_code" required autofocus
+                                   placeholder="SABRO-XXXX-XXXX-XXXX" 
+                                   class="w-full bg-obsidian-950/90 text-lg font-mono tracking-widest text-white px-4 py-3.5 rounded-2xl border border-white/[0.12] focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 uppercase placeholder:text-slate-600 transition-all text-center font-bold shadow-inner">
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-2 text-center flex items-center justify-center gap-1.5 font-medium">
+                            <i class="fa-solid fa-shield-halved text-emerald-400 text-xs"></i> 
+                            <span>Put Your Key to Get Automatic Login & Instant Stream</span>
+                        </p>
+                    </div>
+
+                    <button type="submit" class="btn-shimmer glow-cyan w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-brand-600 via-cyan-500 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-extrabold text-sm shadow-xl shadow-brand-500/30 flex items-center justify-center gap-2.5 transform active:scale-[0.99] transition-all">
+                        <i class="fa-solid fa-circle-play text-amber-300 text-base"></i>
+                        <span>Start Watching Live TV</span>
+                    </button>
+                </form>
+
+                <div class="pt-2 text-center text-xs text-slate-400">
+                    <span>Already have saved credentials?</span>
+                    <button type="button" onclick="document.getElementById('btnTabLogin').click()" class="text-cyan-400 font-bold hover:underline ml-1">
+                        Sign In with Saved Account
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab 2: Username & Password Login (Hidden by default) -->
+            <div id="loginTab" class="space-y-4 hidden">
+                <form action="{{ url_for('user_login') }}" method="POST" class="space-y-4">
+                    <div>
+                        <label for="user_username" class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                            Username
+                        </label>
+                        <input type="text" name="username" id="user_username" required placeholder="e.g. sabro_98ad2b"
+                               class="w-full bg-obsidian-950/90 text-sm text-white px-4 py-3 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 transition-all">
+                    </div>
+
+                    <div>
+                        <label for="user_password" class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                            Password
+                        </label>
+                        <input type="password" name="password" id="user_password" required placeholder="••••••••"
+                               class="w-full bg-obsidian-950/90 text-sm text-white px-4 py-3 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 transition-all">
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-brand-600 via-sky-500 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-bold text-xs shadow-xl shadow-brand-500/25 flex items-center justify-center gap-2 transform active:scale-[0.99] transition-all">
+                        <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
+                        <span>Sign In & Load Saved Key</span>
+                    </button>
+                </form>
+
+                <div class="pt-2 text-center text-xs text-slate-400">
+                    <span>Have an access key?</span>
+                    <button type="button" onclick="document.getElementById('btnTabKey').click()" class="text-cyan-400 font-bold hover:underline ml-1">
+                        Put Key & Get Auto Login
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Clean Multi-Screen Sub-bar -->
+        <div class="mt-4 flex items-center justify-between px-3 py-2 rounded-2xl bg-obsidian-900/60 border border-white/[0.06] text-[11px] text-slate-400 flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 live-pulse"></span>
+                <span class="font-bold text-slate-300 uppercase tracking-wider text-[10px]">Multi-Screen Ready:</span>
+            </div>
+            <div class="flex items-center gap-2.5 text-slate-400 text-[11px]">
+                <span><i class="fa-solid fa-desktop text-cyan-400"></i> Web TV</span>
+                <span>•</span>
+                <span><i class="fa-solid fa-tv text-indigo-400"></i> Smart TV</span>
+                <span>•</span>
+                <span><i class="fa-brands fa-android text-emerald-400"></i> Android</span>
+                <span>•</span>
+                <a href="{{ url_for('multi_device_apps') }}" class="text-cyan-300 font-bold hover:underline flex items-center gap-1">
+                    <span>Apps Hub &rarr;</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Expandable Subscription, Payment & B2B Partner Details (Uncluttered Drawer) -->
+        <details class="group mt-4 rounded-2xl bg-obsidian-900/70 border border-white/[0.08] transition-all duration-300 overflow-hidden">
+            <summary class="cursor-pointer list-none px-4 py-3 flex items-center justify-between text-xs font-semibold text-slate-300 hover:text-white transition-colors select-none">
+                <span class="flex items-center gap-2">
+                    <i class="fa-solid fa-circle-question text-cyan-400"></i>
+                    <span>Need an Access Key or Want to Resell? (Pricing & Payment)</span>
+                </span>
+                <i class="fa-solid fa-chevron-down text-slate-500 text-[10px] group-open:rotate-180 transition-transform duration-200"></i>
+            </summary>
+
+            <div class="px-4 pb-4 pt-1 space-y-4 border-t border-white/[0.06] text-xs">
+                
+                <!-- Pricing Highlights -->
+                <div class="p-3 rounded-xl bg-obsidian-950/80 border border-white/[0.06] space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-emerald-400 font-bold text-[11px] uppercase tracking-wide">
+                            <i class="fa-solid fa-check-circle mr-1"></i> Sabro Networks Subscribers (Sabro Networks Users: 100% Free Forever)
+                        </span>
+                        <span class="text-emerald-400 font-mono text-[10px] font-bold">0 PKR</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-cyan-300 font-bold text-[11px] uppercase tracking-wide">
+                            <i class="fa-solid fa-star mr-1 text-amber-300"></i> Outsiders: Flat 250 PKR (1 Screen)
+                        </span>
+                        <span class="text-cyan-300 font-mono text-[10px] font-bold">PKR 250</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 pt-1">
+                        The <strong class="text-white">All-In-One Monthly Pass</strong> includes all 11,459 channels, live sports, movies, and VOD on 1 Screen.
+                    </p>
+                </div>
+
+                <!-- Payment Accounts (JazzCash & EasyPaisa) -->
+                <div class="space-y-1.5">
+                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Direct Payment Accounts:
+                    </div>
+                    <!-- JazzCash -->
+                    <div class="flex items-center justify-between bg-obsidian-950/80 px-3 py-2 rounded-xl border border-white/[0.06]">
+                        <div class="flex items-center gap-2 text-[11px]">
+                            <span class="font-bold text-amber-400">JazzCash:</span>
+                            <span class="text-white font-mono font-semibold">{{ settings.jazzcash_number }}</span>
+                            <span class="text-slate-400 text-[10px]">({{ settings.jazzcash_title }})</span>
+                        </div>
+                        <button type="button" onclick="navigator.clipboard.writeText('{{ settings.jazzcash_number }}'); alert('JazzCash copied!');" class="text-slate-400 hover:text-white" title="Copy">
+                            <i class="fa-regular fa-copy text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- EasyPaisa -->
+                    <div class="flex items-center justify-between bg-obsidian-950/80 px-3 py-2 rounded-xl border border-white/[0.06]">
+                        <div class="flex items-center gap-2 text-[11px]">
+                            <span class="font-bold text-emerald-400">EasyPaisa:</span>
+                            <span class="text-white font-mono font-semibold">{{ settings.easypaisa_number }}</span>
+                            <span class="text-slate-400 text-[10px]">({{ settings.easypaisa_title }})</span>
+                        </div>
+                        <button type="button" onclick="navigator.clipboard.writeText('{{ settings.easypaisa_number }}'); alert('EasyPaisa copied!');" class="text-slate-400 hover:text-white" title="Copy">
+                            <i class="fa-regular fa-copy text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Instant WhatsApp Helpline -->
+                <div class="flex items-center justify-between gap-2 pt-1">
+                    <a href="https://wa.me/{{ clean_whatsapp }}?text=Assalam-o-Alaikum%20Sabro%20IPTV,%20I%20want%20to%20get%20an%20Access%20Key." 
+                       target="_blank" 
+                       class="flex-1 py-2 px-3 rounded-xl bg-emerald-600/80 hover:bg-emerald-600 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 transition-all">
+                        <i class="fa-brands fa-whatsapp text-sm"></i>
+                        <span>WhatsApp Helpline</span>
+                    </a>
+                    <a href="{{ url_for('public_packages') }}" class="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-[11px] transition-all">
+                        <span>Packages</span>
+                    </a>
+                </div>
+
+                <!-- B2B Reseller & White-Label Link -->
+                <div class="pt-2 border-t border-white/[0.06] flex items-center justify-between text-[11px]">
+                    <span class="text-slate-400">
+                        <strong class="text-white">B2B Reseller</strong> & <span class="text-cyan-300">White-Label Opportunity</span>
+                    </span>
+                    <a href="{{ url_for('partner_portal') }}" class="text-cyan-300 font-bold hover:underline flex items-center gap-1">
+                        <span>Partner Program &rarr;</span>
+                    </a>
+                </div>
+
+            </div>
+        </details>
+
+    </div>
+
+</div>
+
+<script>
+    function switchGatekeeperTab(tabId, btn) {
+        document.getElementById('loginTab').classList.add('hidden');
+        document.getElementById('keyTab').classList.add('hidden');
+        document.getElementById(tabId).classList.remove('hidden');
+
+        document.getElementById('btnTabLogin').classList.remove('bg-brand-600', 'text-white', 'shadow-md', 'shadow-brand-500/30');
+        document.getElementById('btnTabLogin').classList.add('text-slate-400');
+        document.getElementById('btnTabKey').classList.remove('bg-brand-600', 'text-white', 'shadow-md', 'shadow-brand-500/30');
+        document.getElementById('btnTabKey').classList.add('text-slate-400');
+
+        btn.classList.add('bg-brand-600', 'text-white', 'shadow-md', 'shadow-brand-500/30');
+        btn.classList.remove('text-slate-400');
+
+        if (tabId === 'keyTab') {
+            document.getElementById('key_code').focus();
+        } else {
+            document.getElementById('user_username').focus();
+        }
+    }
+</script>
+{% endblock %}

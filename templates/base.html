@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ settings.platform_name }} - Ultra HD Streaming{% endblock %}</title>
+
+    <!-- Mobile & Smart TV PWA Manifest -->
+    <link rel="manifest" href="{{ url_for('pwa_manifest') }}">
+    <meta name="theme-color" content="#06b6d4">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon.svg') }}">
+    <!-- Google Font: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace']
+                    },
+                    colors: {
+                        brand: {
+                            50: '#ecfeff',
+                            100: '#cffafe',
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                            600: '#0891b2',
+                            700: '#0e7490',
+                            glow: 'rgba(6, 182, 212, 0.45)'
+                        },
+                        sabro: {
+                            50: '#ecfeff',
+                            100: '#cffafe',
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                            600: '#0891b2',
+                            700: '#0e7490',
+                            950: '#083344'
+                        },
+                        obsidian: {
+                            800: '#111827',
+                            850: '#0d1322',
+                            900: '#070b14',
+                            950: '#03060d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Hls.js -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #03060d; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #0891b2; }
+
+        /* Accessible focus rings */
+        *:focus-visible {
+            outline: 2px solid #22d3ee !important;
+            outline-offset: 2px !important;
+        }
+
+        /* Glassmorphism System */
+        .cinema-glass {
+            background: rgba(7, 11, 20, 0.82);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-panel {
+            background: linear-gradient(180deg, rgba(13, 19, 34, 0.88) 0%, rgba(7, 11, 20, 0.96) 100%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.16);
+            box-shadow: 0 12px 35px -10px rgba(0, 0, 0, 0.78);
+        }
+        .cinema-glass-card {
+            background: linear-gradient(180deg, rgba(13, 19, 34, 0.85) 0%, rgba(7, 11, 20, 0.95) 100%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 12px 35px -10px rgba(0, 0, 0, 0.8), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+            transition: all 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .cinema-glass-card:hover {
+            border-color: rgba(34, 211, 238, 0.55);
+            border-top-color: rgba(34, 211, 238, 0.85);
+            box-shadow: 0 18px 45px -10px rgba(6, 182, 212, 0.35), inset 0 1px 0 0 rgba(34, 211, 238, 0.2);
+            transform: translateY(-3px);
+        }
+
+        /* Neon Glow Utility Classes */
+        .glow-cyan {
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.45);
+        }
+        .glow-cyan-lg {
+            box-shadow: 0 0 45px rgba(6, 182, 212, 0.6);
+        }
+        .glow-purple {
+            box-shadow: 0 0 25px rgba(139, 92, 246, 0.45);
+        }
+
+        /* Live Indicator Animations */
+        .live-pulse {
+            animation: pulse-dot 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.35; transform: scale(0.8); }
+        }
+        @keyframes eq-wave {
+            0%, 100% { height: 4px; }
+            50% { height: 14px; }
+        }
+        .eq-bar-1 { animation: eq-wave 0.8s ease-in-out infinite 0.1s; }
+        .eq-bar-2 { animation: eq-wave 0.8s ease-in-out infinite 0.3s; }
+        .eq-bar-3 { animation: eq-wave 0.8s ease-in-out infinite 0.2s; }
+
+        /* Shimmer button highlight */
+        .btn-shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-shimmer::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(60deg, transparent 30%, rgba(255, 255, 255, 0.15) 50%, transparent 70%);
+            transform: rotate(30deg) translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+        .btn-shimmer:hover::after {
+            transform: rotate(30deg) translateX(100%);
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-obsidian-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-brand-500 selection:text-white relative overflow-x-hidden pb-16 md:pb-0">
+
+    <!-- Ambient Cinema Glow Lights -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div class="absolute -top-40 left-1/4 w-[650px] h-[650px] bg-brand-500/12 rounded-full blur-[150px]"></div>
+        <div class="absolute top-1/3 -right-40 w-[550px] h-[550px] bg-indigo-600/12 rounded-full blur-[150px]"></div>
+        <div class="absolute -bottom-40 left-1/3 w-[650px] h-[650px] bg-purple-600/8 rounded-full blur-[170px]"></div>
+    </div>
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-50 cinema-glass border-b border-white/[0.08]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4 relative z-10">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3">
+                <a href="{{ url_for('index') }}" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 via-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-brand-500/30 group-hover:scale-105 transition-transform border border-white/20">
+                        <i class="fa-solid fa-satellite-dish text-white text-base"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-brand-400">
+                                {{ settings.platform_name }}
+                            </span>
+                            <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center gap-1 shadow-sm">
+                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500 live-pulse"></span>
+                                LIVE
+                            </span>
+                        </div>
+                        <p class="text-[10px] text-slate-400 hidden sm:block truncate max-w-xs font-semibold">{{ settings.tagline }}</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Global Search & Center Controls -->
+            {% if current_key_info %}
+            <div class="flex-1 max-w-md hidden md:block">
+                <form action="{{ url_for('index') }}" method="GET" class="relative">
+                    <input type="text" name="q" value="{{ request.args.get('q', '') }}" 
+                           placeholder="Search Channels, Sports, News... (Press '/' to search)" 
+                           id="globalSearchInput"
+                           class="w-full bg-obsidian-900/90 text-xs text-slate-200 pl-10 pr-4 py-2.5 rounded-2xl border border-white/[0.08] focus:outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-400 transition-all placeholder:text-slate-500 shadow-inner">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                </form>
+            </div>
+            {% endif %}
+
+            <!-- Right Controls: Key Info & Navigation -->
+            <div class="flex items-center gap-3">
+                {% if current_subscriber %}
+                <a href="{{ url_for('my_account') }}" class="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-obsidian-900/90 border border-brand-500/30 text-xs font-bold text-slate-200 hover:text-white hover:border-brand-400 transition-all shadow-sm" title="My Account & Key Vault">
+                    <i class="fa-solid fa-user-circle text-brand-400"></i>
+                    <span class="max-w-[100px] truncate">{{ current_subscriber.username }}</span>
+                </a>
+                {% endif %}
+
+                {% if current_key_info %}
+                    <!-- User Key Status Badge -->
+                    <div class="hidden sm:flex items-center gap-2.5 px-3 py-1.5 rounded-2xl bg-obsidian-900/90 border border-white/[0.08] text-xs shadow-md">
+                        <div class="w-2 h-2 rounded-full {% if current_key_info.days_left > 5 %}bg-emerald-400 shadow-[0_0_8px_#34d399]{% else %}bg-amber-400 shadow-[0_0_8px_#fbbf24]{% endif %}"></div>
+                        <div class="flex flex-col text-left">
+                            <span class="text-[9px] text-slate-400 uppercase font-black tracking-wider">
+                                {% if current_key_info.user_type == 'subscriber' %}
+                                    Sabro Fiber Pass
+                                {% else %}
+                                    VIP Monthly Pass
+                                {% endif %}
+                            </span>
+                            <span class="font-bold text-slate-100 text-[11px]">
+                                {{ current_key_info.days_left }} days remaining
+                            </span>
+                        </div>
+                    </div>
+
+                    <a href="{{ url_for('logout') }}" title="Exit Key Session" class="p-2 text-slate-400 hover:text-rose-400 transition-colors text-xs" onclick="return confirm('Exit this IPTV session?')">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </a>
+                {% endif %}
+
+                <!-- Packages & Pricing Link -->
+                <a href="{{ url_for('public_packages') }}" class="px-3 py-1.5 rounded-xl bg-purple-600/20 text-purple-300 border border-purple-500/30 text-xs font-bold flex items-center gap-1.5 hover:bg-purple-600 hover:text-white transition-all shadow-sm" title="Packages & Channels">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                    <span class="hidden sm:inline">Packages</span>
+                </a>
+
+                <!-- B2B Partner & Reseller Link -->
+                <a href="{{ url_for('partner_portal') }}" class="px-3 py-1.5 rounded-xl bg-cyan-600/20 text-cyan-300 border border-cyan-500/30 text-xs font-bold flex items-center gap-1.5 hover:bg-cyan-600 hover:text-white transition-all shadow-sm" title="ISP White-Label & Reseller Program">
+                    <i class="fa-solid fa-handshake"></i>
+                    <span class="hidden md:inline">Partner / Reseller</span>
+                </a>
+
+                <!-- Multi-Device & Apps Link -->
+                <a href="{{ url_for('multi_device_apps') }}" class="px-3 py-1.5 rounded-xl bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 text-xs font-bold flex items-center gap-1.5 hover:bg-indigo-600 hover:text-white transition-all shadow-sm" title="Android, Smart TV, Web & Apple Apps">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                    <span class="hidden lg:inline">Apps & Devices</span>
+                </a>
+
+                <!-- TV WebApp Mode Link -->
+                <a href="{{ url_for('tv_player') }}" class="px-3 py-1.5 rounded-xl bg-cyan-600/20 text-cyan-300 border border-cyan-500/30 text-xs font-bold flex items-center gap-1.5 hover:bg-cyan-600 hover:text-white transition-all shadow-sm" title="Smart TV Leanback Mode">
+                    <i class="fa-solid fa-tv"></i>
+                    <span class="hidden sm:inline">TV Mode</span>
+                </a>
+
+                <!-- Admin Link -->
+                {% if is_admin %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="px-3.5 py-1.5 rounded-xl bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 text-xs font-bold flex items-center gap-1.5 hover:bg-indigo-600 hover:text-white transition-all shadow-md">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>Admin</span>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('admin_login') }}" class="p-2 text-slate-500 hover:text-slate-300 transition-colors text-xs" title="Admin Portal">
+                        <i class="fa-solid fa-lock"></i>
+                    </a>
+                {% endif %}
+
+                <!-- WhatsApp Support Helpline -->
+                {% if settings.whatsapp %}
+                <a href="https://wa.me/{{ clean_whatsapp }}?text=Assalam-o-Alaikum%20Sabro%20Vision%20Support," target="_blank" class="px-3 py-1.5 rounded-xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center gap-1.5 hover:bg-emerald-600 hover:text-white transition-all shadow-sm">
+                    <i class="fa-brands fa-whatsapp text-sm"></i>
+                    <span class="hidden lg:inline">Helpline</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Messages -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 w-full relative z-10">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-3 px-4 py-3 rounded-2xl text-xs flex items-center justify-between border 
+                        {% if category == 'success' %}bg-emerald-950/70 text-emerald-200 border-emerald-500/40
+                        {% elif category == 'error' %}bg-rose-950/70 text-rose-200 border-rose-500/40
+                        {% elif category == 'warning' %}bg-amber-950/70 text-amber-200 border-amber-500/40
+                        {% else %}bg-sky-950/70 text-sky-200 border-sky-500/40{% endif %} backdrop-blur-md shadow-lg">
+                        <div class="flex items-center gap-2.5">
+                            {% if category == 'success' %}<i class="fa-solid fa-circle-check text-emerald-400"></i>
+                            {% elif category == 'error' %}<i class="fa-solid fa-circle-exclamation text-rose-400"></i>
+                            {% elif category == 'warning' %}<i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
+                            {% else %}<i class="fa-solid fa-circle-info text-sky-400"></i>{% endif %}
+                            <span class="font-semibold">{{ message }}</span>
+                        </div>
+                        <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white text-xs ml-4">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 w-full relative z-10">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Automatic Account Created Celebration Modal -->
+    {% if newly_generated_creds %}
+    <div id="credsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+        <div class="cinema-glass-card rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-cyan-500/40 shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-16 -right-16 w-48 h-48 bg-brand-500/20 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="text-center mb-5">
+                <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white text-2xl mx-auto mb-3 shadow-xl shadow-cyan-500/30 border border-white/20">
+                    <i class="fa-solid fa-key text-white"></i>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">
+                    {% if newly_generated_creds.is_new %}
+                    🎉 Your Account Is Ready!
+                    {% else %}
+                    🔑 Your Login Credentials
+                    {% endif %}
+                </h2>
+                <p class="text-xs text-slate-300 mt-1 max-w-sm mx-auto">
+                    Your key is now safely linked to your personal subscriber account. Use these details to log in easily anytime on your TV, phone, or computer!
+                </p>
+            </div>
+
+            <div class="space-y-3 mb-6">
+                <!-- Username Box -->
+                <div class="p-3.5 rounded-2xl bg-obsidian-950/90 border border-white/[0.08] flex items-center justify-between">
+                    <div>
+                        <span class="block text-[10px] uppercase font-black tracking-wider text-slate-400">Automatic Username</span>
+                        <span id="credUsername" class="text-sm sm:text-base font-mono font-black text-cyan-300">{{ newly_generated_creds.username }}</span>
+                    </div>
+                    <button type="button" onclick="copyCredText('credUsername', this)" class="px-3 py-1.5 rounded-xl bg-obsidian-900 hover:bg-slate-800 text-xs text-slate-300 hover:text-white border border-white/10 flex items-center gap-1.5 transition-all">
+                        <i class="fa-regular fa-copy text-xs"></i>
+                        <span>Copy</span>
+                    </button>
+                </div>
+
+                <!-- Password Box -->
+                <div class="p-3.5 rounded-2xl bg-obsidian-950/90 border border-white/[0.08] flex items-center justify-between">
+                    <div>
+                        <span class="block text-[10px] uppercase font-black tracking-wider text-slate-400">Automatic Password</span>
+                        <span id="credPassword" class="text-sm sm:text-base font-mono font-black text-emerald-300">{{ newly_generated_creds.password }}</span>
+                    </div>
+                    <button type="button" onclick="copyCredText('credPassword', this)" class="px-3 py-1.5 rounded-xl bg-obsidian-900 hover:bg-slate-800 text-xs text-slate-300 hover:text-white border border-white/10 flex items-center gap-1.5 transition-all">
+                        <i class="fa-regular fa-copy text-xs"></i>
+                        <span>Copy</span>
+                    </button>
+                </div>
+
+                <!-- Key Info Box -->
+                <div class="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/20 flex items-center justify-between text-xs text-cyan-200">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check text-cyan-400"></i>
+                        <span>Linked Key: <strong class="font-mono text-white">{{ newly_generated_creds.key_code }}</strong></span>
+                    </div>
+                    <span class="text-[11px] font-bold text-emerald-400">Pass Active</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-2">
+                <button type="button" onclick="copyAllCreds('{{ newly_generated_creds.username }}', '{{ newly_generated_creds.password }}', '{{ newly_generated_creds.key_code }}')" class="w-full py-2.5 px-4 rounded-xl bg-obsidian-900 hover:bg-obsidian-850 text-white font-bold text-xs border border-white/10 flex items-center justify-center gap-2 transition-all">
+                    <i class="fa-solid fa-copy text-cyan-400"></i>
+                    <span>Copy All Credentials</span>
+                </button>
+                <button type="button" onclick="closeCredsModal()" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-brand-600 via-cyan-500 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-black text-xs shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2 transition-all">
+                    <i class="fa-solid fa-tv text-xs"></i>
+                    <span>Start Watching Live TV</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function copyCredText(elemId, btn) {
+            const text = document.getElementById(elemId).innerText.trim();
+            navigator.clipboard.writeText(text);
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i> <span class="text-emerald-300">Copied!</span>';
+            setTimeout(() => { btn.innerHTML = orig; }, 1800);
+        }
+        function copyAllCreds(u, p, k) {
+            const full = `SABRO VISION Credentials:\nUsername: ${u}\nPassword: ${p}\nAccess Key: ${k}\nPortal: ${window.location.origin}/`;
+            navigator.clipboard.writeText(full);
+            alert('All credentials copied to clipboard! Save them in your notes or WhatsApp.');
+        }
+        function closeCredsModal() {
+            const m = document.getElementById('credsModal');
+            if (m) m.style.display = 'none';
+            fetch('/api/dismiss-creds-modal', { method: 'POST' });
+        }
+    </script>
+    {% endif %}
+
+    <!-- Global Footer with Vshatkay Solutions Attribution -->
+    <footer class="border-t border-white/[0.08] cinema-glass py-7 text-xs text-slate-400 mt-auto relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-center sm:text-left">
+                <div class="flex items-center gap-2">
+                    <span class="font-black text-slate-100 tracking-wider">{{ settings.platform_name }}</span>
+                    <span class="text-slate-600">•</span>
+                    <span>All Rights Reserved &copy; {{ now.year }}</span>
+                </div>
+                <div class="hidden sm:inline text-slate-600">•</div>
+                <div class="flex items-center gap-1.5 text-slate-300">
+                    <span class="text-slate-500">Engineered & Delivered by</span>
+                    <span class="font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400">
+                        Vshatkay Solutions
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4 text-slate-400 text-[11px] flex-wrap justify-center sm:justify-end">
+                <a href="{{ url_for('multi_device_apps') }}" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 font-semibold hover:bg-indigo-500/20 transition-colors">
+                    <i class="fa-solid fa-mobile-screen-button text-xs"></i>
+                    <span>Apps & Devices</span>
+                </a>
+                <a href="{{ url_for('partner_portal') }}" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-semibold hover:bg-cyan-500/20 transition-colors">
+                    <i class="fa-solid fa-handshake text-xs"></i>
+                    <span>ISP & Reseller Program</span>
+                </a>
+                <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-semibold">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse"></span>
+                    <span>Sabro High-Speed Fiber Network</span>
+                </div>
+                <span>Support: <strong class="text-slate-200">{{ settings.phone }}</strong></span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Keyboard Hotkey for Global Search -->
+    <script>
+        document.addEventListener('keydown', function(e) {
+            if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                const search = document.getElementById('globalSearchInput');
+                if (search) search.focus();
+            }
+        });
+    </script>
+    <!-- Mobile Sticky Bottom Navigation Dock (Visible on Mobile Only) -->
+    <nav class="md:hidden fixed bottom-0 inset-x-0 z-40 cinema-glass bg-obsidian-950/95 backdrop-blur-2xl border-t border-white/10 px-2 py-1.5 flex items-center justify-around shadow-2xl">
+        <a href="{{ url_for('index') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-300 hover:text-cyan-400 transition-colors">
+            <i class="fa-solid fa-satellite-dish text-base text-cyan-400"></i>
+            <span class="text-[10px] font-bold">Live TV</span>
+        </a>
+        <a href="{{ url_for('tv_player') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-300 hover:text-cyan-400 transition-colors">
+            <i class="fa-solid fa-tv text-base text-indigo-400"></i>
+            <span class="text-[10px] font-bold">TV Mode</span>
+        </a>
+        <a href="{{ url_for('public_packages') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-300 hover:text-cyan-400 transition-colors">
+            <i class="fa-solid fa-boxes-stacked text-base text-purple-400"></i>
+            <span class="text-[10px] font-bold">Packages</span>
+        </a>
+        <a href="{{ url_for('index', fav_only='1') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-300 hover:text-cyan-400 transition-colors">
+            <i class="fa-solid fa-star text-base text-amber-400"></i>
+            <span class="text-[10px] font-bold">Favorites</span>
+        </a>
+        <a href="{{ url_for('my_account') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-300 hover:text-cyan-400 transition-colors">
+            <i class="fa-solid fa-user-shield text-base text-emerald-400"></i>
+            <span class="text-[10px] font-bold">Key Vault</span>
+        </a>
+        {% if is_admin %}
+        <a href="{{ url_for('admin_dashboard') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-300 hover:text-cyan-400 transition-colors">
+            <i class="fa-solid fa-gear text-base text-purple-400"></i>
+            <span class="text-[10px] font-bold">Admin</span>
+        </a>
+        {% endif %}
+    </nav>
+
+    <!-- Progressive Web App (PWA) Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                    console.log('[Sabro Vision] Service Worker registered successfully:', reg.scope);
+                }).catch(function(err) {
+                    console.log('[Sabro Vision] Service Worker registration failed:', err);
+                });
+            });
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

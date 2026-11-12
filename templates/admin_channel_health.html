@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block title %}Stream Health Diagnostics & Tester - SABRO VISION v1.0{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Admin Nav Tabs -->
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-4 flex-wrap gap-4">
+        <div class="flex items-center gap-2 overflow-x-auto scrollbar-none text-xs font-bold">
+            <a href="{{ url_for('admin_dashboard') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-brand-400"></i>
+                <span>Overview</span>
+            </a>
+            <a href="{{ url_for('admin_customers') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-users text-cyan-300"></i>
+                <span>Customers & PPPoE</span>
+            </a>
+            <a href="{{ url_for('admin_channels') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-tv text-sky-400"></i>
+                <span>Channels</span>
+            </a>
+            <a href="{{ url_for('admin_channels_health') }}" class="px-3.5 py-2 rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/30 flex items-center gap-2">
+                <i class="fa-solid fa-heart-pulse text-rose-300"></i>
+                <span>Stream Health & Tester</span>
+            </a>
+            <a href="{{ url_for('admin_xtream') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-server text-emerald-400"></i>
+                <span>Xtream Codes API</span>
+            </a>
+            <a href="{{ url_for('admin_payments') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice-dollar text-amber-400"></i>
+                <span>Payment Queue</span>
+            </a>
+            <a href="{{ url_for('admin_packages') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-box-archive text-purple-400"></i>
+                <span>Packages</span>
+            </a>
+            <a href="{{ url_for('admin_keys') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-key text-amber-400"></i>
+                <span>Access Keys</span>
+            </a>
+            <a href="{{ url_for('admin_audit') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-shield text-rose-400"></i>
+                <span>Audit & Security</span>
+            </a>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <a href="{{ url_for('tv_player') }}" target="_blank" class="px-3.5 py-2 rounded-xl bg-cyan-600/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-600 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all">
+                <i class="fa-solid fa-tv"></i>
+                <span>Launch TV WebApp</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Health Statistics Overview Cards -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <!-- Total Ingested Channels -->
+        <div class="cinema-glass-card rounded-2xl p-4 border border-white/[0.08]">
+            <div class="flex items-center justify-between text-slate-400 text-xs font-bold mb-1">
+                <span>Total Catalog</span>
+                <i class="fa-solid fa-list-ol"></i>
+            </div>
+            <div class="text-2xl font-black text-white">{{ summary.total }}</div>
+            <p class="text-[11px] text-slate-400 mt-0.5">Ingested from GitHub</p>
+        </div>
+
+        <!-- Total Tested -->
+        <div class="cinema-glass-card rounded-2xl p-4 border border-cyan-500/30 bg-cyan-950/15">
+            <div class="flex items-center justify-between text-cyan-400 text-xs font-bold mb-1">
+                <span>Streams Tested</span>
+                <i class="fa-solid fa-vial-circle-check"></i>
+            </div>
+            <div class="text-2xl font-black text-cyan-300">{{ summary.tested }}</div>
+            <p class="text-[11px] text-slate-400 mt-0.5">Probed with VLC agent</p>
+        </div>
+
+        <!-- Online Streams -->
+        <div class="cinema-glass-card rounded-2xl p-4 border border-emerald-500/30 bg-emerald-950/15">
+            <div class="flex items-center justify-between text-emerald-400 text-xs font-bold mb-1">
+                <span>Verified Online</span>
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="text-2xl font-black text-white">{{ summary.online }}</div>
+            <p class="text-[11px] text-emerald-400 font-semibold mt-0.5">{{ summary.online_pct }}% health score</p>
+        </div>
+
+        <!-- Slow Streams -->
+        <div class="cinema-glass-card rounded-2xl p-4 border border-amber-500/30 bg-amber-950/15">
+            <div class="flex items-center justify-between text-amber-400 text-xs font-bold mb-1">
+                <span>Slow Latency</span>
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="text-2xl font-black text-amber-300">{{ summary.slow }}</div>
+            <p class="text-[11px] text-slate-400 mt-0.5">>2.5s response</p>
+        </div>
+
+        <!-- Offline Streams -->
+        <div class="cinema-glass-card rounded-2xl p-4 border border-rose-500/30 bg-rose-950/15">
+            <div class="flex items-center justify-between text-rose-400 text-xs font-bold mb-1">
+                <span>Offline / Dead</span>
+                <i class="fa-solid fa-circle-xmark"></i>
+            </div>
+            <div class="text-2xl font-black text-rose-300">{{ summary.offline }}</div>
+            <p class="text-[11px] text-slate-400 mt-0.5">Inactive broadcasters</p>
+        </div>
+
+        <!-- Average Latency -->
+        <div class="cinema-glass-card rounded-2xl p-4 border border-indigo-500/30 bg-indigo-950/15">
+            <div class="flex items-center justify-between text-indigo-400 text-xs font-bold mb-1">
+                <span>Average Latency</span>
+                <i class="fa-solid fa-gauge-high"></i>
+            </div>
+            <div class="text-2xl font-black text-white">{{ summary.avg_latency_ms }} ms</div>
+            <p class="text-[11px] text-slate-400 mt-0.5">Probe response speed</p>
+        </div>
+    </div>
+
+    <!-- Stream Quality Control & Actions -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Batch Stream Health Scanner -->
+        <div class="cinema-glass-card rounded-2xl p-6 border border-white/[0.08]">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-2">
+                <i class="fa-solid fa-bolt text-brand-400"></i>
+                <span>Run Batch Stream Diagnostics</span>
+            </h3>
+            <p class="text-xs text-slate-400 mb-4">
+                Execute concurrent health checks to verify which public feeds are actively streaming and update latency metrics in SQLite.
+            </p>
+
+            <form action="{{ url_for('admin_test_batch') }}" method="POST" class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div>
+                    <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Target Category</label>
+                    <select name="category" class="w-full bg-obsidian-900 text-white px-3 py-2.5 rounded-xl border border-white/[0.08]">
+                        <option value="all">All Ingested Channels</option>
+                        <option value="Sports">Sports Channels (476)</option>
+                        <option value="News">News Channels (1,132)</option>
+                        <option value="Entertainment">Entertainment (5,327)</option>
+                        <option value="Movies">Movies (771)</option>
+                        <option value="Islamic">Islamic (779)</option>
+                        <option value="Kids">Kids (595)</option>
+                        <option value="Music">Music (825)</option>
+                        <option value="Documentary">Documentary (344)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Test Batch Size</label>
+                    <select name="limit" class="w-full bg-obsidian-900 text-white px-3 py-2.5 rounded-xl border border-white/[0.08]">
+                        <option value="50">50 Channels (Fast ~5s)</option>
+                        <option value="100" selected>100 Channels (~12s)</option>
+                        <option value="250">250 Channels (~30s)</option>
+                        <option value="500">500 Channels (~60s)</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 text-white font-bold text-xs shadow-md shadow-brand-500/25 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play text-[10px]"></i>
+                        <span>Start Test Batch</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 1-Click Stream Quality Filter -->
+        <div class="cinema-glass-card rounded-2xl p-6 border border-white/[0.08] flex flex-col justify-between">
+            <div>
+                <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-2">
+                    <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+                    <span>Subscriber Quality Protection</span>
+                </h3>
+                <p class="text-xs text-slate-400 mb-4">
+                    Prevent customer complaints by deactivating all verified offline feeds from public view. Only 100% working, bufferless streams will appear in the player.
+                </p>
+            </div>
+
+            <div class="flex items-center gap-3 flex-wrap">
+                <form action="{{ url_for('admin_toggle_offline') }}" method="POST" onsubmit="return confirm('Deactivate all offline channels so subscribers only see online streams?')">
+                    <input type="hidden" name="action" value="disable">
+                    <button type="submit" class="px-4 py-2.5 rounded-xl bg-rose-600/20 text-rose-300 border border-rose-500/30 hover:bg-rose-600 hover:text-white font-bold text-xs flex items-center gap-2 transition-all">
+                        <i class="fa-solid fa-eye-slash"></i>
+                        <span>Deactivate All Offline Channels</span>
+                    </button>
+                </form>
+
+                <form action="{{ url_for('admin_toggle_offline') }}" method="POST" onsubmit="return confirm('Re-enable all channels?')">
+                    <input type="hidden" name="action" value="enable">
+                    <button type="submit" class="px-4 py-2.5 rounded-xl bg-obsidian-900 text-slate-300 border border-white/[0.08] hover:bg-slate-800 font-bold text-xs flex items-center gap-2 transition-all">
+                        <i class="fa-solid fa-eye"></i>
+                        <span>Restore All Feeds</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Recently Tested Channels Table -->
+    <div class="cinema-glass-card rounded-2xl border border-white/[0.08] overflow-hidden">
+        <div class="p-4 border-b border-white/[0.08] flex items-center justify-between">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                <i class="fa-solid fa-tower-broadcast text-brand-400"></i>
+                <span>Sample Channel Diagnostic Ledger</span>
+            </h3>
+            <span class="text-[11px] text-slate-400 font-semibold">Click "Test Stream" for Instant Live Check</span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-obsidian-900/80 text-slate-400 border-b border-white/[0.08] text-[10px] font-bold uppercase">
+                    <tr>
+                        <th class="py-3 px-4">#ID</th>
+                        <th class="py-3 px-4">Channel Name</th>
+                        <th class="py-3 px-4">Category</th>
+                        <th class="py-3 px-4">Health Status</th>
+                        <th class="py-3 px-4">Latency</th>
+                        <th class="py-3 px-4">Last Checked</th>
+                        <th class="py-3 px-4 text-right">Quick Diagnostic</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/[0.06] text-slate-200">
+                    {% for ch in channels %}
+                    <tr class="hover:bg-white/[0.02] transition-colors" id="chRow-{{ ch.id }}">
+                        <td class="py-3 px-4 font-mono font-bold text-slate-400">#{{ ch.id }}</td>
+                        <td class="py-3 px-4 font-bold text-white">
+                            {{ ch.name }}
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-cyan-300">
+                                {{ ch.category }}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4" id="statusCell-{{ ch.id }}">
+                            {% if ch.health_status == 'online' %}
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5 w-max">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse"></span>
+                                Online
+                            </span>
+                            {% elif ch.health_status == 'slow' %}
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 w-max">
+                                Slow Latency
+                            </span>
+                            {% elif ch.health_status == 'offline' %}
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 w-max">
+                                Offline
+                            </span>
+                            {% else %}
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 w-max">
+                                Unchecked
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4 font-mono font-bold text-slate-300" id="latencyCell-{{ ch.id }}">
+                            {% if ch.response_time_ms > 0 %}{{ ch.response_time_ms }} ms{% else %}--{% endif %}
+                        </td>
+                        <td class="py-3 px-4 text-slate-400 text-[11px]" id="timeCell-{{ ch.id }}">
+                            {{ ch.last_checked_at[:19]|replace('T', ' ') if ch.last_checked_at else 'Pending' }}
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            <button type="button" onclick="testChannelLive({{ ch.id }})" id="testBtn-{{ ch.id }}" class="px-3 py-1.5 rounded-xl bg-obsidian-900 hover:bg-slate-800 text-cyan-300 border border-cyan-500/30 font-bold text-[11px] inline-flex items-center gap-1.5 transition-all">
+                                <i class="fa-solid fa-stethoscope text-[10px]"></i>
+                                <span>Test Stream</span>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    async function testChannelLive(channelId) {
+        const btn = document.getElementById('testBtn-' + channelId);
+        const origText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-[10px]"></i> Probing...';
+        btn.disabled = true;
+
+        try {
+            const resp = await fetch('/api/test-channel/' + channelId);
+            const data = await resp.json();
+
+            const statusCell = document.getElementById('statusCell-' + channelId);
+            const latencyCell = document.getElementById('latencyCell-' + channelId);
+            const timeCell = document.getElementById('timeCell-' + channelId);
+
+            if (data.status === 'online') {
+                statusCell.innerHTML = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5 w-max"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse"></span>Online</span>';
+            } else if (data.status === 'slow') {
+                statusCell.innerHTML = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 w-max">Slow Latency</span>';
+            } else {
+                statusCell.innerHTML = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 w-max">Offline</span>';
+            }
+
+            latencyCell.textContent = data.latency_ms + ' ms';
+            timeCell.textContent = 'Just now';
+            btn.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i> Done';
+            setTimeout(() => { btn.innerHTML = origText; btn.disabled = false; }, 2000);
+        } catch (e) {
+            btn.innerHTML = '<i class="fa-solid fa-xmark text-rose-400"></i> Failed';
+            setTimeout(() => { btn.innerHTML = origText; btn.disabled = false; }, 2000);
+        }
+    }
+</script>
+{% endblock %}

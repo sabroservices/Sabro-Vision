@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Audit Logs & Live Connection Events - SABRO VISION v1.0{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Admin Nav Tabs -->
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-4 flex-wrap gap-4">
+        <div class="flex items-center gap-2 overflow-x-auto scrollbar-none text-xs font-bold">
+            <a href="{{ url_for('admin_dashboard') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-brand-400"></i>
+                <span>Overview</span>
+            </a>
+            <a href="{{ url_for('admin_customers') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-users text-cyan-300"></i>
+                <span>Customers & PPPoE</span>
+            </a>
+            <a href="{{ url_for('admin_xtream') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-server text-emerald-400"></i>
+                <span>Xtream Codes API</span>
+            </a>
+            <a href="{{ url_for('admin_resellers') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-handshake text-cyan-300"></i>
+                <span>Resellers & B2B</span>
+            </a>
+            <a href="{{ url_for('admin_payments') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice-dollar text-amber-400"></i>
+                <span>Payment Queue</span>
+            </a>
+            <a href="{{ url_for('admin_packages') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-box-archive text-purple-400"></i>
+                <span>Packages</span>
+            </a>
+            <a href="{{ url_for('admin_keys') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-key text-amber-400"></i>
+                <span>Access Keys</span>
+            </a>
+            <a href="{{ url_for('admin_channels') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-tv text-sky-400"></i>
+                <span>Channels</span>
+            </a>
+            <a href="{{ url_for('admin_audit') }}" class="px-3.5 py-2 rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/30 flex items-center gap-2">
+                <i class="fa-solid fa-shield text-rose-300"></i>
+                <span>Audit & Security</span>
+            </a>
+            <a href="{{ url_for('admin_settings') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-gear text-slate-400"></i>
+                <span>Settings</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Two Column Grid: Audit Logs vs Connection Events -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Column 1: Admin Audit Log -->
+        <div class="cinema-glass-card rounded-2xl border border-white/[0.08] overflow-hidden flex flex-col">
+            <div class="p-4 border-b border-white/[0.08] flex items-center justify-between">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                    <i class="fa-solid fa-user-shield text-cyan-400"></i>
+                    <span>Admin Audit Trail</span>
+                </h3>
+                <span class="text-[10px] text-slate-400 font-semibold">RBAC Actions</span>
+            </div>
+
+            <div class="overflow-y-auto max-h-[500px]">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-obsidian-900/80 text-slate-400 border-b border-white/[0.08] text-[10px] font-bold uppercase">
+                        <tr>
+                            <th class="py-2.5 px-3">Admin</th>
+                            <th class="py-2.5 px-3">Action</th>
+                            <th class="py-2.5 px-3">Details</th>
+                            <th class="py-2.5 px-3 text-right">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/[0.06] text-slate-300 text-[11px]">
+                        {% for a in audit_logs %}
+                        <tr class="hover:bg-white/[0.02]">
+                            <td class="py-2.5 px-3 font-bold text-white">{{ a.admin_user }}</td>
+                            <td class="py-2.5 px-3">
+                                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-cyan-950 text-cyan-300 border border-cyan-800/40 font-mono">
+                                    {{ a.action }}
+                                </span>
+                            </td>
+                            <td class="py-2.5 px-3 text-slate-400 truncate max-w-xs">{{ a.details }}</td>
+                            <td class="py-2.5 px-3 text-right text-slate-500 font-mono text-[10px]">{{ a.created_at[:16].replace('T', ' ') }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-6 text-slate-500">No audit logs recorded yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Column 2: Live Connection Events (TiviMate, Smarters, Web) -->
+        <div class="cinema-glass-card rounded-2xl border border-white/[0.08] overflow-hidden flex flex-col">
+            <div class="p-4 border-b border-white/[0.08] flex items-center justify-between">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                    <i class="fa-solid fa-satellite-dish text-emerald-400"></i>
+                    <span>Live App & Device Connection Events</span>
+                </h3>
+                <span class="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse"></span>
+                    Live Streaming
+                </span>
+            </div>
+
+            <div class="overflow-y-auto max-h-[500px]">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-obsidian-900/80 text-slate-400 border-b border-white/[0.08] text-[10px] font-bold uppercase">
+                        <tr>
+                            <th class="py-2.5 px-3">Subscriber</th>
+                            <th class="py-2.5 px-3">App / User Agent</th>
+                            <th class="py-2.5 px-3">IP Address</th>
+                            <th class="py-2.5 px-3 text-right">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/[0.06] text-slate-300 text-[11px]">
+                        {% for c in conn_events %}
+                        <tr class="hover:bg-white/[0.02]">
+                            <td class="py-2.5 px-3 font-mono font-bold text-cyan-300">{{ c.username }}</td>
+                            <td class="py-2.5 px-3 text-slate-300 truncate max-w-[160px]" title="{{ c.user_agent }}">
+                                {{ c.user_agent or 'IPTV Player' }}
+                            </td>
+                            <td class="py-2.5 px-3 text-slate-400 font-mono text-[10px]">{{ c.client_ip or '—' }}</td>
+                            <td class="py-2.5 px-3 text-right text-slate-500 font-mono text-[10px]">{{ c.created_at[:16].replace('T', ' ') }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-6 text-slate-500">No device connections logged yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

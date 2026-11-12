@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Management & PPPoE Hook - SABRO VISION v1.0{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Admin Nav Tabs -->
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-4 flex-wrap gap-4">
+        <div class="flex items-center gap-2 overflow-x-auto scrollbar-none text-xs font-bold">
+            <a href="{{ url_for('admin_dashboard') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-brand-400"></i>
+                <span>Overview</span>
+            </a>
+            <a href="{{ url_for('admin_customers') }}" class="px-3.5 py-2 rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/30 flex items-center gap-2">
+                <i class="fa-solid fa-users text-cyan-300"></i>
+                <span>Customers & PPPoE</span>
+            </a>
+            <a href="{{ url_for('admin_xtream') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-server text-emerald-400"></i>
+                <span>Xtream Codes API</span>
+            </a>
+            <a href="{{ url_for('admin_resellers') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-handshake text-cyan-300"></i>
+                <span>Resellers & B2B</span>
+            </a>
+            <a href="{{ url_for('admin_payments') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice-dollar text-amber-400"></i>
+                <span>Payment Queue</span>
+            </a>
+            <a href="{{ url_for('admin_packages') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-box-archive text-purple-400"></i>
+                <span>Packages</span>
+            </a>
+            <a href="{{ url_for('admin_keys') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-key text-amber-400"></i>
+                <span>Access Keys</span>
+            </a>
+            <a href="{{ url_for('admin_channels') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-tv text-sky-400"></i>
+                <span>Channels</span>
+            </a>
+            <a href="{{ url_for('admin_audit') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-shield text-rose-400"></i>
+                <span>Audit & Security</span>
+            </a>
+            <a href="{{ url_for('admin_settings') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-gear text-slate-400"></i>
+                <span>Settings</span>
+            </a>
+        </div>
+
+        <button type="button" onclick="document.getElementById('addCustomerModal').classList.remove('hidden')" class="px-4 py-2 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-brand-500/25">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Add Subscriber / PPPoE</span>
+        </button>
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <div class="cinema-glass-card rounded-2xl p-4 border border-white/[0.08] flex flex-col md:flex-row items-center justify-between gap-4">
+        <form action="{{ url_for('admin_customers') }}" method="GET" class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <div class="relative flex-1 md:w-64">
+                <input type="text" name="q" value="{{ search }}" placeholder="Search username, phone, PPPoE, FAT..."
+                       class="w-full bg-obsidian-900 text-xs text-white pl-9 pr-3 py-2 rounded-xl border border-white/[0.08] focus:outline-none focus:border-brand-400">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
+            </div>
+
+            <select name="status" onchange="this.form.submit()" class="bg-obsidian-900 text-xs text-white px-3 py-2 rounded-xl border border-white/[0.08]">
+                <option value="all" {% if status == 'all' %}selected{% endif %}>All Statuses</option>
+                <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+                <option value="expired" {% if status == 'expired' %}selected{% endif %}>Expired</option>
+                <option value="suspended" {% if status == 'suspended' %}selected{% endif %}>Suspended</option>
+            </select>
+
+            <select name="zone" onchange="this.form.submit()" class="bg-obsidian-900 text-xs text-white px-3 py-2 rounded-xl border border-white/[0.08]">
+                <option value="all" {% if zone == 'all' %}selected{% endif %}>All Zones / Sectors</option>
+                <option value="Kalakot Sector 1" {% if zone == 'Kalakot Sector 1' %}selected{% endif %}>Kalakot Sector 1</option>
+                <option value="Kalakot Sector 2" {% if zone == 'Kalakot Sector 2' %}selected{% endif %}>Kalakot Sector 2</option>
+                <option value="Lyari Central" {% if zone == 'Lyari Central' %}selected{% endif %}>Lyari Central</option>
+                <option value="Chakiwara" {% if zone == 'Chakiwara' %}selected{% endif %}>Chakiwara</option>
+            </select>
+
+            <button type="submit" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] text-xs font-bold">
+                Filter
+            </button>
+        </form>
+
+        <div class="text-xs text-slate-400 font-semibold shrink-0">
+            Total Subscribers: <strong class="text-white font-mono">{{ total_count }}</strong>
+        </div>
+    </div>
+
+    <!-- Subscribers Table -->
+    <div class="cinema-glass-card rounded-2xl border border-white/[0.08] overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-obsidian-900/80 text-slate-400 border-b border-white/[0.08] font-bold uppercase tracking-wider text-[10px]">
+                    <tr>
+                        <th class="py-3 px-4">Subscriber</th>
+                        <th class="py-3 px-4">Connect PPPoE Hook</th>
+                        <th class="py-3 px-4">FAT / Zone</th>
+                        <th class="py-3 px-4">Package & Expiry</th>
+                        <th class="py-3 px-4">Status</th>
+                        <th class="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/[0.06] text-slate-200">
+                    {% for sub in subscribers %}
+                    <tr class="hover:bg-white/[0.02] transition-colors">
+                        <td class="py-3.5 px-4">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shadow-sm">
+                                    {{ sub.username[:2]|upper }}
+                                </div>
+                                <div>
+                                    <div class="font-bold text-white flex items-center gap-1.5">
+                                        <span>{{ sub.username }}</span>
+                                        {% if sub.plain_password %}
+                                        <button type="button" onclick="navigator.clipboard.writeText('Username: {{ sub.username }}\nPassword: {{ sub.plain_password }}\nServer: {{ request.host_url.rstrip('/') }}'); alert('Xtream details copied for {{ sub.username }}!');" class="text-slate-500 hover:text-cyan-400" title="Copy Xtream Credentials">
+                                            <i class="fa-regular fa-copy text-[10px]"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-[11px] text-slate-400">{{ sub.full_name or '—' }} {% if sub.phone %}• {{ sub.phone }}{% endif %}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3.5 px-4 font-mono text-[11px]">
+                            {% if sub.pppoe_username %}
+                            <span class="px-2 py-0.5 rounded-md bg-cyan-950/40 text-cyan-300 border border-cyan-800/40">
+                                {{ sub.pppoe_username }}
+                            </span>
+                            {% else %}
+                            <span class="text-slate-500">Unlinked</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3.5 px-4 text-[11px]">
+                            <div class="text-slate-300 font-semibold">{{ sub.zone or 'General' }}</div>
+                            <div class="text-[10px] text-slate-400 font-mono">{{ sub.fat_id or 'No FAT assigned' }}</div>
+                        </td>
+                        <td class="py-3.5 px-4 text-[11px]">
+                            <div class="font-semibold text-slate-200">{{ sub.package_name or 'Basic Pass' }}</div>
+                            <div class="text-[10px] text-slate-400">
+                                {% if sub.sub_expiry %}
+                                Expires: <strong class="text-slate-300 font-mono">{{ sub.sub_expiry[:10] }}</strong>
+                                {% else %}
+                                Active Key Linked
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            {% if sub.status == 'active' %}
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 w-max">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse"></span>
+                                Active
+                            </span>
+                            {% elif sub.status == 'suspended' %}
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 w-max">
+                                Suspended
+                            </span>
+                            {% else %}
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 w-max">
+                                Expired
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3.5 px-4 text-right">
+                            <div class="flex items-center justify-end gap-1.5">
+                                <!-- 1-Click Renew (+30d) -->
+                                <form action="{{ url_for('admin_renew_customer', sub_id=sub.id) }}" method="POST" class="inline">
+                                    <input type="hidden" name="days" value="30">
+                                    <button type="submit" class="p-1.5 rounded-lg bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-800/40" title="Renew +30 Days">
+                                        <i class="fa-solid fa-arrows-rotate text-xs"></i>
+                                    </button>
+                                </form>
+
+                                <!-- Delete -->
+                                <form action="{{ url_for('admin_delete_customer', sub_id=sub.id) }}" method="POST" class="inline" onsubmit="return confirm('Delete subscriber {{ sub.username }}?')">
+                                    <button type="submit" class="p-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/40" title="Delete">
+                                        <i class="fa-solid fa-trash text-xs"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-8 text-slate-500">
+                            No subscribers found matching your criteria.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal: Add New Subscriber / PPPoE Customer -->
+<div id="addCustomerModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm hidden">
+    <div class="cinema-glass-card rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-cyan-500/30 shadow-2xl relative">
+        <div class="flex items-center justify-between mb-5 pb-3 border-b border-white/[0.08]">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-user-plus text-cyan-400"></i>
+                <span>Add Customer & Connect PPPoE Hook</span>
+            </h3>
+            <button type="button" onclick="document.getElementById('addCustomerModal').classList.add('hidden')" class="text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <form action="{{ url_for('admin_add_customer') }}" method="POST" class="space-y-3.5 text-xs">
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Username *</label>
+                    <input type="text" name="username" required placeholder="e.g. tariq_fiber" class="w-full bg-obsidian-900 text-white px-3 py-2.5 rounded-xl border border-white/[0.08] focus:border-brand-400 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Password *</label>
+                    <input type="text" name="password" required placeholder="Min 6 characters" class="w-full bg-obsidian-900 text-white px-3 py-2.5 rounded-xl border border-white/[0.08] focus:border-brand-400 focus:outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Full Name</label>
+                    <input type="text" name="full_name" placeholder="Tariq Baloch" class="w-full bg-obsidian-900 text-white px-3 py-2.5 rounded-xl border border-white/[0.08] focus:border-brand-400 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Phone / WhatsApp</label>
+                    <input type="text" name="phone" placeholder="0300-1234567" class="w-full bg-obsidian-900 text-white px-3 py-2.5 rounded-xl border border-white/[0.08] focus:border-brand-400 focus:outline-none">
+                </div>
+            </div>
+
+            <div class="p-3 rounded-2xl bg-cyan-950/20 border border-cyan-500/20 space-y-2.5">
+                <div class="text-[11px] font-bold text-cyan-300 flex items-center gap-1.5">
+                    <i class="fa-solid fa-network-wired"></i>
+                    <span>Connect Communications Correlation</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">PPPoE Username</label>
+                        <input type="text" name="pppoe_username" placeholder="sabro_kkt_089" class="w-full bg-obsidian-900 text-white px-3 py-2 rounded-xl border border-white/[0.08] font-mono text-[11px]">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">FAT ID / Box</label>
+                        <input type="text" name="fat_id" placeholder="FAT-KKT-04-P02" class="w-full bg-obsidian-900 text-white px-3 py-2 rounded-xl border border-white/[0.08] font-mono text-[11px]">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Sector / Zone</label>
+                    <select name="zone" class="w-full bg-obsidian-900 text-white px-3 py-2 rounded-xl border border-white/[0.08]">
+                        <option value="Kalakot Sector 1">Kalakot Sector 1</option>
+                        <option value="Kalakot Sector 2">Kalakot Sector 2</option>
+                        <option value="Lyari Central">Lyari Central</option>
+                        <option value="Chakiwara">Chakiwara</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Initial Subscription Package</label>
+                <select name="package_id" class="w-full bg-obsidian-900 text-white px-3 py-2.5 rounded-xl border border-white/[0.08]">
+                    {% for pkg in packages %}
+                    <option value="{{ pkg.id }}">{{ pkg.name }} ({{ pkg.price_pkr }} PKR - {{ pkg.duration_days }} days)</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="pt-2">
+                <button type="submit" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 text-white font-bold text-xs shadow-lg shadow-brand-500/25">
+                    Save Customer & Issue Xtream Credentials
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

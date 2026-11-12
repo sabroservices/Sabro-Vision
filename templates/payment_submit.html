@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Payment Receipt - SABRO VISION v1.0{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto py-8 space-y-6">
+
+    <div class="text-center mb-6">
+        <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-emerald-500 to-cyan-600 flex items-center justify-center text-white text-2xl mx-auto mb-3 shadow-xl shadow-emerald-500/25 border border-white/20">
+            <i class="fa-solid fa-receipt text-white"></i>
+        </div>
+        <h1 class="text-2xl font-black text-white tracking-tight">Submit Payment Receipt</h1>
+        <p class="text-xs text-slate-300 mt-1 max-w-md mx-auto">
+            Transferred your package payment via JazzCash, EasyPaisa, or Bank? Enter your transaction details below for instant admin verification and automatic pass activation.
+        </p>
+    </div>
+
+    <!-- Official Payment Accounts Card -->
+    <div class="cinema-glass-card rounded-3xl p-5 border border-emerald-500/30 bg-emerald-950/20">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-300 mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-building-columns"></i>
+            <span>Official Sabro Networks Payment Accounts</span>
+        </h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div class="p-3 rounded-2xl bg-obsidian-950/90 border border-white/[0.08]">
+                <span class="block text-[10px] uppercase font-bold text-slate-400">JazzCash</span>
+                <span class="font-mono font-bold text-amber-300 text-sm select-all">{{ settings.jazzcash_number }}</span>
+                <span class="block text-[10px] text-slate-400 mt-0.5">Title: {{ settings.jazzcash_title }}</span>
+            </div>
+
+            <div class="p-3 rounded-2xl bg-obsidian-950/90 border border-white/[0.08]">
+                <span class="block text-[10px] uppercase font-bold text-slate-400">EasyPaisa</span>
+                <span class="font-mono font-bold text-emerald-300 text-sm select-all">{{ settings.easypaisa_number }}</span>
+                <span class="block text-[10px] text-slate-400 mt-0.5">Title: {{ settings.easypaisa_title }}</span>
+            </div>
+
+            <div class="p-3 rounded-2xl bg-obsidian-950/90 border border-white/[0.08]">
+                <span class="block text-[10px] uppercase font-bold text-slate-400">{{ settings.bank_name }}</span>
+                <span class="font-mono font-bold text-cyan-300 text-sm select-all">{{ settings.bank_account_number }}</span>
+                <span class="block text-[10px] text-slate-400 mt-0.5">Title: {{ settings.bank_account_title }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submission Form -->
+    <div class="cinema-glass-card rounded-3xl p-6 sm:p-8 border border-white/[0.08] shadow-2xl">
+        <form action="{{ url_for('submit_payment') }}" method="POST" class="space-y-4 text-xs">
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                    Select Subscription Package *
+                </label>
+                <select name="package_id" id="packageSelect" onchange="updateAmount(this)" class="w-full bg-obsidian-900 text-white px-3.5 py-3 rounded-xl border border-white/[0.08] focus:border-brand-400 focus:outline-none font-semibold">
+                    {% for pkg in packages %}
+                    <option value="{{ pkg.id }}" data-price="{{ pkg.price_pkr }}" {% if request.args.get('pkg') == pkg.id|string or (not request.args.get('pkg') and pkg.code == 'all_in_one') %}selected{% endif %}>
+                        {{ pkg.name }} ({{ pkg.price_pkr }} PKR / {{ pkg.duration_days }} Days - {{ pkg.max_connections }} Screen{% if pkg.max_connections > 1 %}s{% endif %})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                        Amount Paid (PKR) *
+                    </label>
+                    <input type="number" name="amount_pkr" id="amountInput" required value="250" class="w-full bg-obsidian-900 text-white px-3.5 py-3 rounded-xl border border-white/[0.08] focus:border-brand-400 focus:outline-none font-bold font-mono">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                        Payment Method *
+                    </label>
+                    <select name="payment_method" class="w-full bg-obsidian-900 text-white px-3.5 py-3 rounded-xl border border-white/[0.08] focus:border-brand-400 focus:outline-none font-semibold">
+                        <option value="JazzCash">JazzCash</option>
+                        <option value="EasyPaisa">EasyPaisa</option>
+                        <option value="Meezan Bank">Meezan Bank Transfer</option>
+                        <option value="Cash Collection">Cash Collection / Agent</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                    Transaction ID / Reference Code (TID) *
+                </label>
+                <input type="text" name="transaction_ref" required placeholder="e.g. 0293847501 or Bank Ref Number" class="w-full bg-obsidian-900 text-white px-3.5 py-3 rounded-xl border border-white/[0.08] focus:border-brand-400 focus:outline-none font-mono text-sm tracking-wider">
+                <p class="text-[10px] text-slate-400 mt-1">Copy the 10-12 digit Transaction ID from your payment confirmation SMS or app.</p>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                    Sender Mobile Number
+                </label>
+                <input type="text" name="sender_number" placeholder="e.g. 0300-1234567" class="w-full bg-obsidian-900 text-white px-3.5 py-3 rounded-xl border border-white/[0.08] focus:border-brand-400 focus:outline-none">
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                    Additional Notes (Optional)
+                </label>
+                <textarea name="notes" rows="2" placeholder="e.g. Kalakot sector broadband account" class="w-full bg-obsidian-900 text-white px-3.5 py-2.5 rounded-xl border border-white/[0.08] focus:border-brand-400 focus:outline-none"></textarea>
+            </div>
+
+            <div class="pt-2">
+                <button type="submit" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-500 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-emerald-500/25 flex items-center justify-center gap-2 transform active:scale-[0.99] transition-all">
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                    <span>Submit Payment Proof for Verification</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    function updateAmount(sel) {
+        if (!sel || sel.selectedIndex < 0) return;
+        const price = sel.options[sel.selectedIndex].getAttribute('data-price');
+        if (price !== null && price !== undefined) {
+            document.getElementById('amountInput').value = price;
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const sel = document.getElementById('packageSelect');
+        if (sel) updateAmount(sel);
+    });
+</script>
+{% endblock %}

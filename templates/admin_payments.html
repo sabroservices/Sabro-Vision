@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Payment Verification Queue - SABRO VISION v1.0{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Admin Nav Tabs -->
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-4 flex-wrap gap-4">
+        <div class="flex items-center gap-2 overflow-x-auto scrollbar-none text-xs font-bold">
+            <a href="{{ url_for('admin_dashboard') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-brand-400"></i>
+                <span>Overview</span>
+            </a>
+            <a href="{{ url_for('admin_customers') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-users text-cyan-300"></i>
+                <span>Customers & PPPoE</span>
+            </a>
+            <a href="{{ url_for('admin_xtream') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-server text-emerald-400"></i>
+                <span>Xtream Codes API</span>
+            </a>
+            <a href="{{ url_for('admin_resellers') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-handshake text-cyan-300"></i>
+                <span>Resellers & B2B</span>
+            </a>
+            <a href="{{ url_for('admin_payments') }}" class="px-3.5 py-2 rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/30 flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice-dollar text-amber-300"></i>
+                <span>Payment Queue</span>
+            </a>
+            <a href="{{ url_for('admin_packages') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-box-archive text-purple-400"></i>
+                <span>Packages</span>
+            </a>
+            <a href="{{ url_for('admin_keys') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-key text-amber-400"></i>
+                <span>Access Keys</span>
+            </a>
+            <a href="{{ url_for('admin_channels') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-tv text-sky-400"></i>
+                <span>Channels</span>
+            </a>
+            <a href="{{ url_for('admin_audit') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-shield text-rose-400"></i>
+                <span>Audit & Security</span>
+            </a>
+            <a href="{{ url_for('admin_settings') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-gear text-slate-400"></i>
+                <span>Settings</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Status Filter Buttons -->
+    <div class="flex items-center gap-2 text-xs">
+        <a href="{{ url_for('admin_payments', status='all') }}" class="px-3 py-1.5 rounded-xl border {% if current_status == 'all' %}bg-brand-600 text-white border-brand-500{% else %}bg-obsidian-900 text-slate-400 border-white/[0.08]{% endif %} font-bold">
+            All Payments
+        </a>
+        <a href="{{ url_for('admin_payments', status='pending') }}" class="px-3 py-1.5 rounded-xl border {% if current_status == 'pending' %}bg-amber-600 text-white border-amber-500{% else %}bg-obsidian-900 text-slate-400 border-white/[0.08]{% endif %} font-bold flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-amber-400 live-pulse"></span>
+            Pending Approval
+        </a>
+        <a href="{{ url_for('admin_payments', status='approved') }}" class="px-3 py-1.5 rounded-xl border {% if current_status == 'approved' %}bg-emerald-600 text-white border-emerald-500{% else %}bg-obsidian-900 text-slate-400 border-white/[0.08]{% endif %} font-bold">
+            Approved
+        </a>
+        <a href="{{ url_for('admin_payments', status='rejected') }}" class="px-3 py-1.5 rounded-xl border {% if current_status == 'rejected' %}bg-rose-600 text-white border-rose-500{% else %}bg-obsidian-900 text-slate-400 border-white/[0.08]{% endif %} font-bold">
+            Rejected
+        </a>
+    </div>
+
+    <!-- Payment Receipts Table -->
+    <div class="cinema-glass-card rounded-2xl border border-white/[0.08] overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-obsidian-900/80 text-slate-400 border-b border-white/[0.08] font-bold uppercase tracking-wider text-[10px]">
+                    <tr>
+                        <th class="py-3 px-4">Receipt #</th>
+                        <th class="py-3 px-4">Subscriber</th>
+                        <th class="py-3 px-4">Package</th>
+                        <th class="py-3 px-4">Method & Trans Ref</th>
+                        <th class="py-3 px-4">Amount</th>
+                        <th class="py-3 px-4">Status</th>
+                        <th class="py-3 px-4 text-right">Review Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/[0.06] text-slate-200">
+                    {% for r in receipts %}
+                    <tr class="hover:bg-white/[0.02] transition-colors">
+                        <td class="py-3.5 px-4 font-mono font-bold text-slate-400">#{{ r.id }}</td>
+                        <td class="py-3.5 px-4">
+                            <div class="font-bold text-white">{{ r.username or 'Guest' }}</div>
+                            <div class="text-[11px] text-slate-400">{{ r.sub_phone or r.sender_number or 'No Phone' }}</div>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <span class="font-semibold text-cyan-300">{{ r.package_name or 'VIP Monthly Pass' }}</span>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <div class="font-bold text-slate-300">{{ r.payment_method }}</div>
+                            <div class="font-mono text-[11px] text-brand-400 font-bold select-all">{{ r.transaction_ref or '—' }}</div>
+                        </td>
+                        <td class="py-3.5 px-4 font-black text-emerald-400">
+                            {{ r.amount_pkr }} PKR
+                        </td>
+                        <td class="py-3.5 px-4">
+                            {% if r.status == 'pending' %}
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 w-max">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 live-pulse"></span>
+                                Pending Review
+                            </span>
+                            {% elif r.status == 'approved' %}
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 w-max">
+                                Approved
+                            </span>
+                            {% else %}
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 w-max">
+                                Rejected
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3.5 px-4 text-right">
+                            {% if r.status == 'pending' %}
+                            <div class="flex items-center justify-end gap-2">
+                                <form action="{{ url_for('admin_approve_payment', receipt_id=r.id) }}" method="POST" class="inline">
+                                    <button type="submit" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] shadow-sm flex items-center gap-1">
+                                        <i class="fa-solid fa-check"></i>
+                                        <span>Approve & Activate</span>
+                                    </button>
+                                </form>
+                                <form action="{{ url_for('admin_reject_payment', receipt_id=r.id) }}" method="POST" class="inline" onsubmit="return confirm('Reject receipt #{{ r.id }}?')">
+                                    <button type="submit" class="px-2.5 py-1.5 rounded-xl bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-800/40 text-[11px] font-semibold">
+                                        Reject
+                                    </button>
+                                </form>
+                            </div>
+                            {% else %}
+                            <div class="text-[11px] text-slate-400">
+                                Reviewed by <strong class="text-slate-300">{{ r.reviewer_admin or 'Admin' }}</strong>
+                            </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-8 text-slate-500">
+                            No payment receipts found in this queue.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

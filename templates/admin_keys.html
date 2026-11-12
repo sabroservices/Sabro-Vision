@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+
+{% block title %}Access Keys & Vouchers - Sabro Vision Admin{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Admin Nav Tabs -->
+    <div class="flex items-center justify-between border-b border-slate-800 pb-4 flex-wrap gap-4">
+        <div class="flex items-center gap-2 overflow-x-auto scrollbar-none">
+            <a href="{{ url_for('admin_dashboard') }}" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Overview</span>
+            </a>
+            <a href="{{ url_for('admin_resellers') }}" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-handshake text-cyan-300"></i>
+                <span>Resellers & B2B</span>
+            </a>
+            <a href="{{ url_for('admin_keys') }}" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-md shadow-indigo-600/30 flex items-center gap-2">
+                <i class="fa-solid fa-key text-amber-400"></i>
+                <span>Access Keys</span>
+            </a>
+            <a href="{{ url_for('admin_channels') }}" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-tv text-sky-400"></i>
+                <span>Channels</span>
+            </a>
+            <a href="{{ url_for('admin_playlists') }}" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-list-ul text-emerald-400"></i>
+                <span>Playlists & M3U</span>
+            </a>
+            <a href="{{ url_for('admin_settings') }}" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-gear text-slate-400"></i>
+                <span>Settings</span>
+            </a>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <a href="{{ url_for('admin_export_keys') }}" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5">
+                <i class="fa-solid fa-file-csv text-emerald-400"></i>
+                <span>Export CSV</span>
+            </a>
+            <button type="button" onclick="document.getElementById('singleKeyModal').classList.remove('hidden')" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-600/30">
+                <i class="fa-solid fa-plus"></i>
+                <span>Create Key</span>
+            </button>
+            <button type="button" onclick="document.getElementById('bulkModal').classList.remove('hidden')" class="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-indigo-600/30">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>Bulk Generate</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div class="glass-panel rounded-2xl p-4 border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto scrollbar-none">
+            <span class="text-xs text-slate-400 font-semibold uppercase mr-1">Status:</span>
+            <a href="{{ url_for('admin_keys', type=filter_type, status='all', q=search) }}" 
+               class="px-3 py-1 rounded-lg text-xs font-medium {% if filter_status == 'all' %}bg-sabro-600 text-white{% else %}bg-slate-900 text-slate-400 hover:bg-slate-800{% endif %}">
+                All ({{ stats.total }})
+            </a>
+            <a href="{{ url_for('admin_keys', type=filter_type, status='active', q=search) }}" 
+               class="px-3 py-1 rounded-lg text-xs font-medium {% if filter_status == 'active' %}bg-emerald-600 text-white{% else %}bg-slate-900 text-slate-400 hover:bg-slate-800{% endif %}">
+                Active ({{ stats.active }})
+            </a>
+            <a href="{{ url_for('admin_keys', type=filter_type, status='unused', q=search) }}" 
+               class="px-3 py-1 rounded-lg text-xs font-medium {% if filter_status == 'unused' %}bg-indigo-600 text-white{% else %}bg-slate-900 text-slate-400 hover:bg-slate-800{% endif %}">
+                Unused ({{ stats.unused }})
+            </a>
+            <a href="{{ url_for('admin_keys', type=filter_type, status='expired', q=search) }}" 
+               class="px-3 py-1 rounded-lg text-xs font-medium {% if filter_status == 'expired' %}bg-rose-600 text-white{% else %}bg-slate-900 text-slate-400 hover:bg-slate-800{% endif %}">
+                Expired ({{ stats.expired }})
+            </a>
+        </div>
+
+        <!-- Search Bar -->
+        <form action="{{ url_for('admin_keys') }}" method="GET" class="w-full md:w-72 relative">
+            <input type="hidden" name="type" value="{{ filter_type }}">
+            <input type="hidden" name="status" value="{{ filter_status }}">
+            <input type="text" name="q" value="{{ search }}" placeholder="Search key, name, or phone..." 
+                   class="w-full bg-slate-900 text-xs text-slate-200 pl-8 pr-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-indigo-500">
+            <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+        </form>
+    </div>
+
+    <!-- Keys Ledger Table -->
+    <div class="glass-panel rounded-2xl overflow-hidden border border-slate-800">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-slate-900 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+                    <tr>
+                        <th class="py-3 px-4">Key Code</th>
+                        <th class="py-3 px-4">Type</th>
+                        <th class="py-3 px-4">Package</th>
+                        <th class="py-3 px-4">Customer Name</th>
+                        <th class="py-3 px-4">Phone / WhatsApp</th>
+                        <th class="py-3 px-4">Status</th>
+                        <th class="py-3 px-4">Duration</th>
+                        <th class="py-3 px-4">Expires At</th>
+                        <th class="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/60 text-slate-300">
+                    {% for k in keys %}
+                    <tr class="hover:bg-slate-900/50 transition-colors">
+                        <!-- Key code & copy -->
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-mono font-bold text-white text-sm select-all">{{ k.key_code }}</span>
+                                <button type="button" onclick="navigator.clipboard.writeText('{{ k.key_code }}'); alert('Key copied to clipboard!');" class="text-slate-500 hover:text-white" title="Copy Key">
+                                    <i class="fa-regular fa-copy text-xs"></i>
+                                </button>
+                            </div>
+                            {% if k.device_token %}
+                            <span class="text-[9px] text-emerald-400/80 block mt-0.5"><i class="fa-solid fa-mobile-screen mr-1"></i>Bound to 1 device</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- User Type -->
+                        <td class="py-3 px-4">
+                            {% if k.user_type == 'subscriber' %}
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Free Sabro Client</span>
+                            {% else %}
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/30">Paid Outsider</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Package -->
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                {{ k.package_name or 'Sabro All-Access' }}
+                            </span>
+                        </td>
+
+                        <!-- Customer -->
+                        <td class="py-3 px-4 font-medium">{{ k.customer_name or '—' }}</td>
+
+                        <!-- Phone -->
+                        <td class="py-3 px-4 font-mono">{{ k.phone or '—' }}</td>
+
+                        <!-- Status -->
+                        <td class="py-3 px-4">
+                            {% if k.status == 'active' %}
+                                <span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40">Active</span>
+                            {% elif k.status == 'unused' %}
+                                <span class="px-2 py-0.5 rounded-full text-[10px] bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/40">Unused</span>
+                            {% elif k.status == 'expired' %}
+                                <span class="px-2 py-0.5 rounded-full text-[10px] bg-rose-500/20 text-rose-300 font-bold border border-rose-500/40">Expired</span>
+                            {% else %}
+                                <span class="px-2 py-0.5 rounded-full text-[10px] bg-slate-800 text-slate-400 font-bold">{{ k.status }}</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Duration -->
+                        <td class="py-3 px-4">{{ k.duration_days }} days</td>
+
+                        <!-- Expiry -->
+                        <td class="py-3 px-4 text-slate-400">
+                            {{ k.expires_at[:10] if k.expires_at else '—' }}
+                        </td>
+
+                        <!-- Actions -->
+                        <td class="py-3 px-4 text-right">
+                            <div class="flex items-center justify-end gap-1.5">
+                                <!-- WhatsApp Share -->
+                                {% if k.phone %}
+                                <a href="https://wa.me/{{ k.phone|replace('-', '')|replace(' ', '') }}?text=Assalam-o-Alaikum%20{{ k.customer_name }}!%0A%0AYour%20Sabro%20Vision%20Monthly%20Access%20Key%20is:%20*{{ k.key_code }}*%0AValid%20for%20{{ k.duration_days }}%20Days.%0A%0AWatch%20Now:%20{{ host_url }}" 
+                                   target="_blank" 
+                                   class="p-1.5 rounded-lg bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white" 
+                                   title="Send Key via WhatsApp">
+                                    <i class="fa-brands fa-whatsapp text-sm"></i>
+                                </a>
+                                {% endif %}
+
+                                <!-- 1-Click Renew (+30 days) -->
+                                <form action="{{ url_for('admin_renew_key', key_id=k.id) }}" method="POST" class="inline" onsubmit="return confirm('Renew this key for +30 days?')">
+                                    <input type="hidden" name="extra_days" value="30">
+                                    <button type="submit" class="p-1.5 rounded-lg bg-sky-600/20 text-sky-400 hover:bg-sky-600 hover:text-white" title="Renew +30 Days">
+                                        <i class="fa-solid fa-arrows-rotate text-xs"></i>
+                                    </button>
+                                </form>
+
+                                <!-- Reset Device Lock -->
+                                {% if k.device_token %}
+                                <form action="{{ url_for('admin_reset_device', key_id=k.id) }}" method="POST" class="inline" onsubmit="return confirm('Reset device lock for this key?')">
+                                    <button type="submit" class="p-1.5 rounded-lg bg-amber-600/20 text-amber-400 hover:bg-amber-600 hover:text-white" title="Reset Device Lock">
+                                        <i class="fa-solid fa-mobile-screen-button text-xs"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                                <!-- Revoke -->
+                                {% if k.status != 'revoked' %}
+                                <form action="{{ url_for('admin_revoke_key', key_id=k.id) }}" method="POST" class="inline" onsubmit="return confirm('Revoke this key immediately?')">
+                                    <button type="submit" class="p-1.5 rounded-lg bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white" title="Revoke Key">
+                                        <i class="fa-solid fa-ban text-xs"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                                <!-- Delete -->
+                                <form action="{{ url_for('admin_delete_key', key_id=k.id) }}" method="POST" class="inline" onsubmit="return confirm('Delete this key permanently?')">
+                                    <button type="submit" class="p-1.5 rounded-lg text-slate-500 hover:text-rose-400" title="Delete">
+                                        <i class="fa-regular fa-trash-can text-xs"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Bulk Generator Modal -->
+<div id="bulkModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-panel rounded-2xl max-w-md w-full p-6 border border-slate-700 shadow-2xl relative">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-layer-group text-indigo-400"></i>
+                <span>Bulk Key Generator</span>
+            </h3>
+            <button type="button" onclick="document.getElementById('bulkModal').classList.add('hidden')" class="text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-base"></i>
+            </button>
+        </div>
+
+        <form action="{{ url_for('admin_bulk_keys') }}" method="POST" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Package Tier</label>
+                <select name="package_id" class="w-full bg-slate-900 text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700">
+                    {% for p in packages %}
+                    <option value="{{ p.id }}" {% if p.code == 'master_vip' %}selected{% endif %}>{{ p.name }} (PKR {{ p.price_pkr }}) - {{ p.allowed_categories or 'All Channels' }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Number of Keys to Generate</label>
+                <input type="number" name="count" value="20" min="1" max="500" required class="w-full bg-slate-900 text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700">
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Key Category</label>
+                <select name="user_type" class="w-full bg-slate-900 text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700">
+                    <option value="subscriber">Sabro Fiber Subscribers (FREE Keys)</option>
+                    <option value="outsider">Outside Paid Users (PAID Keys)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Validity Period</label>
+                <select name="duration_days" class="w-full bg-slate-900 text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700">
+                    <option value="7">7 Days (Weekly Pass)</option>
+                    <option value="15">15 Days (Half-Month)</option>
+                    <option value="30" selected>30 Days (Monthly Pass)</option>
+                    <option value="60">60 Days (2 Months)</option>
+                    <option value="90">90 Days (Quarterly)</option>
+                    <option value="365">365 Days (1 Year)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Batch Batch/Notes</label>
+                <input type="text" name="notes" placeholder="e.g. November 2026 Monthly Fiber Batch" class="w-full bg-slate-900 text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700">
+            </div>
+
+            <div class="pt-2">
+                <button type="submit" class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span>Generate Batch Now</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Single Key Generator Modal -->
+<div id="singleKeyModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-panel rounded-2xl max-w-md w-full p-6 border border-emerald-500/30 shadow-2xl relative">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-key text-emerald-400"></i>
+                <span>Generate Single Voucher Key</span>
+            </h3>
+            <button type="button" onclick="document.getElementById('singleKeyModal').classList.add('hidden')" class="text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-base"></i>
+            </button>
+        </div>
+
+        <form action="{{ url_for('admin_create_key') }}" method="POST" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Package Tier</label>
+                <select name="package_id" class="w-full bg-slate-900 text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700">
+                    {% for p in packages %}
+                    <option value="{{ p.id }}" {% if p.code == 'master_vip' %}selected{% endif %}>{{ p.name }} - {{ p.allowed_categories or 'All Channels' }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Customer Name</label>
+                <input type="text" name="customer_name" placeholder="Subscriber Name" class="w-full bg-slate-900 text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700">
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Phone / WhatsApp</label>
+                <input type="text" name="phone" placeholder="0300-1234567" class="w-full bg-slate-900 text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">User Type</label>
+                    <select name="user_type" class="w-full bg-slate-900 text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700">
+                        <option value="subscriber">Subscriber (Free)</option>
+                        <option value="outsider">Outsider (Paid)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Duration</label>
+                    <input type="number" name="duration_days" value="30" class="w-full bg-slate-900 text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Notes</label>
+                <input type="text" name="notes" placeholder="Notes..." class="w-full bg-slate-900 text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700">
+            </div>
+
+            <div class="pt-2">
+                <button type="submit" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Create Access Key</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

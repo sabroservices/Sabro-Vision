@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}My Account & Key Vault - {{ settings.platform_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto py-8 space-y-6">
+
+    <!-- Account Header Card -->
+    <div class="cinema-glass-card rounded-3xl p-6 sm:p-8 border border-white/[0.08] shadow-2xl relative">
+        <div class="flex items-center justify-between mb-6 pb-6 border-b border-white/[0.06] flex-wrap gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white text-xl shadow-lg shadow-brand-500/25 border border-white/20">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-white tracking-tight">{{ subscriber.username }}</h2>
+                    <span class="text-xs text-brand-400 font-semibold flex items-center gap-1.5 mt-0.5">
+                        <i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i>
+                        <span>Sabro Vision Verified Subscriber</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                {% if key_details and key_details.status == 'active' %}
+                <a href="{{ url_for('index') }}" class="px-4 py-2 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 text-white font-bold text-xs shadow-md shadow-brand-500/30 flex items-center gap-1.5">
+                    <i class="fa-solid fa-play text-[10px]"></i>
+                    <span>Watch TV</span>
+                </a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-400 hover:text-rose-400 border border-white/[0.08] text-xs font-semibold flex items-center gap-1.5">
+                    <i class="fa-solid fa-right-from-bracket text-[10px]"></i>
+                    <span>Log Out</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Account Credentials Box -->
+        <div class="space-y-3 mb-6 p-4 sm:p-5 rounded-2xl bg-obsidian-950/80 border border-white/[0.08]">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center justify-between">
+                <span class="flex items-center gap-2">
+                    <i class="fa-solid fa-id-card-clip text-brand-400"></i>
+                    <span>Your Login Credentials</span>
+                </span>
+                <span class="text-[10px] text-cyan-400 font-semibold lowercase">Use on TV or phone</span>
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <!-- Username -->
+                <div class="p-3 rounded-xl bg-obsidian-900 border border-white/[0.06] flex items-center justify-between">
+                    <div>
+                        <span class="block text-[9px] uppercase font-black tracking-wider text-slate-400">Username</span>
+                        <span id="accUser" class="text-xs sm:text-sm font-mono font-bold text-cyan-300">{{ subscriber.username }}</span>
+                    </div>
+                    <button type="button" onclick="navigator.clipboard.writeText('{{ subscriber.username }}'); alert('Username copied!');" class="p-1.5 text-slate-400 hover:text-white" title="Copy Username">
+                        <i class="fa-regular fa-copy text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- Password -->
+                <div class="p-3 rounded-xl bg-obsidian-900 border border-white/[0.06] flex items-center justify-between">
+                    <div>
+                        <span class="block text-[9px] uppercase font-black tracking-wider text-slate-400">Password</span>
+                        <span id="accPass" class="text-xs sm:text-sm font-mono font-bold text-emerald-300">{{ subscriber.plain_password or '••••••••' }}</span>
+                    </div>
+                    {% if subscriber.plain_password %}
+                    <button type="button" onclick="navigator.clipboard.writeText('{{ subscriber.plain_password }}'); alert('Password copied!');" class="p-1.5 text-slate-400 hover:text-white" title="Copy Password">
+                        <i class="fa-regular fa-copy text-xs"></i>
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-1">
+                Tip: Enter this username and password on the Direct Sign-In page of any device to watch TV without re-typing your key.
+            </p>
+        </div>
+
+        <!-- Safe Key Vault Box -->
+        <div class="space-y-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                <i class="fa-solid fa-vault text-brand-400"></i>
+                <span>Your Safely Saved Access Key</span>
+            </h3>
+
+            {% if subscriber.active_key_code and key_details %}
+            <div class="p-4 sm:p-5 rounded-2xl bg-obsidian-950/80 border border-brand-500/30 shadow-inner flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm sm:text-base font-mono font-bold text-cyan-300 select-all tracking-wider">{{ subscriber.active_key_code }}</span>
+                        <button type="button" onclick="navigator.clipboard.writeText('{{ subscriber.active_key_code }}'); alert('Key copied to clipboard!');" class="text-slate-400 hover:text-white" title="Copy Key">
+                            <i class="fa-regular fa-copy text-xs"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs text-slate-400 mt-1">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if key_details.user_type == 'subscriber' %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30{% else %}bg-sky-500/20 text-sky-300 border border-sky-500/30{% endif %}">
+                            {{ 'Sabro Fiber Pass (Free)' if key_details.user_type == 'subscriber' else 'VIP Monthly Pass' }}
+                        </span>
+                        <span>•</span>
+                        <span>Expires on <strong class="text-slate-200">{{ key_details.expires_at[:10] if key_details.expires_at else '—' }}</strong></span>
+                    </div>
+                </div>
+
+                <div class="shrink-0">
+                    {% if key_details.status == 'active' %}
+                    <span class="px-3 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-bold flex items-center gap-1.5 shadow-sm">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 live-pulse"></span>
+                        <span>Active Pass</span>
+                    </span>
+                    {% else %}
+                    <span class="px-3 py-1.5 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/40 text-xs font-bold">
+                        Expired
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div class="p-4 rounded-2xl bg-obsidian-950/60 border border-white/[0.06] text-center">
+                <i class="fa-solid fa-key text-slate-600 text-2xl mb-2"></i>
+                <p class="text-xs text-slate-300 font-medium">No monthly access key linked to this account yet.</p>
+                <p class="text-[11px] text-slate-500 mt-0.5">Enter your monthly key below to activate buffer-free streaming.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Active Package & Channels Access Tier -->
+    <div class="cinema-glass-card rounded-3xl p-6 sm:p-8 border border-white/[0.08] shadow-2xl relative">
+        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-boxes-stacked text-purple-400"></i>
+                <span>Active Package: <strong class="text-cyan-300">{{ package_name }}</strong></span>
+            </h3>
+            <a href="{{ url_for('public_packages') }}" class="px-3 py-1 rounded-xl bg-purple-600/20 text-purple-300 border border-purple-500/30 text-xs font-bold hover:bg-purple-600 hover:text-white transition-all">
+                <i class="fa-solid fa-arrow-up-right-from-square mr-1 text-[10px]"></i> View All Packages
+            </a>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-obsidian-950/80 border border-white/[0.06] space-y-2">
+            <span class="block text-[10px] uppercase font-bold text-slate-400">Channels Included in Your Pass:</span>
+            <div class="flex items-center gap-2 flex-wrap">
+                {% if is_all_access %}
+                <span class="px-3 py-1 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold flex items-center gap-1.5">
+                    <i class="fa-solid fa-infinity"></i>
+                    <span>Master VIP All-Access (All 11,459 Channels Unlocked)</span>
+                </span>
+                {% else %}
+                    {% for cat in allowed_categories_list %}
+                    <span class="px-3 py-1 rounded-xl bg-brand-500/20 text-brand-300 border border-brand-500/40 text-xs font-bold capitalize">
+                        <i class="fa-solid fa-check mr-1 text-emerald-400"></i> {{ cat }}
+                    </span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            {% if not is_all_access %}
+            <p class="text-[11px] text-slate-400 mt-2">
+                Want to watch channels in other categories? <a href="{{ url_for('public_packages') }}" class="text-cyan-400 underline font-semibold">Upgrade to Master VIP All-Access</a> to unlock all channels!
+            </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Xtream Codes API & Smart TV App Connection Box -->
+    <div class="cinema-glass-card rounded-3xl p-6 sm:p-8 border border-cyan-500/30 shadow-2xl relative overflow-hidden">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-server text-cyan-400"></i>
+                <span>Smart TV & Android App Settings (Xtream Codes API)</span>
+            </h3>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                IPTV Smarters / TiviMate
+            </span>
+        </div>
+
+        <p class="text-xs text-slate-300 mb-4 leading-relaxed">
+            Use these credentials to watch on <strong>Android TV, FireStick, Smart TVs, or IPTV Smarters Pro / TiviMate</strong>:
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 text-xs font-mono">
+            <div class="p-3 rounded-2xl bg-obsidian-950 border border-white/[0.08]">
+                <span class="block text-[9px] uppercase font-bold text-slate-400 font-sans">Server URL</span>
+                <span class="font-bold text-cyan-300 select-all">{{ request.host_url.rstrip('/') }}</span>
+            </div>
+            <div class="p-3 rounded-2xl bg-obsidian-950 border border-white/[0.08]">
+                <span class="block text-[9px] uppercase font-bold text-slate-400 font-sans">Username</span>
+                <span class="font-bold text-white select-all">{{ subscriber.username }}</span>
+            </div>
+            <div class="p-3 rounded-2xl bg-obsidian-950 border border-white/[0.08]">
+                <span class="block text-[9px] uppercase font-bold text-slate-400 font-sans">Password</span>
+                <span class="font-bold text-emerald-300 select-all">{{ subscriber.plain_password or '••••••••' }}</span>
+            </div>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-obsidian-950 border border-white/[0.08] text-xs">
+            <span class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Dynamic M3U Playlist URL (VLC / Smart IPTV)</span>
+            <div class="flex items-center justify-between gap-2">
+                <span class="font-mono text-[11px] text-cyan-300 truncate select-all">
+                    {{ request.host_url.rstrip('/') }}/get.php?username={{ subscriber.username }}&password={{ subscriber.plain_password or '' }}&type=m3u_plus
+                </span>
+                <button type="button" onclick="navigator.clipboard.writeText('{{ request.host_url.rstrip('/') }}/get.php?username={{ subscriber.username }}&password={{ subscriber.plain_password or '' }}&type=m3u_plus'); alert('M3U URL copied to clipboard!');" class="text-slate-400 hover:text-white shrink-0 text-xs font-bold">
+                    <i class="fa-regular fa-copy"></i> Copy M3U
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recharge / Top-Up Account Card -->
+    <div class="cinema-glass-card rounded-3xl p-6 sm:p-8 border border-white/[0.08] shadow-2xl">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-arrows-rotate text-emerald-400"></i>
+                <span>Top-Up / Recharge Subscription</span>
+            </h3>
+            <a href="{{ url_for('submit_payment') }}" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/25 flex items-center gap-1.5">
+                <i class="fa-solid fa-receipt"></i>
+                <span>Submit Payment Receipt</span>
+            </a>
+        </div>
+
+        <p class="text-xs text-slate-400 mb-4">
+            Received your new monthly voucher code from your internet provider or WhatsApp? Paste it here to recharge your account:
+        </p>
+
+        <form action="{{ url_for('my_account') }}" method="POST" class="space-y-3">
+            <input type="hidden" name="action" value="link_key">
+            <div>
+                <input type="text" name="key_code" required placeholder="SABRO-XXXX-XXXX-XXXX" 
+                       class="w-full bg-obsidian-900 text-xs text-white px-3.5 py-3 rounded-xl border border-white/[0.08] focus:outline-none focus:border-brand-400 font-mono tracking-wider uppercase text-center font-bold">
+            </div>
+            <button type="submit" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all">
+                <i class="fa-solid fa-bolt"></i>
+                <span>Recharge & Bind Key to Account</span>
+            </button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

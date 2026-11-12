@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block title %}ISP Partner & White-Label Reseller Program - {{ settings.platform_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto py-8 space-y-12">
+
+    <!-- 1. HERO B2B HEADER -->
+    <div class="cinema-glass-card rounded-3xl p-8 sm:p-12 border border-cyan-500/40 shadow-2xl relative overflow-hidden text-center">
+        <div class="absolute -top-24 -left-24 w-80 h-80 bg-brand-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -right-24 w-80 h-80 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 max-w-3xl mx-auto space-y-4">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-black tracking-wider uppercase shadow-sm">
+                <i class="fa-solid fa-handshake text-amber-300"></i>
+                <span>B2B ISP & WHOLESALE RESELLER PORTAL</span>
+            </div>
+
+            <h1 class="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+                Launch Your Own <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400">White-Label IPTV Service</span>
+            </h1>
+
+            <p class="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
+                Are you an <strong class="text-white">Internet Service Provider (ISP)</strong>, <strong class="text-white">Cable TV Operator (LCO)</strong>, or <strong class="text-white">Digital Reseller</strong>? Turnkey IPTV middleware, custom-branded web & Android TV apps, wholesale bulk credits, and localized edge streaming infrastructure to delight your subscribers.
+            </p>
+
+            <!-- Pricing Policy Callout Banner -->
+            <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <div class="px-4 py-2.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+                    <span>Sabro Networks Users: <strong class="text-white">100% FREE Access</strong></span>
+                </div>
+                <div class="px-4 py-2.5 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-xs font-bold flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-tag text-cyan-400 text-sm"></i>
+                    <span>Outside Network Users: <strong class="text-white">Only 250 PKR / Package</strong></span>
+                </div>
+            </div>
+
+            <div class="pt-2 flex flex-wrap justify-center gap-4">
+                <a href="#partnerForm" class="btn-shimmer glow-cyan px-7 py-3.5 rounded-2xl bg-gradient-to-r from-brand-600 via-cyan-500 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-brand-500/30 flex items-center gap-2 transition-all">
+                    <i class="fa-solid fa-rocket text-amber-300"></i>
+                    <span>Apply for Reseller / White-Label</span>
+                </a>
+                {% if clean_whatsapp %}
+                <a href="https://wa.me/{{ clean_whatsapp }}?text=Assalam-o-Alaikum%20Sabro%20Vision,%20I%20am%20an%20ISP/Cable%20Operator%20and%20want%20to%20discuss%20White-Label%20IPTV%20Partnership." target="_blank" class="px-7 py-3.5 rounded-2xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-300 font-bold text-xs sm:text-sm flex items-center gap-2 transition-all">
+                    <i class="fa-brands fa-whatsapp text-emerald-400 text-base"></i>
+                    <span>Chat with B2B Director</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. VALUE PILLARS & ADVANTAGES FOR OUTSIDE PROVIDERS -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="cinema-glass-card rounded-3xl p-6 border border-white/[0.08] hover:border-brand-500/40 space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-xl shadow-md">
+                <i class="fa-solid fa-paint-roller"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white">Full White-Label Branding</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                Deploy with your own ISP / Cable brand, custom logo, personalized color scheme, and proprietary portal domain (<span class="font-mono text-cyan-300">tv.your-isp.com</span>). Your clients stay loyal to your brand.
+            </p>
+        </div>
+
+        <div class="cinema-glass-card rounded-3xl p-6 border border-white/[0.08] hover:border-indigo-500/40 space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-xl shadow-md">
+                <i class="fa-solid fa-sliders"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white">Reseller Control Dashboard</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                Dedicated management portal to issue, renew, monitor, and suspend voucher keys. Real-time active connection tracking, subscriber analytics, and instant sub-account provisioning.
+            </p>
+        </div>
+
+        <div class="cinema-glass-card rounded-3xl p-6 border border-white/[0.08] hover:border-emerald-500/40 space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl shadow-md">
+                <i class="fa-solid fa-network-wired"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white">Bandwidth Savings & Xtream API</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                Full compatibility with off-the-shelf IPTV Smarters, TiviMate, and XCIPTV apps. Optional local edge stream caching saves up to 85% of your costly upstream transit bandwidth.
+            </p>
+        </div>
+    </div>
+
+    <!-- 3. WHOLESALE B2B TIERS & REVENUE MODELS -->
+    <div class="space-y-6">
+        <div class="text-center space-y-2">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-bold">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>WHOLESALE PARTNERSHIP TIERS</span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Flexible Reseller & ISP Packages</h2>
+            <p class="text-xs text-slate-400 max-w-xl mx-auto">
+                Select the partnership tier tailored to your network size. Scalable pricing with generous profit margins.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Tier 1: Digital Reseller -->
+            <div class="cinema-glass-card rounded-3xl p-6 border border-white/[0.08] hover:border-cyan-500/40 flex flex-col justify-between">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[10px] font-black uppercase tracking-wider">
+                            Tier 1: Reseller
+                        </span>
+                        <span class="text-xs text-slate-400 font-semibold">50 - 200 Users</span>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Digital Reseller</h3>
+                        <p class="text-xs text-slate-400 mt-1">For local tech dealers & cable operators starting out.</p>
+                    </div>
+
+                    <div class="p-3 rounded-2xl bg-obsidian-950/80 border border-white/[0.06] space-y-2 text-xs">
+                        <div class="flex items-center gap-2 text-slate-200">
+                            <i class="fa-solid fa-check text-cyan-400"></i>
+                            <span>Reseller Key Management Panel</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-slate-200">
+                            <i class="fa-solid fa-check text-cyan-400"></i>
+                            <span>11,459 Live Channels Unlocked</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-slate-200">
+                            <i class="fa-solid fa-check text-cyan-400"></i>
+                            <span>Xtream Codes API Credentials</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-slate-200">
+                            <i class="fa-solid fa-check text-cyan-400"></i>
+                            <span>Wholesale margin up to 50%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t border-white/[0.08] mt-6">
+                    <a href="#partnerForm" class="btn-shimmer w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-brand-600 to-cyan-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md">
+                        <span>Apply as Reseller</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tier 2: White-Label ISP (Featured) -->
+            <div class="cinema-glass-card rounded-3xl p-6 border-2 border-brand-400/80 bg-gradient-to-b from-cyan-950/25 via-obsidian-900/80 to-obsidian-950 shadow-2xl shadow-brand-500/20 relative flex flex-col justify-between">
+                <div class="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full bg-gradient-to-r from-cyan-400 to-indigo-500 text-obsidian-950 font-black text-[10px] tracking-wider uppercase shadow-md flex items-center gap-1.5">
+                    <i class="fa-solid fa-star text-amber-300"></i>
+                    <span>MOST POPULAR FOR ISPS</span>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between mt-1">
+                        <span class="px-3 py-1 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/40 text-[10px] font-black uppercase tracking-wider">
+                            Tier 2: White-Label
+                        </span>
+                        <span class="text-xs text-cyan-300 font-semibold font-mono">200 - 1,000 Users</span>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-bold text-white">White-Label ISP Suite</h3>
+                        <p class="text-xs text-slate-300 mt-1">For expanding FTTH / Wireless ISPs with their own brand.</p>
+                    </div>
+
+                    <div class="p-3 rounded-2xl bg-obsidian-950/90 border border-white/[0.08] space-y-2 text-xs">
+                        <div class="flex items-center gap-2 text-slate-100">
+                            <i class="fa-solid fa-check-double text-emerald-400"></i>
+                            <span>Custom Logo, Theme & Brand App</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-slate-100">
+                            <i class="fa-solid fa-check-double text-emerald-400"></i>
+                            <span>Custom Portal Domain (<span class="font-mono text-cyan-300 text-[11px]">tv.yourisp.pk</span>)</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-slate-100">
+                            <i class="fa-solid fa-check-double text-emerald-400"></i>
+                            <span>Dedicated Sub-Admin Control Panel</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-slate-100">
+                            <i class="fa-solid fa-check-double text-emerald-400"></i>
+                            <span>Bulk Key Discount Structure</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-slate-100">
+                            <i class="fa-solid fa-check-double text-emerald-400"></i>
+                            <span>Priority 24/7 Broadcaster Relay</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t border-white/[0.08] mt-6">
+                    <a href="#partnerForm" class="btn-shimmer glow-cyan w-full py-3 px-4 rounded-xl bg-gradient-to-r from-brand-500 via-cyan-400 to-indigo-600 text-obsidian-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-cyan-500/30">
+                        <span>Get White-Label Setup</span>
+                        <i class="fa-solid fa-crown text-amber-900"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tier 3: Enterprise ISP & PPPoE Bridge -->
+            <div class="cinema-glass-card rounded-3xl p-6 border border-white/[0.08] hover:border-purple-500/40 flex flex-col justify-between">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[10px] font-black uppercase tracking-wider">
+                            Tier 3: Enterprise
+                        </span>
+                        <span class="text-xs text-slate-400 font-semibold">1,000+ Users</span>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Enterprise ISP / BRAS Bridge</h3>
+                        <p class="text-xs text-slate-400 mt-1">Direct Connect Communications / Mikrotik billing integration.</p>
+                    </div>
+
+                    <div class="p-3 rounded-2xl bg-obsidian-950/80 border border-white/[0.06] space-y-2 text-xs">
+                        <div class="flex items-center gap-2 text-slate-200">
+                            <i class="fa-solid fa-check text-purple-400"></i>
+                            <span>Direct PPPoE / BRAS Session Hook</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-slate-200">
+                            <i class="fa-solid fa-check text-purple-400"></i>
+                            <span>On-Premise Gigabit Edge Cache Relay</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-slate-200">
+                            <i class="fa-solid fa-check text-purple-400"></i>
+                            <span>Zero Transit Bandwidth Overhead</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-slate-200">
+                            <i class="fa-solid fa-check text-purple-400"></i>
+                            <span>Dedicated Engineering Account Lead</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t border-white/[0.08] mt-6">
+                    <a href="#partnerForm" class="btn-shimmer w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md">
+                        <span>Contact Enterprise Team</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. ONBOARDING INQUIRY FORM -->
+    <div id="partnerForm" class="cinema-glass-card rounded-3xl p-8 sm:p-10 border border-white/[0.1] shadow-2xl relative">
+        <div class="max-w-2xl mx-auto space-y-6">
+            <div class="text-center space-y-2">
+                <span class="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                    FAST 24-HOUR ACTIVATION
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                    Partner & Reseller Application
+                </h2>
+                <p class="text-xs text-slate-400">
+                    Fill out the form below. Our B2B partnership engineer will contact you within 24 hours with trial panel credentials and customized wholesale quotation.
+                </p>
+            </div>
+
+            <form action="{{ url_for('partner_portal') }}" method="POST" class="space-y-4 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                            Company / ISP Name *
+                        </label>
+                        <input type="text" name="company_name" required placeholder="e.g. SpeedNet Fiber Solutions" class="w-full bg-obsidian-900 text-white px-4 py-3 rounded-xl border border-white/[0.08] focus:border-brand-400 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                            Contact Person Name *
+                        </label>
+                        <input type="text" name="contact_name" required placeholder="e.g. Asif Khan" class="w-full bg-obsidian-900 text-white px-4 py-3 rounded-xl border border-white/[0.08] focus:border-brand-400 focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                            WhatsApp / Mobile Number *
+                        </label>
+                        <input type="text" name="phone" required placeholder="e.g. 0300-1234567" class="w-full bg-obsidian-900 text-white px-4 py-3 rounded-xl border border-white/[0.08] focus:border-brand-400 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                            Email Address (Optional)
+                        </label>
+                        <input type="email" name="email" placeholder="e.g. contact@speednet.pk" class="w-full bg-obsidian-900 text-white px-4 py-3 rounded-xl border border-white/[0.08] focus:border-brand-400 focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                            City / Operating Area *
+                        </label>
+                        <input type="text" name="city" required placeholder="e.g. Karachi / Rawalpindi" class="w-full bg-obsidian-900 text-white px-4 py-3 rounded-xl border border-white/[0.08] focus:border-brand-400 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                            Subscriber Count *
+                        </label>
+                        <select name="subscriber_count" class="w-full bg-obsidian-900 text-white px-3.5 py-3 rounded-xl border border-white/[0.08] focus:border-brand-400 focus:outline-none font-semibold">
+                            <option value="50-200">50 - 200 Users</option>
+                            <option value="200-500">200 - 500 Users</option>
+                            <option value="500-1000" selected>500 - 1,000 Users</option>
+                            <option value="1000-5000">1,000 - 5,000 Users</option>
+                            <option value="5000+">5,000+ Users (Enterprise)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                            Partnership Model *
+                        </label>
+                        <select name="partner_type" class="w-full bg-obsidian-900 text-white px-3.5 py-3 rounded-xl border border-white/[0.08] focus:border-brand-400 focus:outline-none font-semibold">
+                            <option value="white_label" selected>Full White-Label App</option>
+                            <option value="reseller">Reseller Panel Only</option>
+                            <option value="pppoe_direct">Direct PPPoE / BRAS Hook</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                        Current Setup / Special Requirements
+                    </label>
+                    <textarea name="notes" rows="3" placeholder="Tell us about your current network (e.g. Mikrotik, Fiber, Cisco, Connect Communications, existing channel requests)" class="w-full bg-obsidian-900 text-white px-4 py-3 rounded-xl border border-white/[0.08] focus:border-brand-400 focus:outline-none"></textarea>
+                </div>
+
+                <div class="pt-3">
+                    <button type="submit" class="btn-shimmer glow-cyan w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-brand-600 via-cyan-500 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-black text-sm shadow-xl shadow-brand-500/30 flex items-center justify-center gap-2 transform active:scale-[0.99] transition-all">
+                        <i class="fa-solid fa-paper-plane text-amber-300"></i>
+                        <span>Submit Partnership Application</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

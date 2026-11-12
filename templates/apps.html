@@ -1,0 +1,483 @@
+{% extends "base.html" %}
+
+{% block title %}Multi-Device & Apps Ecosystem - {{ settings.platform_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto py-8 space-y-12">
+
+    <!-- 1. MULTINATIONAL HERO BANNER -->
+    <div class="cinema-glass-card rounded-3xl p-8 sm:p-12 border border-cyan-500/40 shadow-2xl relative overflow-hidden text-center">
+        <div class="absolute -top-24 -left-24 w-80 h-80 bg-brand-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -right-24 w-80 h-80 bg-purple-600/15 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 max-w-3xl mx-auto space-y-4">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-black tracking-wider uppercase shadow-sm">
+                <i class="fa-solid fa-layer-group text-amber-300"></i>
+                <span>GLOBAL MULTI-DEVICE ECOSYSTEM</span>
+            </div>
+
+            <h1 class="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+                One Subscription. <br class="hidden sm:inline">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400">
+                    Every Screen You Own.
+                </span>
+            </h1>
+
+            <p class="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
+                Whether you are watching on a 65-inch 4K Smart TV in your living room, an Android TV box, a flagship smartphone on the go, or a desktop workstation — <strong class="text-white">{{ settings.platform_name }}</strong> delivers an engineered, tailor-made experience with instant channel zapping.
+            </p>
+
+            <!-- Quick Device Mode Selector Buttons -->
+            <div class="pt-4 flex flex-wrap items-center justify-center gap-3">
+                <a href="{{ url_for('index') }}" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-brand-600 to-cyan-600 hover:from-brand-500 hover:to-cyan-500 text-white font-bold text-xs sm:text-sm flex items-center gap-2.5 shadow-lg shadow-brand-500/30 transition-all">
+                    <i class="fa-solid fa-desktop text-amber-300"></i>
+                    <span>Launch Web TV</span>
+                </a>
+
+                <a href="{{ url_for('tv_player') }}" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs sm:text-sm flex items-center gap-2.5 shadow-lg shadow-indigo-600/30 transition-all">
+                    <i class="fa-solid fa-tv text-cyan-300"></i>
+                    <span>Launch Smart TV Mode</span>
+                </a>
+
+                <a href="#android" onclick="switchDeviceTab('tabAndroid')" class="px-5 py-3 rounded-2xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 font-bold text-xs sm:text-sm flex items-center gap-2.5 transition-all">
+                    <i class="fa-brands fa-android text-emerald-400 text-base"></i>
+                    <span>Android & Mobile App</span>
+                </a>
+
+                <a href="#xtream" onclick="switchDeviceTab('tabXtream')" class="px-5 py-3 rounded-2xl bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/40 text-amber-300 font-bold text-xs sm:text-sm flex items-center gap-2.5 transition-all">
+                    <i class="fa-solid fa-server text-amber-400"></i>
+                    <span>Xtream Codes & Smarters</span>
+                </a>
+            </div>
+
+            <!-- Certified Compatible Platforms Pill Carousel -->
+            <div class="pt-6 border-t border-white/[0.08] flex items-center justify-center gap-4 sm:gap-6 flex-wrap text-slate-400 text-xs">
+                <span class="text-[11px] uppercase tracking-wider font-extrabold text-slate-500">Certified Compatible:</span>
+                <span class="flex items-center gap-1.5 hover:text-white transition-colors"><i class="fa-brands fa-android text-emerald-400"></i> Android TV</span>
+                <span class="flex items-center gap-1.5 hover:text-white transition-colors"><i class="fa-solid fa-tv text-cyan-400"></i> Samsung Tizen</span>
+                <span class="flex items-center gap-1.5 hover:text-white transition-colors"><i class="fa-solid fa-satellite text-purple-400"></i> LG webOS</span>
+                <span class="flex items-center gap-1.5 hover:text-white transition-colors"><i class="fa-brands fa-apple text-slate-200"></i> Apple tvOS / iOS</span>
+                <span class="flex items-center gap-1.5 hover:text-white transition-colors"><i class="fa-brands fa-amazon text-amber-400"></i> Fire TV Stick</span>
+                <span class="flex items-center gap-1.5 hover:text-white transition-colors"><i class="fa-brands fa-chrome text-sky-400"></i> Web Browsers</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. INTERACTIVE DEVICE MODE TABS -->
+    <div class="space-y-6">
+        <div class="flex items-center justify-center">
+            <div class="inline-flex rounded-2xl bg-obsidian-900/90 p-1.5 border border-white/[0.08] shadow-lg flex-wrap justify-center gap-1">
+                <button type="button" onclick="switchDeviceTab('tabWeb', this)" id="btnTabWeb" class="px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 bg-brand-600 text-white shadow-md shadow-brand-500/30">
+                    <i class="fa-solid fa-desktop"></i>
+                    <span>Web TV Player</span>
+                </button>
+                <button type="button" onclick="switchDeviceTab('tabSmartTV', this)" id="btnTabSmartTV" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-tv"></i>
+                    <span>Smart TV (10-Foot)</span>
+                </button>
+                <button type="button" onclick="switchDeviceTab('tabAndroid', this)" id="btnTabAndroid" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition-all flex items-center gap-2">
+                    <i class="fa-brands fa-android"></i>
+                    <span>Android & Mobile PWA</span>
+                </button>
+                <button type="button" onclick="switchDeviceTab('tabXtream', this)" id="btnTabXtream" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-server"></i>
+                    <span>Xtream / IPTV Smarters</span>
+                </button>
+                <button type="button" onclick="switchDeviceTab('tabApple', this)" id="btnTabApple" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition-all flex items-center gap-2">
+                    <i class="fa-brands fa-apple"></i>
+                    <span>Apple iOS & tvOS</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- TAB 1: WEB TV PLAYER (DEFAULT) -->
+        <div id="tabWeb" class="cinema-glass-card rounded-3xl p-6 sm:p-10 border border-brand-500/30 space-y-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div class="space-y-4">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold">
+                        <i class="fa-solid fa-globe"></i>
+                        <span>BROWSER-FIRST ENTERTAINMENT</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                        Flagship Web TV Cinema Player
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+                        Designed for laptops, desktop computers, and tablets. Powered by high-speed HLS.js with adaptive multi-bitrate streaming, zero plugin requirements, and instant category filters.
+                    </p>
+
+                    <div class="space-y-2.5 text-xs text-slate-300">
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-circle-check text-cyan-400"></i>
+                            <span>Cinema Theater View with Fullscreen & Picture-in-Picture (PiP)</span>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-circle-check text-cyan-400"></i>
+                            <span>Instant Live EPG Channel Search (<kbd class="px-1.5 py-0.5 rounded bg-obsidian-950 font-mono text-[10px] text-cyan-300 border border-white/10">/</kbd> hotkey)</span>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-circle-check text-cyan-400"></i>
+                            <span>One-click Bookmarking & Favorites Vault</span>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-circle-check text-cyan-400"></i>
+                            <span>Compatible with Google Chrome, Microsoft Edge, Safari, Firefox & Opera</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex items-center gap-3">
+                        <a href="{{ url_for('index') }}" class="btn-shimmer px-6 py-3.5 rounded-2xl bg-gradient-to-r from-brand-600 via-cyan-500 to-indigo-600 hover:from-brand-500 text-white font-bold text-xs flex items-center gap-2 shadow-xl shadow-brand-500/30 transition-all">
+                            <i class="fa-solid fa-play text-amber-300"></i>
+                            <span>Open Web TV Player Now</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Web TV Mockup Card -->
+                <div class="cinema-glass rounded-2xl p-4 border border-white/[0.1] bg-obsidian-900/90 shadow-2xl relative">
+                    <div class="flex items-center justify-between pb-3 border-b border-white/[0.08] mb-3">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+                        </div>
+                        <span class="text-[11px] font-mono text-slate-400 flex items-center gap-1">
+                            <i class="fa-solid fa-lock text-[10px] text-emerald-400"></i>
+                            <span>{{ server_base }}/</span>
+                        </span>
+                        <span class="text-[10px] text-cyan-300 font-bold uppercase tracking-wider">4K / FHD</span>
+                    </div>
+                    <div class="aspect-video rounded-xl bg-black/90 flex flex-col items-center justify-center p-6 text-center border border-white/10 relative overflow-hidden group">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-600 to-cyan-500 flex items-center justify-center text-white text-2xl shadow-xl shadow-brand-500/40 mb-3 group-hover:scale-105 transition-transform">
+                            <i class="fa-solid fa-satellite-dish"></i>
+                        </div>
+                        <h4 class="text-sm font-bold text-white">{{ settings.platform_name }} Web Cinema</h4>
+                        <p class="text-[11px] text-slate-400 mt-1 max-w-xs">11,459 Channels • Bufferless HLS • Multi-Tier Access</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: SMART TV LEANBACK MODE -->
+        <div id="tabSmartTV" class="cinema-glass-card rounded-3xl p-6 sm:p-10 border border-indigo-500/30 space-y-8 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div class="space-y-4">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-bold">
+                        <i class="fa-solid fa-tv"></i>
+                        <span>10-FOOT LEANBACK UI</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                        Smart TV Big Screen Mode ([`/tv`](/tv))
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+                        Designed specifically for television displays. Fully controllable using your standard TV remote control D-Pad without needing a mouse or keyboard.
+                    </p>
+
+                    <div class="space-y-2.5 text-xs text-slate-300">
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-circle-check text-indigo-400"></i>
+                            <span><strong>D-Pad Arrow Navigation</strong>: Move Up, Down, Left, Right with high-contrast glowing cursor</span>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-circle-check text-indigo-400"></i>
+                            <span><strong>Direct Channel Tuning (0-9)</strong>: Press channel number directly on TV remote</span>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-circle-check text-indigo-400"></i>
+                            <span><strong>Fast Zapping (CH+ / CH-)</strong>: Instant channel skipping while watching</span>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-circle-check text-indigo-400"></i>
+                            <span>Compatible with Android TV, Samsung Tizen, LG webOS, Amazon Fire TV</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex items-center gap-3">
+                        <a href="{{ url_for('tv_player') }}" class="btn-shimmer px-6 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 text-white font-bold text-xs flex items-center gap-2 shadow-xl shadow-indigo-600/30 transition-all">
+                            <i class="fa-solid fa-tv text-cyan-300"></i>
+                            <span>Launch Smart TV WebApp</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- TV Remote Guide Box -->
+                <div class="cinema-glass rounded-2xl p-6 border border-white/[0.1] bg-obsidian-900/90 shadow-2xl space-y-4">
+                    <h3 class="text-xs font-black uppercase tracking-wider text-cyan-300 flex items-center gap-2">
+                        <i class="fa-solid fa-gamepad"></i>
+                        <span>TV Remote Shortcut Map</span>
+                    </h3>
+
+                    <div class="grid grid-cols-2 gap-3 text-xs">
+                        <div class="p-3 rounded-xl bg-obsidian-950 border border-white/[0.06]">
+                            <span class="font-mono text-cyan-400 font-bold block mb-0.5">Arrows & [OK]</span>
+                            <span class="text-slate-300 text-[11px]">Navigate guide and select channel</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-obsidian-950 border border-white/[0.06]">
+                            <span class="font-mono text-amber-400 font-bold block mb-0.5">CH+ / CH- (PgUp/Dn)</span>
+                            <span class="text-slate-300 text-[11px]">Next / Previous channel switch</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-obsidian-950 border border-white/[0.06]">
+                            <span class="font-mono text-emerald-400 font-bold block mb-0.5">Number Keys (0-9)</span>
+                            <span class="text-slate-300 text-[11px]">Direct numeric channel jump</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-obsidian-950 border border-white/[0.06]">
+                            <span class="font-mono text-rose-400 font-bold block mb-0.5">[Back] / [Return]</span>
+                            <span class="text-slate-300 text-[11px]">Exit video back to guide</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: ANDROID & MOBILE PWA APP -->
+        <div id="tabAndroid" class="cinema-glass-card rounded-3xl p-6 sm:p-10 border border-emerald-500/30 space-y-8 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div class="space-y-4">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-bold">
+                        <i class="fa-brands fa-android"></i>
+                        <span>PROGRESSIVE WEB APP (PWA)</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                        Android Smartphone & Tablet Experience
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+                        Install {{ settings.platform_name }} directly to your home screen with zero app-store clutter. Enjoy full-screen viewing, offline UI caching, touch gestures, and instant launch.
+                    </p>
+
+                    <!-- PWA Setup Steps -->
+                    <div class="space-y-3 bg-obsidian-900/90 p-4 rounded-2xl border border-white/[0.06] text-xs">
+                        <div class="flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0">1</span>
+                            <div>
+                                <strong class="text-white">Open in Chrome or Brave Browser</strong>
+                                <p class="text-[11px] text-slate-400">Navigate to <code class="text-cyan-300 font-mono">{{ server_base }}/</code> on your Android phone.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0">2</span>
+                            <div>
+                                <strong class="text-white">Tap Menu & Select 'Install App'</strong>
+                                <p class="text-[11px] text-slate-400">Tap the three dots (⋮) in Chrome and choose <em class="text-emerald-300">"Add to Home screen"</em> or <em class="text-emerald-300">"Install app"</em>.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0">3</span>
+                            <div>
+                                <strong class="text-white">Launch from Home Screen</strong>
+                                <p class="text-[11px] text-slate-400">The app icon appears on your home screen with full screen immersive playback.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Android PWA Feature Callout -->
+                <div class="cinema-glass rounded-2xl p-6 border border-emerald-500/20 bg-emerald-950/15 space-y-4 text-center sm:text-left">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-2xl mx-auto sm:mx-0 shadow-md">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white">Native Android Capabilities</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Hardware-accelerated video decoding, swipe down to refresh, portrait and landscape auto-rotation, and low mobile battery consumption.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: XTREAM CODES API & IPTV APPS -->
+        <div id="tabXtream" class="cinema-glass-card rounded-3xl p-6 sm:p-10 border border-amber-500/30 space-y-8 hidden">
+            <div class="space-y-4">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold">
+                    <i class="fa-solid fa-server"></i>
+                    <span>XTREAM CODES API v2 & STANDALONE APPS</span>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                    IPTV Smarters Pro, TiviMate & XCIPTV Setup
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+                    Prefer using an existing IPTV app on your Android TV box or FireStick? Connect {{ settings.platform_name }} directly using the industry-standard Xtream Codes API handshake.
+                </p>
+
+                <!-- Credentials Card -->
+                <div class="cinema-glass rounded-2xl p-6 border border-amber-500/30 bg-amber-950/20 space-y-4">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-key text-amber-400"></i>
+                        <span>Your Connection Parameters</span>
+                    </h3>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                        <div class="p-3.5 rounded-xl bg-obsidian-950 border border-white/[0.08] relative">
+                            <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Server URL / Portal</span>
+                            <span class="font-mono text-cyan-300 font-bold text-xs select-all">{{ server_base }}</span>
+                        </div>
+
+                        <div class="p-3.5 rounded-xl bg-obsidian-950 border border-white/[0.08] relative">
+                            <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Username</span>
+                            <span class="font-mono text-amber-300 font-bold text-xs select-all">{{ sub.username if sub else 'Your Auto-Generated Username' }}</span>
+                        </div>
+
+                        <div class="p-3.5 rounded-xl bg-obsidian-950 border border-white/[0.08] relative">
+                            <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Password</span>
+                            <span class="font-mono text-emerald-300 font-bold text-xs select-all">{{ sub.password if sub else 'Your Auto-Generated Password' }}</span>
+                        </div>
+                    </div>
+
+                    {% if sub %}
+                    <div class="pt-2 flex flex-wrap gap-3">
+                        <a href="{{ url_for('get_m3u', username=sub.username, password=sub.password) }}" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 text-obsidian-950 font-bold text-xs flex items-center gap-2 shadow-md">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Download M3U Playlist File</span>
+                        </a>
+                    </div>
+                    {% else %}
+                    <p class="text-[11px] text-slate-400 mt-2">
+                        <i class="fa-solid fa-circle-info text-cyan-400 mr-1"></i>
+                        <span>Sign in with your access key at <a href="{{ url_for('gatekeeper') }}" class="text-cyan-300 font-bold underline">Gatekeeper</a> to automatically reveal your personal username and password.</span>
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: APPLE IOS & TVOS -->
+        <div id="tabApple" class="cinema-glass-card rounded-3xl p-6 sm:p-10 border border-slate-500/30 space-y-8 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div class="space-y-4">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-500/10 border border-slate-500/30 text-slate-300 text-xs font-bold">
+                        <i class="fa-brands fa-apple"></i>
+                        <span>APPLE ECOSYSTEM</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                        Apple iPhone, iPad, Mac & Apple TV
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+                        Stream on Apple devices via Safari Standalone PWA, AirPlay 2 screen beam to your big screen, or through GSE Smart IPTV and Smarters Player Lite from the App Store.
+                    </p>
+
+                    <div class="space-y-2.5 text-xs text-slate-300">
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-circle-check text-cyan-400"></i>
+                            <span><strong>Safari PWA</strong>: Open in Safari, tap Share (<i class="fa-solid fa-arrow-up-from-bracket text-[10px]"></i>) &rarr; "Add to Home Screen"</span>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-circle-check text-cyan-400"></i>
+                            <span><strong>AirPlay 2 Wireless</strong>: Tap AirPlay icon to beam directly to Apple TV or LG/Samsung TVs</span>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-circle-check text-cyan-400"></i>
+                            <span><strong>Mac Cinema Mode</strong>: Fullscreen bufferless playback on macOS with Retina scaling</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cinema-glass rounded-2xl p-6 border border-white/[0.1] bg-obsidian-900/90 text-center space-y-3">
+                    <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-white text-2xl mx-auto shadow-md">
+                        <i class="fa-brands fa-apple"></i>
+                    </div>
+                    <h4 class="text-sm font-bold text-white">Apple AirPlay & Home Screen Ready</h4>
+                    <p class="text-xs text-slate-400">Zero installation required. Instant HD HLS streaming on all iOS and macOS versions.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 3. MULTINATIONAL COMPARISON MATRIX -->
+    <div class="cinema-glass-card rounded-3xl p-6 sm:p-8 border border-white/[0.08] space-y-6">
+        <div class="text-center space-y-2">
+            <h3 class="text-xl font-black text-white tracking-tight">Feature Matrix Across Devices</h3>
+            <p class="text-xs text-slate-400">Engineered to deliver consistent, uninterrupted entertainment across every screen.</p>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-obsidian-900/90 text-slate-400 border-b border-white/[0.08] text-[10px] font-bold uppercase tracking-wider">
+                    <tr>
+                        <th class="py-3 px-4">Feature / Capability</th>
+                        <th class="py-3 px-4 text-center">Web TV Player</th>
+                        <th class="py-3 px-4 text-center">Smart TV Leanback</th>
+                        <th class="py-3 px-4 text-center">Android Mobile PWA</th>
+                        <th class="py-3 px-4 text-center">Xtream / TiviMate</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/[0.06] text-slate-300">
+                    <tr class="hover:bg-white/[0.02]">
+                        <td class="py-3 px-4 font-semibold text-white">All 11,459 Channels</td>
+                        <td class="py-3 px-4 text-center text-emerald-400"><i class="fa-solid fa-check"></i></td>
+                        <td class="py-3 px-4 text-center text-emerald-400"><i class="fa-solid fa-check"></i></td>
+                        <td class="py-3 px-4 text-center text-emerald-400"><i class="fa-solid fa-check"></i></td>
+                        <td class="py-3 px-4 text-center text-emerald-400"><i class="fa-solid fa-check"></i></td>
+                    </tr>
+                    <tr class="hover:bg-white/[0.02]">
+                        <td class="py-3 px-4 font-semibold text-white">D-Pad Remote Control</td>
+                        <td class="py-3 px-4 text-center text-slate-500">—</td>
+                        <td class="py-3 px-4 text-center text-cyan-300 font-bold"><i class="fa-solid fa-circle-check text-cyan-400 mr-1"></i> Native</td>
+                        <td class="py-3 px-4 text-center text-slate-500">—</td>
+                        <td class="py-3 px-4 text-center text-cyan-300 font-bold"><i class="fa-solid fa-circle-check text-cyan-400 mr-1"></i> Native</td>
+                    </tr>
+                    <tr class="hover:bg-white/[0.02]">
+                        <td class="py-3 px-4 font-semibold text-white">4K & Full HD HLS Streams</td>
+                        <td class="py-3 px-4 text-center text-emerald-400"><i class="fa-solid fa-check"></i></td>
+                        <td class="py-3 px-4 text-center text-emerald-400"><i class="fa-solid fa-check"></i></td>
+                        <td class="py-3 px-4 text-center text-emerald-400"><i class="fa-solid fa-check"></i></td>
+                        <td class="py-3 px-4 text-center text-emerald-400"><i class="fa-solid fa-check"></i></td>
+                    </tr>
+                    <tr class="hover:bg-white/[0.02]">
+                        <td class="py-3 px-4 font-semibold text-white">Touch Swipe Zapping</td>
+                        <td class="py-3 px-4 text-center text-slate-500">—</td>
+                        <td class="py-3 px-4 text-center text-slate-500">—</td>
+                        <td class="py-3 px-4 text-center text-cyan-300 font-bold"><i class="fa-solid fa-circle-check text-cyan-400 mr-1"></i> Native</td>
+                        <td class="py-3 px-4 text-center text-slate-500">—</td>
+                    </tr>
+                    <tr class="hover:bg-white/[0.02]">
+                        <td class="py-3 px-4 font-semibold text-white">Zero App Store Install</td>
+                        <td class="py-3 px-4 text-center text-emerald-400 font-bold"><i class="fa-solid fa-check text-emerald-400 mr-1"></i> Instant</td>
+                        <td class="py-3 px-4 text-center text-emerald-400 font-bold"><i class="fa-solid fa-check text-emerald-400 mr-1"></i> Instant</td>
+                        <td class="py-3 px-4 text-center text-emerald-400 font-bold"><i class="fa-solid fa-check text-emerald-400 mr-1"></i> PWA</td>
+                        <td class="py-3 px-4 text-center text-slate-400">Via APK</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function switchDeviceTab(tabId, btn) {
+        const tabs = ['tabWeb', 'tabSmartTV', 'tabAndroid', 'tabXtream', 'tabApple'];
+        const btns = ['btnTabWeb', 'btnTabSmartTV', 'btnTabAndroid', 'btnTabXtream', 'btnTabApple'];
+
+        tabs.forEach(t => {
+            const el = document.getElementById(t);
+            if (el) el.classList.add('hidden');
+        });
+
+        btns.forEach(b => {
+            const el = document.getElementById(b);
+            if (el) {
+                el.classList.remove('bg-brand-600', 'text-white', 'shadow-md', 'shadow-brand-500/30');
+                el.classList.add('text-slate-400');
+            }
+        });
+
+        const targetTab = document.getElementById(tabId);
+        if (targetTab) targetTab.classList.remove('hidden');
+
+        if (btn) {
+            btn.classList.add('bg-brand-600', 'text-white', 'shadow-md', 'shadow-brand-500/30');
+            btn.classList.remove('text-slate-400');
+        } else {
+            // Match corresponding button
+            const idx = tabs.indexOf(tabId);
+            if (idx !== -1) {
+                const bEl = document.getElementById(btns[idx]);
+                if (bEl) {
+                    bEl.classList.add('bg-brand-600', 'text-white', 'shadow-md', 'shadow-brand-500/30');
+                    bEl.classList.remove('text-slate-400');
+                }
+            }
+        }
+    }
+</script>
+{% endblock %}

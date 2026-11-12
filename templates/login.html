@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Sign In - {{ settings.platform_name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex items-center justify-center py-10 px-4">
+    <div class="relative w-full max-w-md">
+        <div class="absolute -top-14 left-1/2 -translate-x-1/2 w-64 h-64 bg-brand-600/15 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="cinema-glass-card relative rounded-3xl p-8 border border-white/[0.1] shadow-2xl bg-obsidian-900/90 backdrop-blur-2xl">
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-600 via-sky-500 to-indigo-600 border border-white/20 text-white mb-3 shadow-xl shadow-brand-500/25">
+                    <i class="fa-solid fa-user-shield text-xl"></i>
+                </div>
+                <h2 class="text-2xl font-black text-white tracking-tight">Administrator Access</h2>
+                <p class="text-xs text-slate-400 mt-1">Sabro Vision Management & Key Generation Portal</p>
+            </div>
+
+            <form action="{{ url_for('admin_login') }}" method="POST" class="space-y-4">
+                <div>
+                    <label for="username" class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">Username</label>
+                    <input type="text" name="username" id="username" required autofocus placeholder="Enter administrator username"
+                           class="w-full bg-obsidian-950/90 text-sm text-white px-4 py-3 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 transition-all">
+                </div>
+
+                <div>
+                    <label for="password" class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">Password</label>
+                    <input type="password" name="password" id="password" required placeholder="••••••••"
+                           class="w-full bg-obsidian-950/90 text-sm text-white px-4 py-3 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 transition-all">
+                </div>
+
+                <button type="submit" class="btn-shimmer glow-cyan w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-brand-600 via-cyan-500 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-brand-500/30 flex items-center justify-center gap-2 transition-all">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <span>Sign In to Admin Panel</span>
+                </button>
+            </form>
+
+            <div class="mt-6 pt-4 border-t border-white/[0.06] text-center">
+                <a href="{{ url_for('gatekeeper') }}" class="text-xs text-slate-400 hover:text-cyan-300 transition-colors flex items-center justify-center gap-1.5 font-semibold">
+                    <i class="fa-solid fa-arrow-left text-[10px]"></i>
+                    <span>Back to Direct Sign In</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,587 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if active_channel %}{{ active_channel.name }} - {% endif %}{{ settings.platform_name }}
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- 1. CINEMA VIDEO PLAYER SECTION -->
+    <div class="cinema-glass-card rounded-3xl overflow-hidden shadow-2xl border border-white/[0.08] bg-black relative">
+        <div class="relative aspect-video w-full max-h-[70vh] mx-auto flex items-center justify-center bg-black group" id="playerContainer">
+            
+            <!-- Native HTML5 Video element -->
+            <video id="iptvVideo" class="w-full h-full object-contain cursor-pointer" playsinline autoplay controls></video>
+
+            <!-- Loading Spinner Overlay -->
+            <div id="playerLoading" class="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3 z-20 pointer-events-none">
+                <div class="w-12 h-12 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+                <span class="text-xs font-semibold tracking-wider text-slate-300 uppercase">Connecting to HD Feed...</span>
+            </div>
+
+            <!-- Error Reconnect Overlay -->
+            <div id="playerError" class="absolute inset-0 bg-black/90 backdrop-blur-md flex-col items-center justify-center gap-4 z-20 hidden p-6 text-center">
+                <div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-2xl mx-auto">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-white">Stream Momentarily Buffering</h3>
+                    <p class="text-slate-400 text-xs mt-1 max-w-sm mx-auto" id="errorMessage">
+                        The remote broadcaster server is reconnecting. You can retry the feed or jump to the next channel.
+                    </p>
+                </div>
+                <div class="flex gap-3 justify-center">
+                    <button type="button" onclick="reloadCurrentStream()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold flex items-center gap-2 shadow-lg shadow-brand-600/30">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Retry Stream</span>
+                    </button>
+                    <button type="button" onclick="playNextChannel()" class="px-4 py-2 rounded-xl bg-obsidian-800 hover:bg-obsidian-700 text-slate-200 text-xs font-semibold flex items-center gap-2 border border-white/10">
+                        <i class="fa-solid fa-forward-step"></i>
+                        <span>Next Channel</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Top Floating Info Pill (Channel Name & Badges) -->
+            <div class="absolute top-4 left-4 z-10 flex items-center gap-2 pointer-events-none">
+                <span class="px-3.5 py-1.5 rounded-2xl bg-black/85 backdrop-blur-md border border-white/10 text-xs font-bold text-white flex items-center gap-2.5 shadow-xl">
+                    <div class="flex items-end gap-0.5 h-3">
+                        <span class="w-0.5 bg-brand-400 rounded-full eq-bar-1"></span>
+                        <span class="w-0.5 bg-cyan-300 rounded-full eq-bar-2"></span>
+                        <span class="w-0.5 bg-brand-400 rounded-full eq-bar-3"></span>
+                    </div>
+                    <span id="activeChannelName">{{ active_channel.name if active_channel else 'Select Channel' }}</span>
+                </span>
+                {% if active_channel %}
+                <span class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 backdrop-blur-md text-[10px] font-black uppercase tracking-wider text-white shadow-lg border border-white/10" id="activeChannelCategory">
+                    {{ active_channel.category }}
+                </span>
+                <span class="px-2.5 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold font-mono hidden sm:inline shadow-sm">
+                    1080p FHD
+                </span>
+                <span class="px-2.5 py-1.5 rounded-xl bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 text-[10px] font-bold font-mono hidden md:inline">
+                    <i class="fa-solid fa-bolt text-[9px] mr-0.5 text-cyan-400"></i> Ultra Fast
+                </span>
+                {% endif %}
+            </div>
+
+            <!-- Top Right Player Controls -->
+            <div class="absolute top-4 right-4 z-10 flex items-center gap-2">
+                <button type="button" onclick="toggleTheaterMode()" class="p-2.5 rounded-xl bg-black/75 hover:bg-black/95 text-white/90 hover:text-white backdrop-blur-md border border-white/10 text-xs shadow-lg transition-all" title="Theater Mode">
+                    <i class="fa-solid fa-expand"></i>
+                </button>
+                <button type="button" onclick="togglePictureInPicture()" class="p-2.5 rounded-xl bg-black/75 hover:bg-black/95 text-white/90 hover:text-white backdrop-blur-md border border-white/10 text-xs shadow-lg transition-all" title="Picture-in-Picture">
+                    <i class="fa-solid fa-clone"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Channel Metadata & Player Sub-Bar -->
+        {% if active_channel %}
+        <div class="p-4 sm:p-5 bg-obsidian-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-white/[0.06]">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-obsidian-950 border border-white/10 p-1.5 flex items-center justify-center shrink-0 overflow-hidden shadow-md">
+                    {% if active_channel.logo %}
+                    <img src="{{ active_channel.logo }}" alt="{{ active_channel.name }}" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/100x100/0f172a/38bdf8?text=TV';">
+                    {% else %}
+                    <i class="fa-solid fa-tv text-slate-400 text-lg"></i>
+                    {% endif %}
+                </div>
+                <div>
+                    <div class="flex items-center gap-2.5">
+                        <h2 class="text-base sm:text-lg font-bold text-white tracking-tight" id="subChannelName">{{ active_channel.name }}</h2>
+                        <button type="button" onclick="toggleFavorite({{ active_channel.id }})" id="favBtn-{{ active_channel.id }}" class="text-sm {% if active_channel.id in fav_ids %}text-rose-500{% else %}text-slate-500 hover:text-rose-400{% endif %} transition-colors" title="Toggle Favorite">
+                            <i class="{% if active_channel.id in fav_ids %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
+                        <span class="text-brand-400 font-semibold" id="subChannelCat">{{ active_channel.group_title or active_channel.category }}</span>
+                        <span>•</span>
+                        <span>Low Latency Relay</span>
+                        <span>•</span>
+                        <span class="text-emerald-400 flex items-center gap-1 font-medium">
+                            <i class="fa-solid fa-circle-check text-[10px]"></i> Sabro High-Speed Fiber Stream
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Keyboard shortcuts guide -->
+            <div class="hidden lg:flex items-center gap-3 text-[11px] text-slate-400 bg-obsidian-950/80 px-3.5 py-2 rounded-xl border border-white/[0.06]">
+                <span class="text-slate-500 uppercase font-bold text-[9px] tracking-wider">Shortcuts:</span>
+                <span class="px-1.5 py-0.5 rounded bg-obsidian-800 font-mono text-slate-200 text-[10px]">Space</span> <span>Play/Pause</span>
+                <span class="px-1.5 py-0.5 rounded bg-obsidian-800 font-mono text-slate-200 text-[10px]">F</span> <span>Fullscreen</span>
+                <span class="px-1.5 py-0.5 rounded bg-obsidian-800 font-mono text-slate-200 text-[10px]">M</span> <span>Mute</span>
+                <span class="px-1.5 py-0.5 rounded bg-obsidian-800 font-mono text-slate-200 text-[10px]">↑ / ↓</span> <span>Channels</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Multinational Multi-Device Experience Switcher Bar -->
+    <div class="cinema-glass-card rounded-2xl p-3 px-4 border border-white/[0.08] flex items-center justify-between gap-4 flex-wrap text-xs">
+        <div class="flex items-center gap-2.5">
+            <span class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-cyan-500/20 to-indigo-500/20 text-cyan-300 font-extrabold uppercase text-[10px] tracking-wider border border-cyan-500/30 flex items-center gap-1.5">
+                <i class="fa-solid fa-layer-group text-amber-300"></i>
+                <span>Multi-Screen</span>
+            </span>
+            <span class="text-slate-300 font-medium hidden sm:inline">Streaming in <strong>Web TV Mode</strong>. Switch to other platforms:</span>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+            <a href="{{ url_for('tv_player') }}" class="px-3 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 font-bold flex items-center gap-1.5 transition-all" title="Launch 10-Foot D-Pad Remote Mode">
+                <i class="fa-solid fa-tv text-cyan-300"></i>
+                <span>Smart TV Mode</span>
+            </a>
+            <a href="{{ url_for('multi_device_apps') }}#android" class="px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 font-bold flex items-center gap-1.5 transition-all" title="Install Android PWA App">
+                <i class="fa-brands fa-android text-emerald-400"></i>
+                <span>Android App</span>
+            </a>
+            <a href="{{ url_for('multi_device_apps') }}#xtream" class="px-3 py-1.5 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/40 text-amber-300 font-bold flex items-center gap-1.5 transition-all" title="IPTV Smarters & TiviMate Setup">
+                <i class="fa-solid fa-server text-amber-400"></i>
+                <span>Xtream Codes</span>
+            </a>
+            <a href="{{ url_for('multi_device_apps') }}" class="px-3 py-1.5 rounded-xl bg-obsidian-900 hover:bg-obsidian-800 border border-white/[0.1] text-slate-300 font-semibold flex items-center gap-1 transition-all" title="All Compatible Screens">
+                <span>All Devices &rarr;</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 2. CATEGORY PILLS BAR -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        <a href="{{ url_for('index', category='All') }}" 
+           class="px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2
+                  {% if selected_category == 'All' %}bg-brand-600 text-white shadow-lg shadow-brand-600/30 border border-brand-500/50{% else %}cinema-glass-card text-slate-300 hover:text-white{% endif %}">
+            <i class="fa-solid fa-border-all"></i>
+            <span>All Channels</span>
+        </a>
+
+        {% for cat in categories %}
+        {% if cat.channel_count > 0 %}
+        <a href="{{ url_for('index', category=cat.name) }}" 
+           class="px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2
+                  {% if selected_category == cat.name %}bg-brand-600 text-white shadow-lg shadow-brand-600/30 border border-brand-500/50{% else %}cinema-glass-card text-slate-300 hover:text-white{% endif %}">
+            {% if cat.name == 'Sports' or cat.icon == 'trophy' %}<i class="fa-solid fa-trophy text-amber-400"></i>
+            {% elif cat.name == 'News' or cat.icon == 'newspaper' %}<i class="fa-solid fa-newspaper text-sky-400"></i>
+            {% elif cat.name == 'Islamic' or cat.icon == 'moon' %}<i class="fa-solid fa-moon text-emerald-400"></i>
+            {% elif cat.name == 'Kids' or cat.icon == 'smile' %}<i class="fa-solid fa-face-smile text-pink-400"></i>
+            {% elif cat.name == 'Documentary' or cat.icon == 'compass' %}<i class="fa-solid fa-compass text-teal-400"></i>
+            {% elif cat.name == 'Music' or cat.icon == 'music' %}<i class="fa-solid fa-music text-purple-400"></i>
+            {% elif cat.name == 'Movies' %}<i class="fa-solid fa-film text-rose-400"></i>
+            {% elif cat.name == 'Comedy' %}<i class="fa-solid fa-masks-theater text-yellow-400"></i>
+            {% elif cat.name == 'Cooking' %}<i class="fa-solid fa-utensils text-orange-400"></i>
+            {% elif cat.name == 'Education' %}<i class="fa-solid fa-graduation-cap text-indigo-400"></i>
+            {% elif cat.name == 'Business' %}<i class="fa-solid fa-briefcase text-blue-400"></i>
+            {% else %}<i class="fa-solid fa-tv text-slate-400"></i>{% endif %}
+            <span>{{ cat.name }}</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-black/40 text-slate-300 font-mono">
+                {{ cat.channel_count }}
+            </span>
+        </a>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- 3. CHANNELS GRID SECTION -->
+    <div class="space-y-4">
+        <div class="flex items-center justify-between">
+            <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2 flex-wrap">
+                <i class="fa-solid fa-layer-group text-brand-400"></i>
+                <span>Available Channels ({{ channels|length }}{% if total_channel_count and total_channel_count > channels|length %} of {{ total_channel_count }}{% endif %})</span>
+                {% if package_name %}
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold {% if is_all_access %}bg-amber-500/20 text-amber-300 border border-amber-500/30{% else %}bg-purple-500/20 text-purple-300 border border-purple-500/30{% endif %}">
+                    <i class="fa-solid fa-box-archive text-[9px]"></i>
+                    <span>{{ package_name }}</span>
+                </span>
+                {% endif %}
+            </h3>
+
+            <!-- Instant client filter & Mode controls -->
+            <div class="flex items-center gap-2">
+                <a href="{{ url_for('tv_player', category=selected_category) }}" class="px-3 py-1.5 rounded-xl bg-cyan-600/20 text-cyan-300 border border-cyan-500/30 text-xs font-bold hidden sm:flex items-center gap-1.5 hover:bg-cyan-600 hover:text-white transition-all shadow-sm" title="Smart TV Mode">
+                    <i class="fa-solid fa-tv"></i>
+                    <span>TV Mode</span>
+                </a>
+                <a href="{{ url_for('index', online_only='0' if online_only else '1', category=selected_category, q=request.args.get('q', '')) }}" 
+                   class="px-3 py-1.5 rounded-xl {% if online_only %}bg-emerald-600 text-white border-emerald-400 shadow-md shadow-emerald-600/30{% else %}bg-obsidian-900 text-slate-300 border-white/10{% endif %} border text-xs font-bold flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-circle-check {% if online_only %}text-white{% else %}text-emerald-400{% endif %}"></i>
+                    <span class="hidden md:inline">{% if online_only %}Online Feeds Only{% else %}Filter Online{% endif %}</span>
+                </a>
+                <div class="w-36 sm:w-56">
+                    <input type="text" id="channelFilterInput" placeholder="Quick filter..." 
+                           class="w-full bg-obsidian-900/90 text-xs text-slate-200 px-3.5 py-1.5 rounded-xl border border-white/[0.08] focus:outline-none focus:border-brand-500">
+                </div>
+            </div>
+        </div>
+
+        {% if channels %}
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5" id="channelsGrid">
+            {% for ch in channels %}
+            <div class="channel-card cinema-glass-card rounded-2xl p-3 border border-white/[0.08] transition-all cursor-pointer relative group flex flex-col justify-between
+                        {% if active_channel and active_channel.id == ch.id %}ring-2 ring-brand-500 bg-brand-950/40{% endif %}"
+                 data-id="{{ ch.id }}"
+                 data-name="{{ ch.name }}"
+                 data-category="{{ ch.category }}"
+                 data-url="{{ ch.stream_url }}"
+                 onclick="onChannelClick(this)">
+                
+                <!-- Card Top: Category, Health Status & Favorite -->
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-1.5 truncate max-w-[85px]">
+                        <span class="text-[9px] font-bold px-2 py-0.5 rounded-md bg-obsidian-900 text-slate-300 uppercase tracking-wider truncate">
+                            {{ ch.category }}
+                        </span>
+                        {% if ch.health_status == 'online' %}
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 live-pulse shrink-0" title="Online stream ({{ ch.response_time_ms }}ms)"></span>
+                        {% elif ch.health_status == 'slow' %}
+                        <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0" title="Slow stream (>2.5s)"></span>
+                        {% endif %}
+                    </div>
+                    <button type="button" onclick="event.stopPropagation(); toggleFavorite({{ ch.id }});" id="fav-{{ ch.id }}" 
+                            class="text-xs {% if ch.id in fav_ids %}text-rose-500{% else %}text-slate-600 group-hover:text-slate-400{% endif %} hover:scale-125 transition-all">
+                        <i class="{% if ch.id in fav_ids %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+                    </button>
+                </div>
+
+                <!-- Channel Logo -->
+                <div class="h-20 w-full flex items-center justify-center p-2 rounded-xl bg-obsidian-950/90 mb-2 overflow-hidden border border-white/[0.04]">
+                    {% if ch.logo %}
+                    <img src="{{ ch.logo }}" alt="{{ ch.name }}" class="max-h-full max-w-full object-contain filter group-hover:scale-105 transition-transform" onerror="this.onerror=null; this.src='https://placehold.co/120x80/0f172a/38bdf8?text=TV';">
+                    {% else %}
+                    <div class="w-10 h-10 rounded-full bg-obsidian-800 flex items-center justify-center text-slate-400">
+                        <i class="fa-solid fa-satellite-dish text-base"></i>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Channel Title & Play Action -->
+                <div>
+                    <h4 class="text-xs font-semibold text-white truncate text-center group-hover:text-brand-400 transition-colors">
+                        {{ ch.name }}
+                    </h4>
+                    <div class="flex items-center justify-center gap-1.5 mt-1 text-[10px] text-slate-400">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                        <span>Watch Live</span>
+                    </div>
+                </div>
+
+                <!-- Play Overlay Hint on Hover -->
+                <div class="absolute inset-0 bg-brand-600/20 backdrop-blur-[2px] rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                    <div class="w-10 h-10 rounded-full bg-brand-500 text-white flex items-center justify-center shadow-xl shadow-brand-500/40 transform group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-play text-xs ml-0.5"></i>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="cinema-glass-card rounded-3xl p-12 text-center border border-white/[0.08]">
+            <i class="fa-solid fa-tv text-slate-600 text-5xl mb-4"></i>
+            <h3 class="text-base font-bold text-white">No channels found in this category</h3>
+            <p class="text-slate-400 text-xs mt-1">Select another category or clear your search keyword.</p>
+            <a href="{{ url_for('index') }}" class="inline-block mt-4 px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-lg shadow-brand-600/30">
+                View All Channels
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Channel list for navigation (Safe JSON serialization)
+    const channelList = [
+        {% for ch in channels %}
+        {
+            id: {{ ch.id }},
+            name: {{ ch.name|tojson }},
+            category: {{ ch.category|tojson }},
+            url: {{ ch.stream_url|tojson }}
+        },
+        {% endfor %}
+    ];
+
+    function onChannelClick(card) {
+        const id = parseInt(card.getAttribute('data-id'));
+        const name = card.getAttribute('data-name');
+        const category = card.getAttribute('data-category');
+        const url = card.getAttribute('data-url');
+        loadChannel(id, name, category, url);
+    }
+
+    let currentChannelIndex = {% if active_channel %}
+        channelList.findIndex(c => c.id === {{ active_channel.id }})
+    {% else %}0{% endif %};
+
+    if (currentChannelIndex < 0) currentChannelIndex = 0;
+
+    let hls = null;
+    let streamRetryCount = 0;
+    const video = document.getElementById('iptvVideo');
+    const loadingOverlay = document.getElementById('playerLoading');
+    const errorOverlay = document.getElementById('playerError');
+    const activeNameElem = document.getElementById('activeChannelName');
+
+    function showPlayerError() {
+        if (loadingOverlay) loadingOverlay.classList.add('hidden');
+        if (errorOverlay) {
+            errorOverlay.classList.remove('hidden');
+            errorOverlay.classList.add('flex');
+        }
+    }
+
+    function hidePlayerError() {
+        if (errorOverlay) {
+            errorOverlay.classList.add('hidden');
+            errorOverlay.classList.remove('flex');
+        }
+    }
+
+    function playStream(channelId, rawStreamUrl) {
+        if (!video) return;
+        streamRetryCount = 0;
+
+        if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+        hidePlayerError();
+
+        const proxiedStreamUrl = `/stream/${channelId}`;
+
+        if (hls) {
+            hls.destroy();
+            hls = null;
+        }
+
+        if (Hls.isSupported()) {
+            hls = new Hls({
+                maxBufferLength: 30,
+                maxMaxBufferLength: 60,
+                liveSyncDurationCount: 3,
+                enableWorker: true
+            });
+
+            hls.loadSource(proxiedStreamUrl);
+            hls.attachMedia(video);
+
+            hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                if (loadingOverlay) loadingOverlay.classList.add('hidden');
+                hidePlayerError();
+                video.play().catch(e => console.log('Autoplay policy deferred'));
+            });
+
+            hls.on(Hls.Events.ERROR, function (event, data) {
+                if (data.fatal) {
+                    console.warn('Fatal HLS error, attempting recovery:', data.type);
+                    streamRetryCount += 1;
+                    switch (data.type) {
+                        case Hls.ErrorTypes.NETWORK_ERROR:
+                            if (streamRetryCount === 1 && hls.url !== rawStreamUrl) {
+                                hls.loadSource(rawStreamUrl);
+                            } else if (streamRetryCount <= 2) {
+                                hls.startLoad();
+                            } else {
+                                showPlayerError();
+                                hls.destroy();
+                            }
+                            break;
+                        case Hls.ErrorTypes.MEDIA_ERROR:
+                            if (streamRetryCount <= 2) {
+                                hls.recoverMediaError();
+                            } else {
+                                showPlayerError();
+                                hls.destroy();
+                            }
+                            break;
+                        default:
+                            showPlayerError();
+                            hls.destroy();
+                            break;
+                    }
+                }
+            });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = proxiedStreamUrl;
+            video.onloadedmetadata = function () {
+                if (loadingOverlay) loadingOverlay.classList.add('hidden');
+                video.play().catch(e => console.log('Autoplay policy'));
+            };
+            video.onerror = function () {
+                if (video.src.includes('/stream/') && rawStreamUrl) {
+                    video.src = rawStreamUrl;
+                } else {
+                    showPlayerError();
+                }
+            };
+        }
+    }
+
+    function loadChannel(id, name, category, rawUrl) {
+        if (activeNameElem) activeNameElem.innerText = name;
+        const activeCatElem = document.getElementById('activeChannelCategory');
+        if (activeCatElem && category) activeCatElem.innerText = category;
+        const subNameElem = document.getElementById('subChannelName');
+        if (subNameElem) subNameElem.innerText = name;
+        const subCatElem = document.getElementById('subChannelCat');
+        if (subCatElem && category) subCatElem.innerText = category;
+
+        document.querySelectorAll('.channel-card').forEach(card => {
+            if (parseInt(card.getAttribute('data-id')) === id) {
+                card.classList.add('border-cyan-400', 'ring-2', 'ring-cyan-400/20');
+            } else {
+                card.classList.remove('border-cyan-400', 'ring-2', 'ring-cyan-400/20');
+            }
+        });
+
+        currentChannelIndex = channelList.findIndex(c => c.id === id);
+        
+        window.history.pushState({}, '', `/?channel_id=${id}`);
+        playStream(id, rawUrl);
+        
+        const container = document.getElementById('playerContainer');
+        if (container) {
+            container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+
+    function reloadCurrentStream() {
+        if (channelList.length > 0 && currentChannelIndex >= 0) {
+            const ch = channelList[currentChannelIndex];
+            loadChannel(ch.id, ch.name, ch.category, ch.url);
+        }
+    }
+
+    function playNextChannel() {
+        if (channelList.length === 0) return;
+        currentChannelIndex = (currentChannelIndex + 1) % channelList.length;
+        const nextCh = channelList[currentChannelIndex];
+        loadChannel(nextCh.id, nextCh.name, nextCh.category, nextCh.url);
+    }
+
+    function playPrevChannel() {
+        if (channelList.length === 0) return;
+        currentChannelIndex = (currentChannelIndex - 1 + channelList.length) % channelList.length;
+        const prevCh = channelList[currentChannelIndex];
+        loadChannel(prevCh.id, prevCh.name, prevCh.category, prevCh.url);
+    }
+
+    function togglePictureInPicture() {
+        if (!video) return;
+        if (document.pictureInPictureElement) {
+            document.exitPictureInPicture();
+        } else if (document.pictureInPictureEnabled) {
+            video.requestPictureInPicture();
+        }
+    }
+
+    function toggleTheaterMode() {
+        const container = document.getElementById('playerContainer');
+        if (!container) return;
+        if (!document.fullscreenElement) {
+            container.requestFullscreen().catch(err => {
+                alert(`Error entering fullscreen: ${err.message}`);
+            });
+        } else {
+            document.exitFullscreen();
+        }
+    }
+
+    // Favorites AJAX Toggle
+    function toggleFavorite(channelId) {
+        fetch('/api/favorite/toggle', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ channel_id: channelId })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                const btns = [document.getElementById(`fav-${channelId}`), document.getElementById(`favBtn-${channelId}`)];
+                btns.forEach(btn => {
+                    if (btn) {
+                        const icon = btn.querySelector('i');
+                        if (data.is_favorite) {
+                            btn.classList.add('text-rose-500');
+                            btn.classList.remove('text-slate-600', 'text-slate-500');
+                            if (icon) { icon.classList.remove('fa-regular'); icon.classList.add('fa-solid'); }
+                        } else {
+                            btn.classList.remove('text-rose-500');
+                            btn.classList.add('text-slate-500');
+                            if (icon) { icon.classList.remove('fa-solid'); icon.classList.add('fa-regular'); }
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    // Client-side quick filter
+    const filterInput = document.getElementById('channelFilterInput');
+    if (filterInput) {
+        filterInput.addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.channel-card');
+            cards.forEach(card => {
+                const name = (card.getAttribute('data-name') || '').toLowerCase();
+                const cat = (card.getAttribute('data-category') || '').toLowerCase();
+                if (name.includes(query) || cat.includes(query)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Keyboard Shortcuts
+    document.addEventListener('keydown', function(e) {
+        if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+        if (e.key === ' ' || e.code === 'Space') {
+            e.preventDefault();
+            if (video.paused) video.play(); else video.pause();
+        } else if (e.key === 'f' || e.key === 'F') {
+            e.preventDefault();
+            toggleTheaterMode();
+        } else if (e.key === 'm' || e.key === 'M') {
+            e.preventDefault();
+            video.muted = !video.muted;
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            playPrevChannel();
+        } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            playNextChannel();
+        }
+    });
+
+    // Mobile Touch Gestures for Channel Switching
+    const pContainer = document.getElementById('playerContainer');
+    if (pContainer) {
+        let touchX = 0;
+        let touchY = 0;
+        pContainer.addEventListener('touchstart', function(e) {
+            touchX = e.changedTouches[0].screenX;
+            touchY = e.changedTouches[0].screenY;
+        }, { passive: true });
+
+        pContainer.addEventListener('touchend', function(e) {
+            const dx = e.changedTouches[0].screenX - touchX;
+            const dy = e.changedTouches[0].screenY - touchY;
+            if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+                if (dx < 0) {
+                    playNextChannel();
+                } else {
+                    playPrevChannel();
+                }
+            }
+        }, { passive: true });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        {% if active_channel %}
+        playStream({{ active_channel.id }}, {{ active_channel.stream_url|tojson }});
+        {% endif %}
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Xtream Codes API & Client Compatibility - SABRO VISION v1.0{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Admin Nav Tabs -->
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-4 flex-wrap gap-4">
+        <div class="flex items-center gap-2 overflow-x-auto scrollbar-none text-xs font-bold">
+            <a href="{{ url_for('admin_dashboard') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-brand-400"></i>
+                <span>Overview</span>
+            </a>
+            <a href="{{ url_for('admin_customers') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-users text-cyan-300"></i>
+                <span>Customers & PPPoE</span>
+            </a>
+            <a href="{{ url_for('admin_xtream') }}" class="px-3.5 py-2 rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/30 flex items-center gap-2">
+                <i class="fa-solid fa-server text-emerald-400"></i>
+                <span>Xtream Codes API</span>
+            </a>
+            <a href="{{ url_for('admin_resellers') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-handshake text-cyan-300"></i>
+                <span>Resellers & B2B</span>
+            </a>
+            <a href="{{ url_for('admin_payments') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice-dollar text-amber-400"></i>
+                <span>Payment Queue</span>
+            </a>
+            <a href="{{ url_for('admin_packages') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-box-archive text-purple-400"></i>
+                <span>Packages</span>
+            </a>
+            <a href="{{ url_for('admin_keys') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-key text-amber-400"></i>
+                <span>Access Keys</span>
+            </a>
+            <a href="{{ url_for('admin_channels') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-tv text-sky-400"></i>
+                <span>Channels</span>
+            </a>
+            <a href="{{ url_for('admin_audit') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-shield text-rose-400"></i>
+                <span>Audit & Security</span>
+            </a>
+            <a href="{{ url_for('admin_settings') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-gear text-slate-400"></i>
+                <span>Settings</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Xtream Codes API Server Info Banner -->
+    <div class="cinema-glass-card rounded-3xl p-6 sm:p-8 border border-emerald-500/30 bg-gradient-to-r from-emerald-950/30 via-obsidian-900/60 to-indigo-950/30 relative overflow-hidden">
+        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+            <div>
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold uppercase tracking-wider mb-2 border border-emerald-500/30">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse"></span>
+                    Xtream Codes API v2 Active & Online
+                </div>
+                <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">
+                    Smart TV & Android App Compatibility Engine
+                </h2>
+                <p class="text-xs text-slate-300 mt-1 max-w-xl">
+                    SABRO VISION natively supports standard Xtream Codes API (<code class="text-cyan-300">/player_api.php</code>). Subscribers can use off-the-shelf apps: <strong>IPTV Smarters Pro, TiviMate, XCIPTV, OTT Navigator, Televizo</strong> on Android TV, FireStick, Smart TVs, and smartphones.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 text-xs w-full lg:w-auto shrink-0">
+                <div class="p-3 rounded-2xl bg-obsidian-950/80 border border-white/[0.08]">
+                    <span class="block text-[10px] uppercase font-bold text-slate-400">Server Host / URL</span>
+                    <span class="font-mono font-bold text-cyan-300 select-all">{{ host_url }}</span>
+                </div>
+                <div class="p-3 rounded-2xl bg-obsidian-950/80 border border-white/[0.08]">
+                    <span class="block text-[10px] uppercase font-bold text-slate-400">Port</span>
+                    <span class="font-mono font-bold text-emerald-300 select-all">{{ server_port }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Connection Instructions for Client Apps -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- 1. IPTV Smarters Pro -->
+        <div class="cinema-glass-card rounded-2xl p-5 border border-white/[0.08] flex flex-col justify-between">
+            <div>
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-8 h-8 rounded-xl bg-cyan-600/20 border border-cyan-500/30 text-cyan-400 flex items-center justify-center font-bold text-xs">
+                        1
+                    </div>
+                    <h3 class="font-bold text-white text-xs">IPTV Smarters Pro</h3>
+                </div>
+                <ol class="text-[11px] text-slate-300 space-y-1.5 list-decimal list-inside leading-relaxed">
+                    <li>Open Smarters and choose <strong>Login with Xtream Codes API</strong></li>
+                    <li>Any Name: <code class="text-cyan-300">Sabro Vision</code></li>
+                    <li>Username & Password: from customer list below</li>
+                    <li>Server URL: <code class="text-cyan-300">{{ host_url }}</code></li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- 2. TiviMate IPTV Player -->
+        <div class="cinema-glass-card rounded-2xl p-5 border border-white/[0.08] flex flex-col justify-between">
+            <div>
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-8 h-8 rounded-xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center font-bold text-xs">
+                        2
+                    </div>
+                    <h3 class="font-bold text-white text-xs">TiviMate (Android TV)</h3>
+                </div>
+                <ol class="text-[11px] text-slate-300 space-y-1.5 list-decimal list-inside leading-relaxed">
+                    <li>Select <strong>Add Playlist &gt; Xtream Codes</strong></li>
+                    <li>Server Address: <code class="text-cyan-300">{{ host_url }}</code></li>
+                    <li>Enter customer's <strong>Username</strong> & <strong>Password</strong></li>
+                    <li>EPG & 11,400+ channels load automatically!</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- 3. VLC / M3U Playlist URL -->
+        <div class="cinema-glass-card rounded-2xl p-5 border border-white/[0.08] flex flex-col justify-between">
+            <div>
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-8 h-8 rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-400 flex items-center justify-center font-bold text-xs">
+                        3
+                    </div>
+                    <h3 class="font-bold text-white text-xs">VLC & M3U URL</h3>
+                </div>
+                <p class="text-[11px] text-slate-300 leading-relaxed mb-2">
+                    For VLC Media Player, Apple TV, iOS, or MAG boxes, use the dynamic M3U playlist format:
+                </p>
+                <div class="p-2 rounded-xl bg-obsidian-950 font-mono text-[10px] text-cyan-300 truncate select-all">
+                    {{ host_url }}/get.php?username=USER&password=PASS&type=m3u_plus
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Xtream Subscriber Accounts Ledger -->
+    <div class="cinema-glass-card rounded-2xl border border-white/[0.08] overflow-hidden">
+        <div class="p-4 border-b border-white/[0.08] flex items-center justify-between">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                <i class="fa-solid fa-list-check text-brand-400"></i>
+                <span>Active Xtream Accounts & Copy Setup</span>
+            </h3>
+            <span class="text-[11px] text-slate-400">Click copy to generate ready-to-send WhatsApp configuration</span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-obsidian-900/80 text-slate-400 border-b border-white/[0.08] font-bold uppercase tracking-wider text-[10px]">
+                    <tr>
+                        <th class="py-3 px-4">Username</th>
+                        <th class="py-3 px-4">Password</th>
+                        <th class="py-3 px-4">Full Name / Phone</th>
+                        <th class="py-3 px-4">PPPoE Link</th>
+                        <th class="py-3 px-4">Status</th>
+                        <th class="py-3 px-4 text-right">1-Click Client Setup</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/[0.06] text-slate-200 font-mono text-xs">
+                    {% for sub in subscribers %}
+                    <tr class="hover:bg-white/[0.02] transition-colors">
+                        <td class="py-3 px-4 font-bold text-cyan-300">{{ sub.username }}</td>
+                        <td class="py-3 px-4 font-bold text-emerald-300">{{ sub.plain_password or '••••••••' }}</td>
+                        <td class="py-3 px-4 font-sans text-[11px] text-slate-300">{{ sub.full_name or '—' }} ({{ sub.phone or 'No Phone' }})</td>
+                        <td class="py-3 px-4 text-[11px] text-slate-400">{{ sub.pppoe_username or '—' }}</td>
+                        <td class="py-3 px-4">
+                            {% if sub.status == 'active' %}
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-sans font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Active</span>
+                            {% else %}
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-sans font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">{{ sub.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4 text-right font-sans">
+                            <button type="button" onclick="copyXtreamConfig('{{ sub.username }}', '{{ sub.plain_password }}', '{{ host_url }}')" 
+                                    class="px-3 py-1.5 rounded-xl bg-cyan-950/40 hover:bg-cyan-900/60 text-cyan-300 border border-cyan-800/40 text-[11px] font-bold inline-flex items-center gap-1.5 transition-all">
+                                <i class="fa-brands fa-whatsapp text-xs text-emerald-400"></i>
+                                <span>Copy Client Setup</span>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function copyXtreamConfig(username, password, serverUrl) {
+        const text = `SABRO VISION IPTV Setup Details:\n\nApp: IPTV Smarters Pro / TiviMate / XCIPTV\nServer URL: ${serverUrl}\nUsername: ${username}\nPassword: ${password}\n\nDynamic M3U Playlist:\n${serverUrl}/get.php?username=${username}&password=${password}&type=m3u_plus\n\nEnjoy buffer-free streaming! Support: Sabro Networks`;
+        navigator.clipboard.writeText(text);
+        alert(`Xtream setup details for ${username} copied to clipboard! You can paste directly to customer WhatsApp.`);
+    }
+</script>
+{% endblock %}

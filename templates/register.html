@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Create Subscriber Account - {{ settings.platform_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto py-10">
+    <div class="cinema-glass-card rounded-3xl p-8 border border-white/[0.08] shadow-2xl relative">
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-600 shadow-xl shadow-brand-500/25 border border-white/20 mb-3">
+                <i class="fa-solid fa-user-plus text-white text-xl"></i>
+            </div>
+            <h2 class="text-xl font-bold text-white tracking-tight">Create Subscriber Account</h2>
+            <p class="text-xs text-slate-400 mt-1">Keep your monthly IPTV access keys safe & manage your devices</p>
+        </div>
+
+        <form action="{{ url_for('register') }}" method="POST" class="space-y-4">
+            <div>
+                <label for="username" class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                    Username <span class="text-rose-400">*</span>
+                </label>
+                <div class="relative">
+                    <input type="text" name="username" id="username" required value="{{ username or '' }}" autofocus placeholder="e.g. saadiqbal"
+                           class="w-full bg-obsidian-900/90 text-xs text-white px-3.5 py-2.5 rounded-xl border border-white/[0.08] focus:outline-none focus:border-brand-400">
+                </div>
+            </div>
+
+            <div>
+                <label for="password" class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                    Password <span class="text-rose-400">*</span>
+                </label>
+                <div class="relative">
+                    <input type="password" name="password" id="password" required minlength="6" placeholder="At least 6 characters"
+                           class="w-full bg-obsidian-900/90 text-xs text-white px-3.5 py-2.5 rounded-xl border border-white/[0.08] focus:outline-none focus:border-brand-400">
+                </div>
+            </div>
+
+            <div>
+                <label for="phone" class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                    Phone / WhatsApp Number (Optional)
+                </label>
+                <div class="relative">
+                    <input type="text" name="phone" id="phone" value="{{ phone or '' }}" placeholder="0300-1234567"
+                           class="w-full bg-obsidian-900/90 text-xs text-white px-3.5 py-2.5 rounded-xl border border-white/[0.08] focus:outline-none focus:border-brand-400">
+                </div>
+            </div>
+
+            <div class="pt-1">
+                <label for="key_code" class="block text-[11px] font-bold uppercase tracking-wider text-brand-300 mb-1.5 flex items-center justify-between">
+                    <span><i class="fa-solid fa-key mr-1"></i> Access Key (Optional)</span>
+                    <span class="text-[10px] text-slate-500 font-normal">Can add later</span>
+                </label>
+                <div class="relative">
+                    <input type="text" name="key_code" id="key_code" value="{{ key_code or '' }}" placeholder="SABRO-XXXX-XXXX-XXXX"
+                           class="w-full bg-obsidian-900/90 text-xs text-cyan-300 font-mono px-3.5 py-2.5 rounded-xl border border-brand-500/30 focus:outline-none focus:border-brand-400 uppercase">
+                </div>
+                <p class="text-[10px] text-slate-500 mt-1">If you have a monthly pass key, enter it to bind it safely to your account right away.</p>
+            </div>
+
+            <button type="submit" class="w-full mt-2 py-3 px-4 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-brand-500/25 flex items-center justify-center gap-2 transition-all">
+                <i class="fa-solid fa-check"></i>
+                <span>Register & Save Key Safe</span>
+            </button>
+        </form>
+
+        <div class="mt-6 pt-4 border-t border-white/[0.06] text-center">
+            <span class="text-xs text-slate-400">Already registered?</span>
+            <a href="{{ url_for('gatekeeper') }}" class="text-xs text-brand-400 font-bold hover:underline ml-1">
+                Sign In to Account
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

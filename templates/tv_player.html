@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart TV WebApp - {{ settings.platform_name }}</title>
+
+    <!-- Web App Manifest for Smart TV & Mobile -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#06b6d4">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace']
+                    },
+                    colors: {
+                        brand: {
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                            600: '#0891b2'
+                        },
+                        obsidian: {
+                            800: '#111827',
+                            900: '#070b14',
+                            950: '#03060d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Hls.js & TV Styles -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tv.css') }}">
+
+    <style>
+        .tv-card-glow {
+            background: linear-gradient(180deg, rgba(13, 19, 34, 0.9) 0%, rgba(3, 6, 13, 0.98) 100%);
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .tv-card-glow:hover, .tv-card-glow.tv-focused {
+            border-color: #00d2ff !important;
+            box-shadow: 0 0 35px rgba(0, 210, 255, 0.75), inset 0 0 15px rgba(0, 210, 255, 0.25) !important;
+            transform: scale(1.05);
+        }
+        .live-pulse {
+            animation: pulse-dot 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.35; transform: scale(0.85); }
+        }
+    </style>
+</head>
+<body class="tv-mode bg-obsidian-950 text-slate-100 min-h-screen overflow-hidden font-sans selection:bg-brand-500">
+
+    <!-- Direct Channel Tuning Digit Banner (e.g. typing "12" on remote) -->
+    <div id="tvNumberBanner" class="fixed top-8 right-8 z-50 hidden cinema-glass px-6 py-4 rounded-3xl border-2 border-brand-400 shadow-2xl bg-black/90 flex items-center gap-3">
+        <i class="fa-solid fa-satellite-dish text-brand-400 text-xl"></i>
+        <span class="text-xs font-bold uppercase tracking-widest text-slate-400">CH #</span>
+        <span id="tvNumberDigits" class="text-4xl font-mono font-black text-white"></span>
+    </div>
+
+    <!-- MAIN TV LEANBACK INTERFACE (Channel Guide / Category Carousel) -->
+    <div id="tvGuideScreen" class="h-screen flex flex-col justify-between p-6 sm:p-10 transition-opacity duration-300">
+        
+        <!-- Header: Logo, Time & Quick Controls -->
+        <header class="flex items-center justify-between border-b border-white/[0.08] pb-4">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-600 via-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-brand-500/30 border border-white/20">
+                    <i class="fa-solid fa-satellite-dish text-white text-xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2.5">
+                        <h1 class="text-2xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-brand-400">
+                            {{ settings.platform_name }}
+                        </h1>
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-cyan-400 live-pulse"></span>
+                            SMART TV LEANBACK
+                        </span>
+                        {% if package_name %}
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider {% if is_all_access %}bg-amber-500/20 text-amber-300 border border-amber-500/30{% else %}bg-purple-500/20 text-purple-300 border border-purple-500/30{% endif %}">
+                            <i class="fa-solid fa-box-archive mr-1"></i> {{ package_name }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <p class="text-xs text-slate-400 font-semibold mt-0.5">Sabro Networks Fiber IPTV • 10-Foot Remote UI</p>
+                </div>
+            </div>
+
+            <!-- Remote Help & Filter Controls -->
+            <div class="flex items-center gap-4">
+                <!-- Verified Working Only Filter Toggle -->
+                <a href="{{ url_for('tv_player', online_only='0' if online_only else '1', category=selected_category) }}" 
+                   data-tv-focus="true"
+                   class="tv-focusable px-4 py-2.5 rounded-2xl {% if online_only %}bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 border-emerald-400{% else %}bg-obsidian-900 text-slate-300 border-white/10{% endif %} border text-xs font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-circle-check {% if online_only %}text-white{% else %}text-emerald-400{% endif %}"></i>
+                    <span>{% if online_only %}Showing: Verified Working (Online){% else %}Filter: Show Online Only{% endif %}</span>
+                </a>
+
+                <!-- Remote Control Help Pill -->
+                <button type="button" onclick="toggleRemoteModal()" data-tv-focus="true" class="tv-focusable px-4 py-2.5 rounded-2xl bg-obsidian-900 border border-white/10 text-slate-300 hover:text-white text-xs font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-gamepad text-amber-400"></i>
+                    <span>Remote Keys Guide (?)</span>
+                </button>
+
+                <!-- Exit TV Mode to Standard Web -->
+                <a href="{{ url_for('index') }}" data-tv-focus="true" class="tv-focusable px-4 py-2.5 rounded-2xl bg-obsidian-900 border border-white/10 text-slate-300 hover:text-white text-xs font-bold flex items-center gap-1.5">
+                    <i class="fa-solid fa-desktop text-cyan-400"></i>
+                    <span>Web Mode</span>
+                </a>
+
+                <!-- Multi-Device & Apps Hub -->
+                <a href="{{ url_for('multi_device_apps') }}" data-tv-focus="true" class="tv-focusable px-4 py-2.5 rounded-2xl bg-obsidian-900 border border-white/10 text-slate-300 hover:text-white text-xs font-bold flex items-center gap-1.5">
+                    <i class="fa-solid fa-layer-group text-purple-400"></i>
+                    <span>All Devices</span>
+                </a>
+
+                <!-- TV Clock -->
+                <div class="px-5 py-2.5 rounded-2xl bg-obsidian-900/90 border border-white/[0.08] font-mono text-sm font-black text-cyan-300 shadow-inner" id="tvClock">
+                    --:--:--
+                </div>
+            </div>
+        </header>
+
+        <!-- Horizontal Category Ribbon -->
+        <nav class="py-4">
+            <div class="flex items-center gap-3 overflow-x-auto scrollbar-none py-2 px-1">
+                <a href="{{ url_for('tv_player', category='all', online_only='1' if online_only else '0') }}" 
+                   data-tv-focus="true"
+                   class="tv-focusable px-5 py-3 rounded-2xl text-xs font-black uppercase tracking-wider whitespace-nowrap {% if selected_category == 'all' %}bg-gradient-to-r from-brand-600 to-indigo-600 text-white shadow-xl shadow-brand-500/30 tv-default-focus{% else %}bg-obsidian-900/90 text-slate-300 border border-white/10 hover:text-white{% endif %}">
+                    <i class="fa-solid fa-layer-group mr-2"></i> All ({{ total_channels_count }})
+                </a>
+                {% for cat in categories %}
+                <a href="{{ url_for('tv_player', category=cat.name, online_only='1' if online_only else '0') }}" 
+                   data-tv-focus="true"
+                   class="tv-focusable px-5 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider whitespace-nowrap {% if selected_category == cat.name %}bg-gradient-to-r from-brand-600 to-indigo-600 text-white shadow-xl shadow-brand-500/30{% else %}bg-obsidian-900/90 text-slate-300 border border-white/10 hover:text-white{% endif %}">
+                    <span>{{ cat.name }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </nav>
+
+        <!-- Main TV Channel Grid (Scrollable via D-Pad) -->
+        <main class="flex-1 overflow-y-auto px-2 py-2" id="tvChannelGridContainer">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5" id="tvChannelGrid">
+                {% for ch in channels %}
+                <div data-tv-focus="true"
+                     data-channel-id="{{ ch.id }}"
+                     data-channel-num="{{ loop.index }}"
+                     data-channel-name="{{ ch.name }}"
+                     data-channel-cat="{{ ch.category }}"
+                     data-raw-url="{{ ch.stream_url }}"
+                     data-stream-url="{% if settings.stream_proxy_enabled == '1' %}{{ url_for('proxy_url', url=ch.stream_url) }}{% else %}{{ ch.stream_url }}{% endif %}"
+                     onclick="launchTvPlayback(this)"
+                     class="tv-focusable tv-card-glow rounded-3xl p-4 flex flex-col justify-between cursor-pointer relative group transition-all">
+                    
+                    <!-- Top Pill: Channel Number & Health Status -->
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-2.5 py-0.5 rounded-full font-mono text-[10px] font-black bg-white/10 text-cyan-300">
+                            #{{ loop.index }}
+                        </span>
+                        
+                        {% if ch.health_status == 'online' %}
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse"></span>
+                            {{ ch.response_time_ms }}ms
+                        </span>
+                        {% elif ch.health_status == 'slow' %}
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                            Slow
+                        </span>
+                        {% else %}
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-800 text-slate-400">
+                            Stream
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Channel Logo or Default Graphic -->
+                    <div class="w-full h-24 rounded-2xl bg-black/60 flex items-center justify-center p-3 mb-3 border border-white/5 overflow-hidden">
+                        {% if ch.logo %}
+                        <img src="{{ ch.logo }}" alt="{{ ch.name }}" class="max-h-full max-w-full object-contain filter drop-shadow group-hover:scale-105 transition-transform" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fa-solid fa-tv text-3xl text-brand-400\'></i>';">
+                        {% else %}
+                        <i class="fa-solid fa-tv text-3xl text-brand-400 group-hover:scale-110 transition-transform"></i>
+                        {% endif %}
+                    </div>
+
+                    <!-- Channel Title & Category -->
+                    <div>
+                        <h3 class="text-sm font-black text-white truncate mb-0.5">{{ ch.name }}</h3>
+                        <p class="text-[11px] text-slate-400 font-semibold truncate">{{ ch.category }}</p>
+                    </div>
+
+                    <!-- Play Hint on Remote Focus -->
+                    <div class="mt-2 text-center text-[10px] font-black uppercase tracking-wider text-brand-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                        Press [OK] to Watch
+                    </div>
+                </div>
+                {% else %}
+                <div class="col-span-full text-center py-20 text-slate-400">
+                    <i class="fa-solid fa-satellite-dish text-4xl text-slate-600 mb-3"></i>
+                    <p class="text-sm font-bold">No channels found matching the selected filter.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </main>
+
+        <!-- Bottom Status Bar -->
+        <footer class="pt-4 border-t border-white/[0.08] flex items-center justify-between text-xs text-slate-400">
+            <div class="flex items-center gap-3">
+                <span class="font-bold text-white">Showing {{ channels|length }} Channels</span>
+                <span>•</span>
+                <span>D-Pad <strong class="text-cyan-300">[&uarr;&darr;&larr;&rarr;]</strong> Navigate</span>
+                <span>•</span>
+                <span><strong class="text-cyan-300">[OK]</strong> Watch Live</span>
+                <span>•</span>
+                <span><strong class="text-cyan-300">[0-9]</strong> Tune Channel</span>
+                <span>•</span>
+                <span><strong class="text-cyan-300">[Back]</strong> Exit</span>
+            </div>
+            <div>
+                All Rights Reserved © 2026 SABRO VISION v1.0 • Vshatkay Solutions
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- FULLSCREEN SMART TV VIDEO PLAYER STAGE (Hidden until a channel is selected) -->
+    <div id="tvPlaybackStage" class="fixed inset-0 z-50 bg-black hidden flex items-center justify-center">
+        
+        <!-- Video Stream Element -->
+        <video id="tvVideo" class="w-full h-full object-contain" autoplay playsinline></video>
+
+        <!-- Loading Indicator -->
+        <div id="tvVideoLoading" class="absolute inset-0 bg-black/85 flex flex-col items-center justify-center gap-4 z-10">
+            <div class="w-16 h-16 border-4 border-brand-400 border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-sm font-bold uppercase tracking-widest text-slate-300">Tuning Sabro Vision HD Feed...</p>
+        </div>
+
+        <!-- TV On-Screen Display (OSD) Overlay -->
+        <div id="tvOsdOverlay" class="absolute bottom-0 inset-x-0 p-8 cinema-glass bg-gradient-to-t from-black/95 via-black/80 to-transparent border-t border-white/10 z-20 transition-all duration-300 transform">
+            <div class="max-w-6xl mx-auto flex items-center justify-between gap-6">
+                
+                <div class="flex items-center gap-5">
+                    <!-- Channel Number Badge -->
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center font-mono font-black text-2xl text-white shadow-xl shadow-brand-500/40 border border-white/20">
+                        <span id="osdChannelNum">#1</span>
+                    </div>
+
+                    <!-- Channel Name & Category -->
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <h2 id="osdChannelName" class="text-2xl font-black text-white tracking-wide">Channel Name</h2>
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-500/20 text-rose-400 border border-rose-500/40 flex items-center gap-1.5 shadow-sm">
+                                <span class="w-2 h-2 rounded-full bg-rose-500 live-pulse"></span>
+                                LIVE
+                            </span>
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                                1080p FHD
+                            </span>
+                        </div>
+                        <p id="osdChannelCat" class="text-xs text-slate-300 font-semibold mt-1">Category • Sabro Networks High-Speed Optical Stream</p>
+                    </div>
+                </div>
+
+                <!-- Live Clock & Remote Navigation Guide -->
+                <div class="flex items-center gap-6">
+                    <div class="text-right">
+                        <div class="text-xs text-slate-400 font-semibold">Remote Shortcuts</div>
+                        <div class="text-xs font-bold text-cyan-300 mt-0.5">
+                            [CH+] Next • [CH-] Prev • [Back] Guide
+                        </div>
+                    </div>
+                    
+                    <button type="button" onclick="closeTvPlayback()" data-tv-focus="true" class="tv-focusable px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-2 border border-white/20 shadow-lg">
+                        <i class="fa-solid fa-table-cells"></i>
+                        <span>Channel Guide</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Remote Keys Guide Modal -->
+    <div id="tvRemoteModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center hidden p-6">
+        <div class="cinema-glass-card rounded-3xl p-8 max-w-lg w-full border border-white/20 bg-obsidian-900 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-gamepad text-2xl text-amber-400"></i>
+                    <h3 class="text-lg font-black text-white">Smart TV Remote Control Guide</h3>
+                </div>
+                <button type="button" onclick="toggleRemoteModal()" class="text-slate-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4 text-xs">
+                <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                    <span class="font-bold text-white">D-Pad Arrow Keys [&uarr;&darr;&larr;&rarr;]</span>
+                    <span class="text-cyan-300 font-mono">Navigate Channels & Categories</span>
+                </div>
+                <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                    <span class="font-bold text-white">[OK] / [Enter] Key</span>
+                    <span class="text-cyan-300 font-mono">Launch Fullscreen Video</span>
+                </div>
+                <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                    <span class="font-bold text-white">[Back] / [Escape] Key</span>
+                    <span class="text-cyan-300 font-mono">Exit Playback to Guide</span>
+                </div>
+                <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                    <span class="font-bold text-white">[CH+] / [CH-] or [PgUp]/[PgDn]</span>
+                    <span class="text-cyan-300 font-mono">Zap to Next / Previous Channel</span>
+                </div>
+                <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                    <span class="font-bold text-white">Number Keys [0-9]</span>
+                    <span class="text-cyan-300 font-mono">Tune Channel # Directly</span>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <button type="button" onclick="toggleRemoteModal()" data-tv-focus="true" class="tv-focusable w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-extrabold text-xs shadow-lg shadow-brand-500/25">
+                    Got It, Continue Watching
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Spatial Navigation Engine -->
+    <script src="{{ url_for('static', filename='js/tv_nav.js') }}"></script>
+
+    <script>
+        let currentHls = null;
+        let osdTimer = null;
+        let activeTvChannelIndex = 0;
+        const allChannelCards = Array.from(document.querySelectorAll('#tvChannelGrid > div[data-channel-id]'));
+
+        // Real-Time Clock
+        function updateClock() {
+            const now = new Date();
+            const str = now.toLocaleTimeString('en-US', { hour12: false });
+            const clockEl = document.getElementById('tvClock');
+            if (clockEl) clockEl.textContent = str;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Launch TV Video Playback
+        function launchTvPlayback(cardEl) {
+            if (!cardEl) return;
+            const streamUrl = cardEl.getAttribute('data-stream-url');
+            const rawUrl = cardEl.getAttribute('data-raw-url') || streamUrl;
+            const chName = cardEl.getAttribute('data-channel-name');
+            const chNum = cardEl.getAttribute('data-channel-num');
+            const chCat = cardEl.getAttribute('data-channel-cat');
+
+            activeTvChannelIndex = allChannelCards.indexOf(cardEl);
+
+            // Update OSD Info
+            document.getElementById('osdChannelNum').textContent = '#' + chNum;
+            document.getElementById('osdChannelName').textContent = chName;
+            document.getElementById('osdChannelCat').textContent = chCat + ' • Sabro Networks High-Speed Optical Stream';
+
+            // Show Playback Stage
+            const stage = document.getElementById('tvPlaybackStage');
+            const guide = document.getElementById('tvGuideScreen');
+            const loading = document.getElementById('tvVideoLoading');
+            const video = document.getElementById('tvVideo');
+
+            stage.classList.remove('hidden');
+            guide.classList.add('opacity-0', 'pointer-events-none');
+            loading.classList.remove('hidden');
+
+            // Play stream using Hls.js
+            if (currentHls) {
+                currentHls.destroy();
+                currentHls = null;
+            }
+
+            if (Hls.isSupported() && (streamUrl.includes('.m3u8') || streamUrl.includes('/proxy'))) {
+                let tvTriedFallback = false;
+                currentHls = new Hls({ enableWorker: true, lowLatencyMode: true });
+                currentHls.loadSource(streamUrl);
+                currentHls.attachMedia(video);
+                currentHls.on(Hls.Events.MANIFEST_PARSED, function () {
+                    video.play().catch(e => console.log('Autoplay policy caught:', e));
+                    loading.classList.add('hidden');
+                });
+                currentHls.on(Hls.Events.ERROR, function (ev, data) {
+                    if (data.fatal) {
+                        if (!tvTriedFallback && rawUrl && rawUrl !== streamUrl) {
+                            tvTriedFallback = true;
+                            currentHls.loadSource(rawUrl);
+                        } else {
+                            loading.classList.add('hidden');
+                        }
+                    }
+                });
+            } else {
+                video.src = streamUrl;
+                video.play().then(() => loading.classList.add('hidden')).catch(() => loading.classList.add('hidden'));
+            }
+
+            showTvOsd();
+        }
+
+        function closeTvPlayback() {
+            const stage = document.getElementById('tvPlaybackStage');
+            const guide = document.getElementById('tvGuideScreen');
+            const video = document.getElementById('tvVideo');
+
+            if (currentHls) {
+                currentHls.destroy();
+                currentHls = null;
+            }
+            if (video) {
+                video.pause();
+                video.removeAttribute('src');
+                video.load();
+            }
+
+            stage.classList.add('hidden');
+            guide.classList.remove('opacity-0', 'pointer-events-none');
+
+            // Focus last watched card
+            if (activeTvChannelIndex >= 0 && allChannelCards[activeTvChannelIndex]) {
+                window.tvNav.setFocus(allChannelCards[activeTvChannelIndex]);
+            }
+        }
+
+        // Channel Zapping
+        window.tuneNextChannel = function() {
+            if (allChannelCards.length === 0) return;
+            activeTvChannelIndex = (activeTvChannelIndex + 1) % allChannelCards.length;
+            launchTvPlayback(allChannelCards[activeTvChannelIndex]);
+        };
+
+        window.tunePrevChannel = function() {
+            if (allChannelCards.length === 0) return;
+            activeTvChannelIndex = (activeTvChannelIndex - 1 + allChannelCards.length) % allChannelCards.length;
+            launchTvPlayback(allChannelCards[activeTvChannelIndex]);
+        };
+
+        window.tuneChannelByNumber = function(num) {
+            const target = allChannelCards.find(c => c.getAttribute('data-channel-num') == num);
+            if (target) {
+                launchTvPlayback(target);
+            }
+        };
+
+        window.onTvBackPress = function() {
+            const stage = document.getElementById('tvPlaybackStage');
+            if (stage && !stage.classList.contains('hidden')) {
+                closeTvPlayback();
+            } else {
+                window.location.href = '/';
+            }
+        };
+
+        // OSD Display and auto-fade
+        function showTvOsd() {
+            const osd = document.getElementById('tvOsdOverlay');
+            if (!osd) return;
+            osd.classList.remove('opacity-0', 'translate-y-8');
+            clearTimeout(osdTimer);
+            osdTimer = setTimeout(() => {
+                osd.classList.add('opacity-0', 'translate-y-8');
+            }, 4000);
+        }
+
+        window.toggleTvOsd = function() {
+            const osd = document.getElementById('tvOsdOverlay');
+            if (!osd) return;
+            if (osd.classList.contains('opacity-0')) {
+                showTvOsd();
+            } else {
+                osd.classList.add('opacity-0', 'translate-y-8');
+            }
+        };
+
+        window.toggleTvPlayPause = function() {
+            const video = document.getElementById('tvVideo');
+            if (video) {
+                if (video.paused) video.play(); else video.pause();
+            }
+        };
+
+        function toggleRemoteModal() {
+            const m = document.getElementById('tvRemoteModal');
+            if (m) m.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>

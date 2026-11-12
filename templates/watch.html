@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}{{ active_channel.name }} - Live Stream - {{ settings.platform_name }}{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6 py-2">
+
+    <!-- Main Player Column (3 cols) -->
+    <div class="lg:col-span-3 space-y-4">
+        <div class="glass-panel rounded-2xl overflow-hidden shadow-2xl border border-slate-800 bg-black relative" id="watchPlayerContainer">
+            
+            <div class="relative aspect-video w-full bg-black flex items-center justify-center">
+                <video id="theaterVideo" class="w-full h-full object-contain" playsinline autoplay controls></video>
+
+                <!-- Loading Spinner -->
+                <div id="theaterLoading" class="absolute inset-0 bg-black/70 flex flex-col items-center justify-center gap-3 z-20 pointer-events-none">
+                    <div class="w-12 h-12 border-4 border-sabro-500 border-t-transparent rounded-full animate-spin"></div>
+                    <span class="text-sm font-medium text-slate-300">Buffering Live Feed...</span>
+                </div>
+
+                <!-- Top Floating Info Pill -->
+                <div class="absolute top-4 left-4 z-10 flex items-center gap-2 pointer-events-none">
+                    <span class="px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-md border border-white/10 text-xs font-bold text-white flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-red-500 live-pulse"></span>
+                        <span id="theaterChannelTitle">{{ active_channel.name }}</span>
+                    </span>
+                    <span class="px-2.5 py-1 rounded-lg bg-sabro-600/80 backdrop-blur-md text-[11px] font-semibold text-white">
+                        {{ active_channel.category }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Metadata Info Below Video -->
+            <div class="p-4 bg-obsidian-900 border-t border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-slate-800 p-1 flex items-center justify-center shrink-0">
+                        {% if active_channel.logo %}
+                        <img src="{{ active_channel.logo }}" alt="" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/80x80/1e293b/38bdf8?text=TV';">
+                        {% else %}
+                        <i class="fa-solid fa-tv text-slate-400"></i>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold text-white" id="watchChannelName">{{ active_channel.name }}</h2>
+                        <span class="text-xs text-sabro-400">{{ active_channel.group_title or active_channel.category }}</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <a href="{{ url_for('index') }}" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium flex items-center gap-1.5">
+                        <i class="fa-solid fa-grip text-xs"></i>
+                        <span>Grid View</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Side Channel Surfing Drawer (1 col) -->
+    <div class="glass-panel rounded-2xl p-4 border border-slate-800 flex flex-col h-[75vh]">
+        <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
+            <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-list-ol text-sabro-400"></i>
+                <span>Quick Zapping</span>
+            </h3>
+            <span class="text-[10px] text-slate-400 font-mono">{{ channels|length }} Channels</span>
+        </div>
+
+        <!-- Filter input -->
+        <input type="text" id="sideSearch" placeholder="Filter channels..." 
+               class="w-full bg-slate-900 text-xs text-slate-200 px-3 py-1.5 rounded-lg border border-slate-800 focus:outline-none focus:border-sabro-500 mb-3">
+
+        <!-- Channel list -->
+        <div class="flex-1 overflow-y-auto space-y-1.5 pr-1" id="sideChannelList">
+            {% for ch in channels %}
+            <div class="side-channel-item p-2 rounded-xl flex items-center gap-2.5 cursor-pointer hover:bg-slate-800/80 transition-colors
+                        {% if ch.id == active_channel.id %}bg-sabro-950/80 border border-sabro-500/50 text-white{% else %}text-slate-300 border border-transparent{% endif %}"
+                 data-id="{{ ch.id }}"
+                 data-name="{{ ch.name }}"
+                 data-category="{{ ch.category }}"
+                 data-url="{{ ch.stream_url }}"
+                 onclick="onWatchItemClick(this)">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 p-0.5 shrink-0 flex items-center justify-center overflow-hidden">
+                    {% if ch.logo %}
+                    <img src="{{ ch.logo }}" alt="" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/60x60/1e293b/38bdf8?text=TV';">
+                    {% else %}
+                    <i class="fa-solid fa-tv text-[10px] text-slate-400"></i>
+                    {% endif %}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h5 class="text-xs font-semibold truncate">{{ ch.name }}</h5>
+                    <span class="text-[10px] text-slate-500 block truncate">{{ ch.category }}</span>
+                </div>
+                {% if ch.id == active_channel.id %}
+                <span class="w-2 h-2 rounded-full bg-red-500 live-pulse shrink-0"></span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let hls = null;
+    const video = document.getElementById('theaterVideo');
+    const loading = document.getElementById('theaterLoading');
+    const titleHeader = document.getElementById('theaterChannelTitle');
+    const nameSub = document.getElementById('watchChannelName');
+
+    function startStream(channelId, rawUrl) {
+        if (!video) return;
+        if (loading) loading.classList.remove('hidden');
+
+        const streamUrl = `/stream/${channelId}`;
+
+        if (hls) {
+            hls.destroy();
+            hls = null;
+        }
+
+        if (Hls.isSupported()) {
+            let watchRetries = 0;
+            hls = new Hls({ maxBufferLength: 30, enableWorker: true });
+            hls.loadSource(streamUrl);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                if (loading) loading.classList.add('hidden');
+                video.play().catch(e => console.log('Autoplay deferred'));
+            });
+            hls.on(Hls.Events.ERROR, function (e, data) {
+                if (data.fatal) {
+                    watchRetries += 1;
+                    if (data.type === Hls.ErrorTypes.NETWORK_ERROR && watchRetries === 1 && hls.url !== rawUrl) {
+                        hls.loadSource(rawUrl);
+                    } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR && watchRetries <= 2) {
+                        hls.recoverMediaError();
+                    } else {
+                        if (loading) loading.classList.add('hidden');
+                    }
+                }
+            });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = streamUrl;
+            video.addEventListener('loadedmetadata', function () {
+                if (loading) loading.classList.add('hidden');
+                video.play().catch(e => console.log('Autoplay deferred'));
+            });
+        }
+    }
+
+    function onWatchItemClick(item) {
+        const id = parseInt(item.getAttribute('data-id'));
+        const name = item.getAttribute('data-name');
+        const cat = item.getAttribute('data-category');
+        const url = item.getAttribute('data-url');
+        switchWatchChannel(id, name, cat, url);
+    }
+
+    function switchWatchChannel(id, name, cat, url) {
+        if (titleHeader) titleHeader.innerText = name;
+        if (nameSub) nameSub.innerText = name;
+        window.history.pushState({}, '', `/watch/${id}`);
+        startStream(id, url);
+
+        // Highlight selected
+        document.querySelectorAll('.side-channel-item').forEach(el => {
+            if (parseInt(el.getAttribute('data-id')) === id) {
+                el.classList.add('bg-sabro-950/80', 'border-sabro-500/50', 'text-white');
+                el.classList.remove('border-transparent');
+            } else {
+                el.classList.remove('bg-sabro-950/80', 'border-sabro-500/50', 'text-white');
+                el.classList.add('border-transparent');
+            }
+        });
+    }
+
+    // Quick side filter
+    const sideInput = document.getElementById('sideSearch');
+    if (sideInput) {
+        sideInput.addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase().trim();
+            document.querySelectorAll('.side-channel-item').forEach(item => {
+                const name = (item.getAttribute('data-name') || '').toLowerCase();
+                if (name.includes(query)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        startStream({{ active_channel.id }}, {{ active_channel.stream_url|tojson }});
+    });
+</script>
+{% endblock %}

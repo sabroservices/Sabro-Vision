@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}B2B Reseller & White-Label Leads - {{ settings.platform_name }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Admin Nav Tabs -->
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-4 flex-wrap gap-4">
+        <div class="flex items-center gap-2 overflow-x-auto scrollbar-none text-xs font-bold">
+            <a href="{{ url_for('admin_dashboard') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-brand-400"></i>
+                <span>Overview</span>
+            </a>
+            <a href="{{ url_for('admin_customers') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-users text-cyan-300"></i>
+                <span>Customers & PPPoE</span>
+            </a>
+            <a href="{{ url_for('admin_xtream') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-server text-emerald-400"></i>
+                <span>Xtream Codes API</span>
+            </a>
+            <a href="{{ url_for('admin_resellers') }}" class="px-3.5 py-2 rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/30 flex items-center gap-2">
+                <i class="fa-solid fa-handshake text-cyan-300"></i>
+                <span>Resellers & B2B</span>
+                {% if pending_count > 0 %}
+                <span class="w-2 h-2 rounded-full bg-cyan-400 live-pulse"></span>
+                {% endif %}
+            </a>
+            <a href="{{ url_for('admin_payments') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice-dollar text-amber-400"></i>
+                <span>Payment Queue</span>
+            </a>
+            <a href="{{ url_for('admin_packages') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-box-archive text-purple-400"></i>
+                <span>Packages</span>
+            </a>
+            <a href="{{ url_for('admin_keys') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-key text-amber-400"></i>
+                <span>Access Keys</span>
+            </a>
+            <a href="{{ url_for('admin_channels') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-tv text-sky-400"></i>
+                <span>Channels</span>
+            </a>
+            <a href="{{ url_for('admin_audit') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-shield text-rose-400"></i>
+                <span>Audit & Security</span>
+            </a>
+            <a href="{{ url_for('admin_settings') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-gear text-slate-400"></i>
+                <span>Settings</span>
+            </a>
+        </div>
+
+        <a href="{{ url_for('partner_portal') }}" target="_blank" class="px-3.5 py-2 rounded-xl bg-cyan-950/40 text-cyan-300 border border-cyan-800/50 hover:bg-cyan-900/60 text-xs font-semibold flex items-center gap-1.5 transition-all">
+            <i class="fa-solid fa-external-link text-xs"></i>
+            <span>View Public B2B Landing</span>
+        </a>
+    </div>
+
+    <!-- Stat Metrics -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="cinema-glass-card rounded-2xl p-4 border border-cyan-500/30 bg-cyan-950/15">
+            <div class="flex items-center justify-between text-cyan-400 text-xs font-bold mb-1">
+                <span>Total Inquiries</span>
+                <i class="fa-solid fa-list-check"></i>
+            </div>
+            <div class="text-2xl font-black text-white">{{ stats.total }}</div>
+            <p class="text-[11px] text-slate-400 mt-0.5">ISPs, LCOs & Resellers</p>
+        </div>
+
+        <div class="cinema-glass-card rounded-2xl p-4 border border-amber-500/30 bg-amber-950/15">
+            <div class="flex items-center justify-between text-amber-400 text-xs font-bold mb-1">
+                <span>Pending Action</span>
+                <i class="fa-solid fa-bell"></i>
+            </div>
+            <div class="text-2xl font-black text-amber-300">{{ stats.pending }}</div>
+            <p class="text-[11px] text-slate-400 mt-0.5">Need first callback</p>
+        </div>
+
+        <div class="cinema-glass-card rounded-2xl p-4 border border-sky-500/30 bg-sky-950/15">
+            <div class="flex items-center justify-between text-sky-400 text-xs font-bold mb-1">
+                <span>In Discussion</span>
+                <i class="fa-solid fa-comments"></i>
+            </div>
+            <div class="text-2xl font-black text-sky-300">{{ stats.contacted }}</div>
+            <p class="text-[11px] text-slate-400 mt-0.5">Quotation or trial sent</p>
+        </div>
+
+        <div class="cinema-glass-card rounded-2xl p-4 border border-emerald-500/30 bg-emerald-950/15">
+            <div class="flex items-center justify-between text-emerald-400 text-xs font-bold mb-1">
+                <span>Converted Partners</span>
+                <i class="fa-solid fa-handshake"></i>
+            </div>
+            <div class="text-2xl font-black text-emerald-300">{{ stats.approved }}</div>
+            <p class="text-[11px] text-slate-400 mt-0.5">Live white-label networks</p>
+        </div>
+    </div>
+
+    <!-- Status Filter Buttons -->
+    <div class="flex items-center justify-between flex-wrap gap-4">
+        <div class="flex items-center gap-2 text-xs">
+            <a href="{{ url_for('admin_resellers', status='all') }}" class="px-3 py-1.5 rounded-xl border {% if current_status == 'all' %}bg-brand-600 text-white border-brand-500{% else %}bg-obsidian-900 text-slate-400 border-white/[0.08]{% endif %} font-bold">
+                All Inquiries
+            </a>
+            <a href="{{ url_for('admin_resellers', status='pending') }}" class="px-3 py-1.5 rounded-xl border {% if current_status == 'pending' %}bg-amber-600 text-white border-amber-500{% else %}bg-obsidian-900 text-slate-400 border-white/[0.08]{% endif %} font-bold flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-amber-400 live-pulse"></span>
+                <span>Pending Action</span>
+            </a>
+            <a href="{{ url_for('admin_resellers', status='contacted') }}" class="px-3 py-1.5 rounded-xl border {% if current_status == 'contacted' %}bg-sky-600 text-white border-sky-500{% else %}bg-obsidian-900 text-slate-400 border-white/[0.08]{% endif %} font-bold">
+                Contacted
+            </a>
+            <a href="{{ url_for('admin_resellers', status='approved') }}" class="px-3 py-1.5 rounded-xl border {% if current_status == 'approved' %}bg-emerald-600 text-white border-emerald-500{% else %}bg-obsidian-900 text-slate-400 border-white/[0.08]{% endif %} font-bold">
+                Approved / Active
+            </a>
+            <a href="{{ url_for('admin_resellers', status='rejected') }}" class="px-3 py-1.5 rounded-xl border {% if current_status == 'rejected' %}bg-rose-600 text-white border-rose-500{% else %}bg-obsidian-900 text-slate-400 border-white/[0.08]{% endif %} font-bold">
+                Rejected
+            </a>
+        </div>
+
+        <div class="text-xs text-slate-400">
+            Showing <strong class="text-white">{{ inquiries|length }}</strong> partnership inquiries
+        </div>
+    </div>
+
+    <!-- Inquiries Table -->
+    <div class="cinema-glass-card rounded-2xl border border-white/[0.08] overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-obsidian-900/90 text-slate-400 border-b border-white/[0.08] text-[10px] font-bold uppercase tracking-wider">
+                    <tr>
+                        <th class="py-3 px-4"># ID</th>
+                        <th class="py-3 px-4">Company / Contact</th>
+                        <th class="py-3 px-4">Contact Info</th>
+                        <th class="py-3 px-4">Scale & Tier</th>
+                        <th class="py-3 px-4">Notes / Network</th>
+                        <th class="py-3 px-4">Status</th>
+                        <th class="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/[0.06] text-slate-300">
+                    {% for item in inquiries %}
+                    {% set clean_phone = item.phone|replace('-', '')|replace(' ', '')|replace('+', '') %}
+                    {% if clean_phone.startswith('0') %}
+                        {% set wa_num = '92' ~ clean_phone[1:] %}
+                    {% else %}
+                        {% set wa_num = clean_phone %}
+                    {% endif %}
+                    <tr class="hover:bg-white/[0.02] transition-colors">
+                        <td class="py-3.5 px-4 font-mono font-bold text-slate-400">#{{ item.id }}</td>
+                        
+                        <td class="py-3.5 px-4">
+                            <div class="font-bold text-white text-sm">{{ item.company_name }}</div>
+                            <div class="text-[11px] text-cyan-300 flex items-center gap-1 mt-0.5">
+                                <i class="fa-solid fa-user text-[10px]"></i>
+                                <span>{{ item.contact_name }}</span>
+                                {% if item.city %}
+                                <span class="text-slate-500">•</span>
+                                <span class="text-slate-400">{{ item.city }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+
+                        <td class="py-3.5 px-4">
+                            <div class="flex items-center gap-2">
+                                <span class="font-mono text-white text-xs font-semibold">{{ item.phone }}</span>
+                                <a href="https://wa.me/{{ wa_num }}?text=Assalam-o-Alaikum%20{{ item.contact_name|urlencode }},%20this%20is%20Sabro%20Vision%20B2B%20Partnership%20Team%20regarding%20your%20White-Label%20inquiry%20for%20{{ item.company_name|urlencode }}." target="_blank" class="px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[10px] font-bold hover:bg-emerald-500 hover:text-white transition-all flex items-center gap-1" title="Open in WhatsApp">
+                                    <i class="fa-brands fa-whatsapp text-xs"></i>
+                                    <span>Chat</span>
+                                </a>
+                            </div>
+                            {% if item.email %}
+                            <div class="text-[11px] text-slate-400 mt-1 truncate max-w-[180px]">
+                                <i class="fa-solid fa-envelope text-[10px] mr-1 text-slate-500"></i>
+                                <a href="mailto:{{ item.email }}" class="hover:text-cyan-300 hover:underline">{{ item.email }}</a>
+                            </div>
+                            {% endif %}
+                        </td>
+
+                        <td class="py-3.5 px-4">
+                            <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold 
+                                {% if item.partner_type == 'white_label' %}bg-cyan-500/20 text-cyan-300 border border-cyan-500/40
+                                {% elif item.partner_type == 'reseller' %}bg-purple-500/20 text-purple-300 border border-purple-500/40
+                                {% else %}bg-indigo-500/20 text-indigo-300 border border-indigo-500/40{% endif %}">
+                                {% if item.partner_type == 'white_label' %}<i class="fa-solid fa-paint-roller text-[9px]"></i> White-Label
+                                {% elif item.partner_type == 'reseller' %}<i class="fa-solid fa-sliders text-[9px]"></i> Reseller Panel
+                                {% else %}<i class="fa-solid fa-network-wired text-[9px]"></i> PPPoE BRAS Bridge{% endif %}
+                            </div>
+                            <div class="text-[11px] text-slate-400 mt-1">
+                                Scale: <strong class="text-slate-200">{{ item.subscriber_count or 'Not specified' }}</strong> users
+                            </div>
+                        </td>
+
+                        <td class="py-3.5 px-4 max-w-xs">
+                            <p class="text-xs text-slate-300 line-clamp-2" title="{{ item.notes }}">
+                                {{ item.notes or 'No extra notes provided.' }}
+                            </p>
+                            <span class="text-[10px] text-slate-500 font-mono block mt-1">
+                                {{ item.created_at[:16].replace('T', ' ') if item.created_at else '' }}
+                            </span>
+                        </td>
+
+                        <td class="py-3.5 px-4">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold 
+                                {% if item.status == 'approved' %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/40
+                                {% elif item.status == 'contacted' %}bg-sky-500/20 text-sky-300 border border-sky-500/40
+                                {% elif item.status == 'rejected' %}bg-rose-500/20 text-rose-300 border border-rose-500/40
+                                {% else %}bg-amber-500/20 text-amber-300 border border-amber-500/40 live-pulse{% endif %}">
+                                {% if item.status == 'approved' %}<i class="fa-solid fa-check text-[9px]"></i> Approved
+                                {% elif item.status == 'contacted' %}<i class="fa-solid fa-comments text-[9px]"></i> Contacted
+                                {% elif item.status == 'rejected' %}<i class="fa-solid fa-xmark text-[9px]"></i> Rejected
+                                {% else %}<i class="fa-solid fa-clock text-[9px]"></i> Pending{% endif %}
+                            </span>
+                        </td>
+
+                        <td class="py-3.5 px-4 text-right">
+                            <form action="{{ url_for('admin_update_reseller_status', inquiry_id=item.id) }}" method="POST" class="inline-flex items-center gap-1">
+                                <select name="status" onchange="this.form.submit()" class="bg-obsidian-900 text-slate-200 text-xs px-2.5 py-1.5 rounded-xl border border-white/[0.1] focus:outline-none focus:border-brand-400">
+                                    <option value="pending" {% if item.status == 'pending' %}selected{% endif %}>Pending</option>
+                                    <option value="contacted" {% if item.status == 'contacted' %}selected{% endif %}>Contacted</option>
+                                    <option value="approved" {% if item.status == 'approved' %}selected{% endif %}>Approve Partner</option>
+                                    <option value="rejected" {% if item.status == 'rejected' %}selected{% endif %}>Reject</option>
+                                </select>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="py-12 text-center text-slate-500">
+                            <i class="fa-solid fa-handshake text-3xl mb-3 text-slate-600 block"></i>
+                            <p class="text-sm font-semibold text-slate-400">No B2B reseller inquiries found matching this filter.</p>
+                            <p class="text-xs text-slate-500 mt-1">Direct outside providers to <code class="text-cyan-400">/partner</code> or share the link via WhatsApp.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
