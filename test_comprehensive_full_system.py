@@ -293,5 +293,14 @@ class TestComprehensiveFullSystem(unittest.TestCase):
             self.assertLess(avg, 80.0, f"Endpoint {ep} latency {avg:.2f}ms should be under 80ms")
 
 
+    @classmethod
+    def tearDownClass(cls):
+        """Clean all test data from database."""
+        conn = db.get_db()
+        for t in ['access_keys', 'subscribers', 'subscriptions', 'favorites', 'payment_receipts', 'reseller_inquiries', 'audit_logs', 'connection_events']:
+            conn.execute(f"DELETE FROM {t}")
+        conn.commit()
+        conn.close()
+
 if __name__ == "__main__":
     unittest.main()
