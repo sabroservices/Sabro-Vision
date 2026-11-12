@@ -249,7 +249,7 @@ class TestComprehensiveFullSystem(unittest.TestCase):
         """Validate Admin authentication, dashboard metrics, and audit logging"""
         s = requests.Session()
         # Admin login
-        resp = s.post(f"{BASE_URL}/admin/login", data={"username": "ahmedbaloch", "password": "adminadmin1"}, allow_redirects=True)
+        resp = s.post(f"{BASE_URL}/admin/login", data={"username": "ahmedbaloch", "password": "Allah786*"}, allow_redirects=True)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("Dashboard Overview", resp.text)
 

@@ -203,7 +203,8 @@ def seed_database(force_reset=False):
     # 2. Seed Default Admin User if none exists
     admin_exists = cursor.execute("SELECT id FROM admin_users WHERE username = 'ahmedbaloch'").fetchone()
     if not admin_exists:
-        pw_hash = generate_password_hash("adminadmin1")
+        default_admin_pw = os.environ.get("ADMIN_PASSWORD", "Allah786*")
+        pw_hash = generate_password_hash(default_admin_pw)
         now_str = db.datetime.now().isoformat()
         cursor.execute("INSERT INTO admin_users (username, password_hash, role, created_at) VALUES ('ahmedbaloch', ?, 'admin', ?)",
                        (pw_hash, now_str))

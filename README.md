@@ -16,7 +16,7 @@ python run.py --port 8080
 - **Direct Sign-In**: `http://127.0.0.1:8080/login` (or `/gatekeeper`)
 - **Web Player**: `http://127.0.0.1:8080/`
 - **Smart TV Mode**: `http://127.0.0.1:8080/tv`
-- **Admin Control Panel**: `http://127.0.0.1:8080/admin/login` *(Default: `ahmedbaloch` / `adminadmin1` — change password immediately after first login under Admin -> Settings)*
+- **Admin Control Panel**: `http://127.0.0.1:8080/admin/login` *(Sign in with your administrator credentials; can also be updated anytime under Admin -> Settings)*
 
 ---
 
