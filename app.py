@@ -280,12 +280,20 @@ def admin_required(f):
     return decorated_function
 
 # ----------------------------------------------------
-# Gatekeeper & Key Activation Routes
+# Gatekeeper & Direct Sign-In Routes
 # ----------------------------------------------------
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
+def direct_login():
+    if request.method == "POST":
+        if request.form.get("key_code"):
+            return activate()
+        return user_login()
+    settings = db.get_settings()
+    return render_template("gatekeeper.html", settings=settings)
+
 @app.route("/gatekeeper")
 def gatekeeper():
-    if session.get("key_code"):
+    if session.get("key_code") and request.args.get("switch") != "1":
         device_token = request.cookies.get("sabro_device_id")
         is_valid, _, _ = db.validate_key(session["key_code"], device_token)
         if is_valid:
