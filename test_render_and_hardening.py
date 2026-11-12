@@ -118,5 +118,11 @@ class TestRenderAndHardening(unittest.TestCase):
             self.assertIn(b"window.location.origin", r_act.data)
             self.assertNotIn(b"http://127.0.0.1:8080/", r_act.data)
 
+            # Verify /login STILL opens cleanly even when already signed in as subscriber
+            r_login_panel = c.get("/login", follow_redirects=False)
+            self.assertEqual(r_login_panel.status_code, 200)
+            self.assertIn(b"Start Watching Live TV", r_login_panel.data)
+            self.assertIn(b"Watch Live TV", r_login_panel.data)
+
 if __name__ == "__main__":
     unittest.main()
