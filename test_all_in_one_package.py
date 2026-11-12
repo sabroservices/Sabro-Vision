@@ -131,5 +131,14 @@ class TestAllInOnePackage(unittest.TestCase):
         self.assertGreaterEqual(len(categories), 7, "All categories must be available to All-in-One user")
 
 
+    @classmethod
+    def tearDownClass(cls):
+        """Ensure test data created during test run is completely wiped so database stays pristine."""
+        conn = db.get_db()
+        for t in ['access_keys', 'subscribers', 'subscriptions', 'favorites', 'payment_receipts', 'reseller_inquiries', 'audit_logs', 'connection_events']:
+            conn.execute(f"DELETE FROM {t}")
+        conn.commit()
+        conn.close()
+
 if __name__ == "__main__":
     unittest.main()
