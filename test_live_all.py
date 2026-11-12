@@ -401,6 +401,15 @@ report("Master VIP user can stream Comedy channels without restriction", r_maste
 report("Master VIP user can stream Sports channels without restriction", r_master_sports.status_code in (200, 302))
 
 # ----------------------------------------------------
+# FINAL DATABASE CLEANUP (Zero Pollution)
+# ----------------------------------------------------
+conn = db.get_db()
+for t in ['access_keys', 'subscribers', 'subscriptions', 'favorites', 'payment_receipts', 'reseller_inquiries', 'audit_logs', 'connection_events']:
+    conn.execute(f"DELETE FROM {t}")
+conn.commit()
+conn.close()
+
+# ----------------------------------------------------
 # FINAL SUMMARY
 # ----------------------------------------------------
 print("\n" + "="*70)
