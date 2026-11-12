@@ -1,7 +1,6 @@
 /* Sabro Vision - Service Worker for Smart TV & Mobile PWA */
-const CACHE_NAME = 'sabro-vision-v1';
+const CACHE_NAME = 'sabro-vision-v1-static';
 const STATIC_ASSETS = [
-  '/',
   '/static/manifest.json',
   '/static/icons/icon.svg'
 ];
@@ -27,17 +26,8 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Network-only for live streaming feeds, API calls, and Admin routes
-  if (
-    url.pathname.startsWith('/live/') ||
-    url.pathname.startsWith('/stream/') ||
-    url.pathname.startsWith('/proxy') ||
-    url.pathname.startsWith('/api/') ||
-    url.pathname.startsWith('/admin') ||
-    url.pathname.startsWith('/player_api.php') ||
-    url.pathname.startsWith('/get.php') ||
-    event.request.method !== 'GET'
-  ) {
+  // Only cache immutable static assets; always hit network for HTML navigations, auth, streams, and APIs
+  if (!url.pathname.startsWith('/static/') || event.request.method !== 'GET') {
     return;
   }
 
