@@ -26,6 +26,18 @@
             </div>
 
             <!-- Tab Switcher (Direct Key vs Account Login) -->
+            {% if current_key_info %}
+            <div class="mb-5 p-3 rounded-2xl bg-emerald-950/50 border border-emerald-500/30 flex items-center justify-between gap-3 text-xs">
+                <span class="text-emerald-200 font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                    <span>Session active ({{ current_key_info.days_left }}d left)</span>
+                </span>
+                <a href="{{ url_for('index') }}" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] transition-all shrink-0">
+                    Watch Live TV &rarr;
+                </a>
+            </div>
+            {% endif %}
+
             <div class="flex rounded-2xl bg-obsidian-950/80 p-1 mb-6 border border-white/[0.06]">
                 <button type="button" onclick="switchGatekeeperTab('keyTab', this)" id="btnTabKey" 
                         class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 bg-brand-600 text-white shadow-md shadow-brand-500/30">
@@ -96,11 +108,17 @@
                     </button>
                 </form>
 
-                <div class="pt-2 text-center text-xs text-slate-400">
-                    <span>Have an access key?</span>
-                    <button type="button" onclick="document.getElementById('btnTabKey').click()" class="text-cyan-400 font-bold hover:underline ml-1">
-                        Put Key & Get Auto Login
-                    </button>
+                <div class="pt-2 text-center text-xs text-slate-400 flex items-center justify-between gap-2 flex-wrap">
+                    <div>
+                        <span>Have an access key?</span>
+                        <button type="button" onclick="document.getElementById('btnTabKey').click()" class="text-cyan-400 font-bold hover:underline ml-1">
+                            Put Key & Get Auto Login
+                        </button>
+                    </div>
+                    <a href="{{ url_for('admin_login') }}" class="text-indigo-300 hover:text-indigo-200 font-semibold text-[11px] flex items-center gap-1">
+                        <i class="fa-solid fa-shield-halved text-[10px]"></i>
+                        <span>Admin Panel</span>
+                    </a>
                 </div>
             </div>
 

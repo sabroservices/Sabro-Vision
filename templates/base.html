@@ -263,8 +263,9 @@
                         <span>Admin</span>
                     </a>
                 {% else %}
-                    <a href="{{ url_for('admin_login') }}" class="p-2 text-slate-500 hover:text-slate-300 transition-colors text-xs" title="Admin Portal">
-                        <i class="fa-solid fa-lock"></i>
+                    <a href="{{ url_for('admin_login') }}" class="px-3 py-1.5 rounded-xl bg-obsidian-900/90 text-slate-300 border border-white/[0.1] text-xs font-bold flex items-center gap-1.5 hover:bg-indigo-600/30 hover:text-white hover:border-indigo-500/40 transition-all shadow-sm" title="Admin Panel Login">
+                        <i class="fa-solid fa-shield-halved text-indigo-400"></i>
+                        <span class="hidden sm:inline">Admin</span>
                     </a>
                 {% endif %}
 
