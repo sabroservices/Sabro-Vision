@@ -194,9 +194,9 @@ adm_sess = requests.Session()
 r_bad_adm = adm_sess.post(f"{BASE_URL}/admin/login", data={"username": "ahmedbaloch", "password": "wrongpassword"}, allow_redirects=True)
 report("Wrong admin password correctly rejected", "Invalid administrator" in r_bad_adm.text or "Invalid" in r_bad_adm.text)
 
-# Test correct credentials: ahmedbaloch / adminadmin1
-r_good_adm = adm_sess.post(f"{BASE_URL}/admin/login", data={"username": "ahmedbaloch", "password": "adminadmin1"}, allow_redirects=True)
-report("Admin login with 'ahmedbaloch'/'adminadmin1' succeeds", r_good_adm.status_code == 200 and "Admin Panel" in r_good_adm.text)
+# Test correct credentials: ahmedbaloch
+r_good_adm = adm_sess.post(f"{BASE_URL}/admin/login", data={"username": "ahmedbaloch", "password": "Allah786*"}, allow_redirects=True)
+report("Admin login with 'ahmedbaloch' succeeds", r_good_adm.status_code == 200 and "Admin Panel" in r_good_adm.text)
 
 # Test Admin Dashboard
 r_dash = adm_sess.get(f"{BASE_URL}/admin")

@@ -104,7 +104,7 @@ class TestSabroIPTV(unittest.TestCase):
             self.assertIn("/admin/login", dash_unauth.headers["Location"])
 
             # Login with ahmedbaloch admin credentials
-            login_resp = client.post("/admin/login", data={"username": "ahmedbaloch", "password": "adminadmin1"}, follow_redirects=True)
+            login_resp = client.post("/admin/login", data={"username": "ahmedbaloch", "password": "Allah786*"}, follow_redirects=True)
             self.assertEqual(login_resp.status_code, 200)
             self.assertIn(b"Admin Panel", login_resp.data)
             self.assertIn(b"Active Keys", login_resp.data)
@@ -439,7 +439,7 @@ https://cdn.example.com/ten/stream.m3u8
         """Verify admin customer management with decoupled Connect PPPoE hook & FAT mapping."""
         with app.test_client() as client:
             # Login admin
-            client.post("/admin/login", data={"username": "ahmedbaloch", "password": "adminadmin1"})
+            client.post("/admin/login", data={"username": "ahmedbaloch", "password": "Allah786*"})
 
             # Add customer with PPPoE reference
             add_resp = client.post("/admin/customers/add", data={
@@ -479,7 +479,7 @@ https://cdn.example.com/ten/stream.m3u8
             self.assertIn(b"submitted successfully", sub_resp.data)
 
             # Admin checks queue and approves
-            client.post("/admin/login", data={"username": "ahmedbaloch", "password": "adminadmin1"})
+            client.post("/admin/login", data={"username": "ahmedbaloch", "password": "Allah786*"})
             payments_page = client.get("/admin/payments")
             self.assertEqual(payments_page.status_code, 200)
             self.assertIn(b"EP-TRX-100234", payments_page.data)
@@ -509,7 +509,7 @@ https://cdn.example.com/ten/stream.m3u8
         self.assertIn("VIP Premium Cinema Pass", pkg_names)
 
         with app.test_client() as client:
-            client.post("/admin/login", data={"username": "ahmedbaloch", "password": "adminadmin1"})
+            client.post("/admin/login", data={"username": "ahmedbaloch", "password": "Allah786*"})
             audit_page = client.get("/admin/audit")
             self.assertEqual(audit_page.status_code, 200)
             self.assertIn(b"Audit Trail", audit_page.data)
@@ -566,7 +566,7 @@ https://cdn.example.com/ten/stream.m3u8
             self.assertGreater(summary["total"], 0)
 
             # 3. Admin Stream Health Center
-            client.post("/admin/login", data={"username": "ahmedbaloch", "password": "adminadmin1"})
+            client.post("/admin/login", data={"username": "ahmedbaloch", "password": "Allah786*"})
             health_page = client.get("/admin/channels/health")
             self.assertEqual(health_page.status_code, 200)
             self.assertIn(b"Stream Health", health_page.data)
