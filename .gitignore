@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+venv/
+.venv/
+env/
+
+# Environment & Secrets
+.env
+.env.local
+
+# SQLite WAL sidecar files
+*.db-shm
+*.db-wal
+
+# Local Build & Temporary Archives
+*.zip
+.agents/
+.gemini/
+
+# OS & Editor Artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
