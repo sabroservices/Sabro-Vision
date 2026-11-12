@@ -240,24 +240,6 @@ def seed_database(force_reset=False):
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, (ch["name"], ch["logo"], ch["stream_url"], ch["group_title"], ch["category"], ch["stream_type"], idx + 1, now_str))
 
-    # 5. Seed Initial Test Keys (1 Free for Sabro Fiber users, 1 Paid demo key)
-    key_count = cursor.execute("SELECT COUNT(*) as c FROM access_keys").fetchone()["c"]
-    if key_count == 0:
-        now_str = db.datetime.now().isoformat()
-        # Free subscriber demo key
-        cursor.execute("""
-            INSERT INTO access_keys 
-            (key_code, user_type, customer_name, phone, duration_days, created_at, status, notes)
-            VALUES ('SABRO-FREE-DEMO', 'subscriber', 'Sabro Fiber Subscriber', '03001234567', 30, ?, 'unused', 'Default test key for Sabro subscribers')
-        """, (now_str,))
-        
-        # Paid outsider demo key
-        cursor.execute("""
-            INSERT INTO access_keys 
-            (key_code, user_type, customer_name, phone, duration_days, created_at, status, notes)
-            VALUES ('SABRO-PAID-DEMO', 'outsider', 'Outsider Paid Subscriber', '03119876543', 30, ?, 'unused', 'Default test key for outside paid subscribers')
-        """, (now_str,))
-
     conn.commit()
     conn.close()
 
