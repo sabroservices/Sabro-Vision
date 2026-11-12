@@ -178,5 +178,14 @@ class TestPartnerAndPricing(unittest.TestCase):
         self.assertEqual(resp_dash.status_code, 200)
         self.assertIn(b"B2B Resellers", resp_dash.data)
 
+    @classmethod
+    def tearDownClass(cls):
+        """Clean all test data from database."""
+        conn = db.get_db()
+        for t in ['access_keys', 'subscribers', 'subscriptions', 'favorites', 'payment_receipts', 'reseller_inquiries', 'audit_logs', 'connection_events']:
+            conn.execute(f"DELETE FROM {t}")
+        conn.commit()
+        conn.close()
+
 if __name__ == "__main__":
     unittest.main()
