@@ -1,6 +1,6 @@
 {
   "platform": "SABRO VISION",
-  "exported_at": "2026-11-13T21:08:10.697136",
+  "exported_at": "2026-11-13T21:48:54.490508",
   "version": "1.0",
   "tables": {
     "settings": [
@@ -78,8 +78,92 @@
         "created_at": "2026-11-07T22:41:15.842424"
       }
     ],
-    "access_keys": [],
-    "subscribers": [],
+    "access_keys": [
+      {
+        "id": 28,
+        "key_code": "SABRO-FREE-8D1C05-7CAB",
+        "user_type": "subscriber",
+        "customer_name": "Auto User 7D",
+        "phone": "",
+        "duration_days": 7,
+        "created_at": "2026-11-13T21:48:52.056708",
+        "activated_at": null,
+        "expires_at": null,
+        "status": "unused",
+        "max_devices": 1,
+        "device_token": null,
+        "notes": "",
+        "package_id": null
+      },
+      {
+        "id": 29,
+        "key_code": "SABRO-FREE-B52884-772E",
+        "user_type": "subscriber",
+        "customer_name": "Auto User 15D",
+        "phone": "",
+        "duration_days": 15,
+        "created_at": "2026-11-13T21:48:52.073097",
+        "activated_at": "2026-11-13T21:48:52.706614",
+        "expires_at": "2026-11-28T21:48:52.706614",
+        "status": "active",
+        "max_devices": 1,
+        "device_token": "a4091525-e41d-4b23-95f7-18cca4e95089",
+        "notes": "",
+        "package_id": null
+      },
+      {
+        "id": 30,
+        "key_code": "SABRO-FREE-BED1A0-1102",
+        "user_type": "subscriber",
+        "customer_name": "Auto User 30D",
+        "phone": "",
+        "duration_days": 30,
+        "created_at": "2026-11-13T21:48:52.090053",
+        "activated_at": "2026-11-13T21:48:52.123003",
+        "expires_at": "2026-12-13T21:48:52.123003",
+        "status": "active",
+        "max_devices": 1,
+        "device_token": "ebf45664-9a9d-49e4-93bd-fe36be0e9f43",
+        "notes": "",
+        "package_id": null
+      },
+      {
+        "id": 31,
+        "key_code": "SABRO-FREE-4F83A3-C36F",
+        "user_type": "subscriber",
+        "customer_name": "Admin Generated Live User",
+        "phone": "03009988776",
+        "duration_days": 30,
+        "created_at": "2026-11-13T21:48:54.473675",
+        "activated_at": null,
+        "expires_at": null,
+        "status": "unused",
+        "max_devices": 1,
+        "device_token": null,
+        "notes": "Live test from admin",
+        "package_id": null
+      }
+    ],
+    "subscribers": [
+      {
+        "id": 25,
+        "username": "sabro_bed1a0",
+        "password_hash": "scrypt:32768:8:1$j56BUuTjYVXV5I3K$c02cbe010de2f4130fc055755bd6f0743bbfb7c68d7c66dc516c1734d86a2a743ed1ffb0517420f116c89b6b673322e535b48c18e18373e417bfc6d455d28c60",
+        "phone": "",
+        "full_name": "Subscriber BED1A0",
+        "active_key_code": "SABRO-FREE-B52884-772E",
+        "created_at": "2026-11-13T21:48:52.123003",
+        "last_login_at": "2026-11-13T21:48:53.324123",
+        "plain_password": "sabro1784",
+        "pppoe_username": null,
+        "zone": null,
+        "fat_id": null,
+        "email": null,
+        "status": "active",
+        "package_id": null,
+        "notes": null
+      }
+    ],
     "subscriptions": [],
     "payment_receipts": [],
     "reseller_inquiries": [],
