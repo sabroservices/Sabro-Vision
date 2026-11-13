@@ -1,154 +1,181 @@
 {% extends "base.html" %}
 
-{% block title %}Subscription Packages & Channels - {{ settings.platform_name }}{% endblock %}
+{% block title %}Subscription Plans & Channels - {{ settings.platform_name }}{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto py-8 space-y-8">
+<div class="max-w-5xl mx-auto py-8 sm:py-12 space-y-10">
 
     <!-- Header Banner -->
     <div class="text-center space-y-3">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-300 text-xs font-bold tracking-wide">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/25 text-orange-400 text-xs font-bold tracking-wide">
             <i class="fa-solid fa-boxes-stacked"></i>
-            <span>SABRO VISION TIERED ENTERTAINMENT</span>
+            <span>SIMPLE & TRANSPARENT PRICING</span>
         </div>
-        <h1 class="text-2xl sm:text-4xl font-black text-white tracking-tight">
-            Choose Your High-Speed IPTV Package
+        <h1 class="text-3xl sm:text-5xl font-black text-white tracking-tight">
+            Choose Your <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500">Sabro Vision</span> Plan
         </h1>
-        <p class="text-sm text-slate-400 max-w-2xl mx-auto">
-            Choose between dedicated standalone category passes (Comedy, Sports, News, Movies, Kids, Islamic) or unlock everything with the Master All-Access VIP Pass.
+        <p class="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+            Stream all 11,459+ live channels, sports, and blockbuster cinema in 1080p Ultra HD. No hidden fees, instant activation.
         </p>
     </div>
 
-    <!-- Pricing Policy Banner: Sabro Users Free vs Outside Flat 250 PKR -->
-    <div class="cinema-glass-card rounded-3xl p-5 sm:p-6 border border-white/[0.1] bg-gradient-to-r from-emerald-950/30 via-obsidian-900/90 to-cyan-950/30 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-        <div class="flex items-center gap-3.5">
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0 text-xl shadow-md">
-                <i class="fa-solid fa-gift"></i>
-            </div>
-            <div>
-                <div class="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
-                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-black uppercase tracking-wider">
-                        Sabro Networks Users: 100% FREE
-                    </span>
-                    <span class="px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[10px] font-black uppercase tracking-wider">
-                        Outsiders: Flat 250 PKR (1 Screen)
-                    </span>
-                </div>
-                <p class="text-xs text-slate-300 mt-1 font-normal">
-                    Broadband subscribers of Sabro Networks get zero-charge access. For non-Sabro users from any network worldwide, <strong class="text-white">every package is flat 250 PKR for 1 screen</strong> including our full All-In-One pass.
-                </p>
-            </div>
-        </div>
-        <a href="{{ url_for('partner_portal') }}" class="px-4 py-2.5 rounded-xl bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 border border-cyan-500/30 text-xs font-bold shrink-0 flex items-center gap-1.5 transition-all">
-            <i class="fa-solid fa-handshake"></i>
-            <span>ISP Wholesale &rarr;</span>
-        </a>
-    </div>
-
-    <!-- Packages Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for pkg in packages %}
-        {% set is_aio = (pkg.code == 'all_in_one') %}
-        {% set is_master = (pkg.allowed_categories == 'all' or not pkg.allowed_categories) %}
-        <div class="cinema-glass-card rounded-3xl p-6 border {% if is_aio %}border-cyan-400/60 bg-gradient-to-b from-cyan-950/30 via-obsidian-900/80 to-obsidian-950 shadow-cyan-500/20 shadow-2xl relative ring-2 ring-cyan-400/30{% elif is_master %}border-amber-500/40 bg-gradient-to-b from-amber-950/20 via-obsidian-900/60 to-obsidian-950 shadow-amber-500/10 shadow-2xl relative{% elif pkg.price_pkr == 0 %}border-emerald-500/40 bg-gradient-to-b from-emerald-950/20 to-transparent{% else %}border-white/[0.08]{% endif %} flex flex-col justify-between transition-all hover:border-brand-500/40">
+    <!-- The 2 Official Plans Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+        
+        <!-- PLAN 1: SABRO NETWORKS FIBER CUSTOMERS (FREE) -->
+        <div class="cinema-glass-card rounded-3xl p-7 sm:p-9 border-2 border-emerald-500/40 bg-gradient-to-b from-emerald-950/25 via-obsidian-900/90 to-obsidian-950 shadow-2xl relative flex flex-col justify-between hover:border-emerald-500/70 transition-all group">
             
-            {% if is_aio %}
-            <div class="absolute -top-3.5 right-4 sm:right-6 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-cyan-400 via-sky-400 to-indigo-500 text-obsidian-950 font-black text-[10px] tracking-widest uppercase shadow-xl shadow-cyan-500/40 flex items-center gap-1.5 animate-pulse">
-                <i class="fa-solid fa-fire text-amber-300"></i>
-                <span>ALL-IN-ONE • JUST 250 RS (1 SCREEN)</span>
+            <!-- Top Entitlement Pill -->
+            <div class="absolute -top-3.5 left-6 px-4 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 text-obsidian-950 font-black text-[11px] tracking-wider uppercase shadow-lg shadow-emerald-500/30 flex items-center gap-1.5">
+                <i class="fa-solid fa-gift"></i>
+                <span>SABRO BROADBAND INCLUDED</span>
             </div>
-            {% elif is_master %}
-            <div class="absolute -top-3 right-6 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 text-obsidian-950 font-black text-[10px] tracking-wider uppercase shadow-md flex items-center gap-1.5">
-                <i class="fa-solid fa-crown text-[10px]"></i>
-                <span>ALL CHANNELS UNLOCKED</span>
-            </div>
-            {% endif %}
 
-            <div>
-                <!-- Badge row -->
-                <div class="flex items-center justify-between mb-3 mt-1">
-                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider {% if is_aio %}bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm{% elif is_master %}bg-amber-500/20 text-amber-300 border border-amber-500/30{% elif pkg.price_pkr == 0 %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30{% else %}bg-purple-500/20 text-purple-300 border border-purple-500/30{% endif %}">
-                        {{ pkg.code }}
-                    </span>
-                    <span class="text-xs text-slate-400 font-semibold flex items-center gap-1.5">
-                        <i class="fa-solid fa-tv text-[11px] text-cyan-400"></i>
-                        <span>{{ pkg.max_connections }} Screen{% if pkg.max_connections > 1 %}s{% endif %}</span>
-                    </span>
+            <div class="space-y-6">
+                <!-- Title & Target -->
+                <div class="pt-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Sabro Internet Users</span>
+                    <h3 class="text-2xl sm:text-3xl font-black text-white mt-1">Sabro Broadband Pass</h3>
+                    <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                        Exclusively for active internet subscribers of Sabro Networks. 100% complimentary with your fiber broadband connection.
+                    </p>
                 </div>
 
-                <h3 class="text-lg font-bold text-white mb-1.5">{{ pkg.name }}</h3>
-
-                <!-- Price Tag -->
-                <div class="flex items-baseline gap-1.5 mb-4">
-                    <span class="text-3xl font-black text-transparent bg-clip-text {% if is_aio %}bg-gradient-to-r from-cyan-300 via-sky-200 to-white{% elif is_master %}bg-gradient-to-r from-amber-300 via-yellow-200 to-white{% elif pkg.price_pkr == 0 %}bg-gradient-to-r from-emerald-300 to-white{% else %}bg-gradient-to-r from-white via-cyan-100 to-brand-400{% endif %}">
-                        {{ pkg.price_pkr }} PKR
-                    </span>
-                    <span class="text-xs text-slate-400 font-semibold">/ {{ pkg.duration_days }} days</span>
-                </div>
-
-                <!-- Allowed Categories Tag -->
-                <div class="mb-4 p-3 rounded-2xl bg-obsidian-950/80 border border-white/[0.06]">
-                    <span class="block text-[9px] uppercase font-bold text-slate-400 mb-1 tracking-wider">Included Channels</span>
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                        {% if is_aio %}
-                        <span class="px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[11px] font-bold flex items-center gap-1">
-                            <i class="fa-solid fa-check-double text-cyan-400"></i> Everything Included (All 11,459 Channels)
-                        </span>
-                        {% elif is_master %}
-                        <span class="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold">
-                            <i class="fa-solid fa-infinity mr-1"></i> All 11,459 Channels
-                        </span>
-                        {% else %}
-                            {% for cat in pkg.allowed_categories.split(',') %}
-                            <span class="px-2 py-0.5 rounded-lg bg-brand-500/20 text-brand-300 border border-brand-500/30 text-[11px] font-bold">
-                                {{ cat.strip() }}
-                            </span>
-                            {% endfor %}
-                        {% endif %}
+                <!-- Price Box -->
+                <div class="p-5 rounded-2xl bg-obsidian-950/80 border border-emerald-500/20 flex items-baseline justify-between">
+                    <div>
+                        <div class="flex items-baseline gap-1.5">
+                            <span class="text-4xl sm:text-5xl font-black text-emerald-400 font-mono">0</span>
+                            <span class="text-lg font-bold text-emerald-300">PKR</span>
+                        </div>
+                        <span class="text-[11px] text-slate-400 font-semibold">100% Free Forever with Broadband</span>
                     </div>
+                    <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold font-mono">
+                        2 Screens
+                    </span>
                 </div>
 
-                <p class="text-xs text-slate-300 mb-6 leading-relaxed">
-                    {{ pkg.description or 'High-definition bufferless IPTV streaming.' }}
-                </p>
+                <!-- Feature List -->
+                <ul class="space-y-3 text-xs text-slate-200">
+                    <li class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+                        <span><strong>All 11,459+ Global Channels</strong> (Cricket, Sports, Cinema, News)</span>
+                    </li>
+                    <li class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+                        <span><strong>2 Simultaneous Screens:</strong> TV, Mobile, Tablet, PC</span>
+                    </li>
+                    <li class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+                        <span><strong>Direct ISP Fiber Route:</strong> Zero buffering & lowest latency</span>
+                    </li>
+                    <li class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+                        <span><strong>Xtream Codes & M3U:</strong> Compatible with TiviMate & Smarters</span>
+                    </li>
+                </ul>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="pt-4 border-t border-white/[0.08] space-y-2">
-                <a href="{{ url_for('submit_payment') }}?pkg={{ pkg.id }}" class="btn-shimmer w-full py-2.5 px-4 rounded-xl {% if is_master %}bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 text-obsidian-950 shadow-amber-500/20{% else %}bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 text-white shadow-brand-500/20{% endif %} font-bold text-xs shadow-md flex items-center justify-center gap-1.5 transition-all">
-                    <i class="fa-solid fa-receipt text-[11px]"></i>
-                    <span>Subscribe / Submit Receipt</span>
+            <!-- Action Button -->
+            <div class="pt-8">
+                <a href="{{ url_for('gatekeeper') }}" class="btn-shimmer w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 text-white font-black text-sm shadow-xl shadow-emerald-500/25 flex items-center justify-center gap-2 transition-all">
+                    <i class="fa-solid fa-bolt text-amber-300"></i>
+                    <span>Verify Broadband & Access Free</span>
+                </a>
+            </div>
+
+        </div>
+
+        <!-- PLAN 2: OUTSIDE CUSTOMERS (150 PKR) -->
+        <div class="cinema-glass-card rounded-3xl p-7 sm:p-9 border-2 border-orange-500/50 bg-gradient-to-b from-orange-950/25 via-obsidian-900/90 to-obsidian-950 shadow-2xl relative flex flex-col justify-between hover:border-orange-500/80 transition-all group ring-2 ring-orange-500/20">
+            
+            <!-- Top Entitlement Pill -->
+            <div class="absolute -top-3.5 left-6 px-4 py-1 rounded-full bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white font-black text-[11px] tracking-wider uppercase shadow-lg shadow-orange-500/30 flex items-center gap-1.5 animate-pulse">
+                <i class="fa-solid fa-fire text-amber-200"></i>
+                <span>POPULAR • NON-SABRO USERS</span>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Title & Target -->
+                <div class="pt-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-orange-400">Non-Sabro Worldwide Customers</span>
+                    <h3 class="text-2xl sm:text-3xl font-black text-white mt-1">Sabro Vision Commercial Pass</h3>
+                    <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                        For anyone not using Sabro Networks internet. Enjoy full all-access streaming from Nayatel, PTCL, StormFiber, Zong, Jazz, or abroad.
+                    </p>
+                </div>
+
+                <!-- Price Box -->
+                <div class="p-5 rounded-2xl bg-obsidian-950/80 border border-orange-500/20 flex items-baseline justify-between">
+                    <div>
+                        <div class="flex items-baseline gap-1.5">
+                            <span class="text-4xl sm:text-5xl font-black text-white font-mono">150</span>
+                            <span class="text-lg font-bold text-orange-400">PKR</span>
+                        </div>
+                        <span class="text-[11px] text-slate-400 font-semibold">Per Month / 30 Days Access</span>
+                    </div>
+                    <span class="px-3 py-1 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30 text-xs font-bold font-mono">
+                        1 Screen
+                    </span>
+                </div>
+
+                <!-- Feature List -->
+                <ul class="space-y-3 text-xs text-slate-200">
+                    <li class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-circle-check text-orange-400 text-sm"></i>
+                        <span><strong>All 11,459+ Global Channels</strong> (Full VIP Access across all genres)</span>
+                    </li>
+                    <li class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-circle-check text-orange-400 text-sm"></i>
+                        <span><strong>1 Dedicated Screen:</strong> TV, Mobile, Laptop, or FireStick</span>
+                    </li>
+                    <li class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-circle-check text-orange-400 text-sm"></i>
+                        <span><strong>Instant Payment:</strong> JazzCash, EasyPaisa, or Bank Transfer</span>
+                    </li>
+                    <li class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-circle-check text-orange-400 text-sm"></i>
+                        <span><strong>Instant Provisioning:</strong> Get automatic Username & Password</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Action Button -->
+            <div class="pt-8 space-y-2.5">
+                <a href="{{ url_for('submit_payment') }}?pkg=231" class="btn-shimmer glow-orange w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white font-black text-sm shadow-xl shadow-orange-500/30 flex items-center justify-center gap-2 transition-all">
+                    <i class="fa-solid fa-credit-card text-amber-200"></i>
+                    <span>Subscribe for 150 PKR &rarr;</span>
                 </a>
 
                 {% if clean_whatsapp %}
-                <a href="https://wa.me/{{ clean_whatsapp }}?text=Hi%20Sabro%20Vision,%20I%20want%20to%20subscribe%20to%20the%20{{ pkg.name|urlencode }}%20({{ pkg.price_pkr }}%20PKR)" target="_blank" class="w-full py-2 px-4 rounded-xl bg-obsidian-900 hover:bg-emerald-950/40 text-emerald-400 font-semibold text-xs border border-emerald-500/20 flex items-center justify-center gap-1.5 transition-all">
-                    <i class="fa-brands fa-whatsapp"></i>
-                    <span>Order on WhatsApp</span>
+                <a href="https://wa.me/{{ clean_whatsapp }}?text=Hi%20Sabro%20Vision,%20I%20want%20to%20subscribe%20to%20the%20Sabro%20Vision%20Commercial%20Pass%20for%20150%20PKR." target="_blank" class="w-full py-2.5 px-4 rounded-xl bg-obsidian-900 hover:bg-emerald-950/40 text-emerald-400 font-semibold text-xs border border-emerald-500/20 flex items-center justify-center gap-1.5 transition-all">
+                    <i class="fa-brands fa-whatsapp text-sm"></i>
+                    <span>Quick Order on WhatsApp</span>
                 </a>
                 {% endif %}
             </div>
 
         </div>
-        {% endfor %}
+
     </div>
 
     <!-- B2B Reseller & White-Label Card -->
-    <div class="cinema-glass-card rounded-3xl p-6 sm:p-8 border border-cyan-500/30 bg-gradient-to-r from-cyan-950/20 via-obsidian-900/80 to-indigo-950/20 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl">
+    <div class="cinema-glass-card rounded-3xl p-6 sm:p-8 border border-orange-500/30 bg-gradient-to-r from-orange-950/20 via-obsidian-900/80 to-amber-950/20 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl">
         <div class="space-y-2">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-[10px] font-black uppercase tracking-wider">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-300 text-[10px] font-black uppercase tracking-wider">
                 <i class="fa-solid fa-handshake text-amber-300"></i>
-                <span>WHOLESALE PARTNERSHIPS</span>
+                <span>WHOLESALE ISP & RESELLER SAAS</span>
             </div>
             <h3 class="text-xl sm:text-2xl font-black text-white tracking-tight">
-                Want to Resell or White-Label SABRO VISION for Your Network?
+                Are you an ISP or Cable Operator? Run Your Own Branded IPTV!
             </h3>
             <p class="text-xs text-slate-300 max-w-xl leading-relaxed">
-                We provide custom branded apps, reseller management dashboard, sub-accounts, Xtream Codes API compatibility for Android TV & Smarters, and bulk credit pricing for ISPs and Cable Operators.
+                Launch your own white-label IPTV with custom brand colors, custom logos, reseller control dashboard, customer staff management, and bulk wholesale credit rates.
             </p>
         </div>
-        <a href="{{ url_for('partner_portal') }}" class="btn-shimmer glow-cyan px-6 py-3.5 rounded-2xl bg-gradient-to-r from-brand-600 via-cyan-500 to-indigo-600 hover:from-brand-500 text-white font-black text-xs shrink-0 flex items-center gap-2 shadow-xl shadow-brand-500/30 transition-all">
-            <i class="fa-solid fa-rocket text-amber-300"></i>
-            <span>Explore Partner Program</span>
+        <a href="{{ url_for('partner_portal') }}" class="btn-shimmer glow-orange px-6 py-3.5 rounded-2xl bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 hover:from-orange-500 text-white font-black text-xs shrink-0 flex items-center gap-2 shadow-xl shadow-orange-500/30 transition-all">
+            <i class="fa-solid fa-rocket text-amber-200"></i>
+            <span>Reseller Program &rarr;</span>
         </a>
     </div>
 
