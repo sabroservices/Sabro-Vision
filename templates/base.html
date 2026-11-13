@@ -334,7 +334,7 @@
             <div class="absolute -top-16 -right-16 w-48 h-48 bg-brand-500/20 rounded-full blur-3xl pointer-events-none"></div>
             
             <div class="text-center mb-5">
-                <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white text-2xl mx-auto mb-3 shadow-xl shadow-cyan-500/30 border border-white/20">
+                <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-orange-600 via-orange-500 to-amber-500 flex items-center justify-center text-white text-2xl mx-auto mb-3 shadow-xl shadow-orange-500/30 border border-white/20">
                     <i class="fa-solid fa-key text-white"></i>
                 </div>
                 <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">
@@ -354,7 +354,7 @@
                 <div class="p-3.5 rounded-2xl bg-obsidian-950/90 border border-white/[0.08] flex items-center justify-between">
                     <div>
                         <span class="block text-[10px] uppercase font-black tracking-wider text-slate-400">Automatic Username</span>
-                        <span id="credUsername" class="text-sm sm:text-base font-mono font-black text-cyan-300">{{ newly_generated_creds.username }}</span>
+                        <span id="credUsername" class="text-sm sm:text-base font-mono font-black text-orange-400">{{ newly_generated_creds.username }}</span>
                     </div>
                     <button type="button" onclick="copyCredText('credUsername', this)" class="px-3 py-1.5 rounded-xl bg-obsidian-900 hover:bg-slate-800 text-xs text-slate-300 hover:text-white border border-white/10 flex items-center gap-1.5 transition-all">
                         <i class="fa-regular fa-copy text-xs"></i>
@@ -366,7 +366,7 @@
                 <div class="p-3.5 rounded-2xl bg-obsidian-950/90 border border-white/[0.08] flex items-center justify-between">
                     <div>
                         <span class="block text-[10px] uppercase font-black tracking-wider text-slate-400">Automatic Password</span>
-                        <span id="credPassword" class="text-sm sm:text-base font-mono font-black text-emerald-300">{{ newly_generated_creds.password }}</span>
+                        <span id="credPassword" class="text-sm sm:text-base font-mono font-black text-amber-300">{{ newly_generated_creds.password }}</span>
                     </div>
                     <button type="button" onclick="copyCredText('credPassword', this)" class="px-3 py-1.5 rounded-xl bg-obsidian-900 hover:bg-slate-800 text-xs text-slate-300 hover:text-white border border-white/10 flex items-center gap-1.5 transition-all">
                         <i class="fa-regular fa-copy text-xs"></i>
@@ -375,9 +375,9 @@
                 </div>
 
                 <!-- Key Info Box -->
-                <div class="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/20 flex items-center justify-between text-xs text-cyan-200">
+                <div class="p-3 rounded-xl bg-orange-950/30 border border-orange-500/20 flex items-center justify-between text-xs text-orange-200">
                     <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-circle-check text-cyan-400"></i>
+                        <i class="fa-solid fa-circle-check text-orange-400"></i>
                         <span>Linked Key: <strong class="font-mono text-white">{{ newly_generated_creds.key_code }}</strong></span>
                     </div>
                     <span class="text-[11px] font-bold text-emerald-400">Pass Active</span>
@@ -387,10 +387,10 @@
             <!-- Action Buttons -->
             <div class="space-y-2">
                 <button type="button" onclick="copyAllCreds('{{ newly_generated_creds.username }}', '{{ newly_generated_creds.password }}', '{{ newly_generated_creds.key_code }}')" class="w-full py-2.5 px-4 rounded-xl bg-obsidian-900 hover:bg-obsidian-850 text-white font-bold text-xs border border-white/10 flex items-center justify-center gap-2 transition-all">
-                    <i class="fa-solid fa-copy text-cyan-400"></i>
+                    <i class="fa-solid fa-copy text-orange-400"></i>
                     <span>Copy All Credentials</span>
                 </button>
-                <button type="button" onclick="closeCredsModal()" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-brand-600 via-cyan-500 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-black text-xs shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2 transition-all">
+                <button type="button" onclick="closeCredsModal()" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white font-black text-xs shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2 transition-all">
                     <i class="fa-solid fa-tv text-xs"></i>
                     <span>Start Watching Live TV</span>
                 </button>
@@ -430,18 +430,18 @@
                 <div class="hidden sm:inline text-slate-600">•</div>
                 <div class="flex items-center gap-1.5 text-slate-300">
                     <span class="text-slate-500">Engineered & Delivered by</span>
-                    <span class="font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400">
+                    <span class="font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-red-400">
                         Vshatkay Solutions
                     </span>
                 </div>
             </div>
 
             <div class="flex items-center gap-4 text-slate-400 text-[11px] flex-wrap justify-center sm:justify-end">
-                <a href="{{ url_for('multi_device_apps') }}" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 font-semibold hover:bg-indigo-500/20 transition-colors">
+                <a href="{{ url_for('multi_device_apps') }}" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-950/50 border border-orange-500/30 text-orange-300 font-semibold hover:bg-orange-600 hover:text-white transition-colors">
                     <i class="fa-solid fa-mobile-screen-button text-xs"></i>
                     <span>Apps & Devices</span>
                 </a>
-                <a href="{{ url_for('partner_portal') }}" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-semibold hover:bg-cyan-500/20 transition-colors">
+                <a href="{{ url_for('partner_portal') }}" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-300 font-semibold hover:bg-orange-500/20 transition-colors">
                     <i class="fa-solid fa-handshake text-xs"></i>
                     <span>ISP & Reseller Program</span>
                 </a>
