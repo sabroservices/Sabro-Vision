@@ -5,13 +5,13 @@
 
 :root {
     --tv-safe-padding: 3vw;
-    --tv-focus-color: #22d3ee;
-    --tv-focus-glow: rgba(6, 182, 212, 0.7);
+    --tv-focus-color: #ff6b00;
+    --tv-focus-glow: rgba(255, 107, 0, 0.7);
 }
 
 body.tv-mode {
     padding: var(--tv-safe-padding);
-    background-color: #03060d;
+    background-color: #080503;
     color: #f8fafc;
     overflow-x: hidden;
     user-select: none;
@@ -35,8 +35,8 @@ body.tv-mode.hide-cursor {
 
 .tv-focusable.tv-focused {
     transform: scale(1.05) translateY(-3px) !important;
-    border-color: #00d2ff !important;
-    box-shadow: 0 20px 40px -10px rgba(0, 210, 255, 0.65), 0 0 0 3px #00d2ff !important;
+    border-color: #ff6b00 !important;
+    box-shadow: 0 20px 40px -10px rgba(255, 107, 0, 0.65), 0 0 0 3px #ff6b00 !important;
     z-index: 50 !important;
 }
 
