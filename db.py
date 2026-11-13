@@ -1422,12 +1422,18 @@ def get_package_by_id(package_id):
 def get_package_by_code(code):
     if not code:
         return None
+    c_clean = code.strip().lower()
     conn = get_db()
-    row = conn.execute("SELECT * FROM packages WHERE LOWER(code) = LOWER(?)", (code.strip(),)).fetchone()
+    row = conn.execute("SELECT * FROM packages WHERE LOWER(code) = LOWER(?)", (c_clean,)).fetchone()
+    if not row:
+        if c_clean in ("basic", "sabro_free", "fiber_pass", "free"):
+            row = conn.execute("SELECT * FROM packages WHERE LOWER(code) = 'basic'").fetchone()
+        elif c_clean in ("all_in_one", "outside_paid", "commercial", "master_vip", "outsider", "vip"):
+            row = conn.execute("SELECT * FROM packages WHERE LOWER(code) = 'all_in_one'").fetchone()
     conn.close()
     return dict(row) if row else None
 
-def add_package(name, code, duration_days=30, price_pkr=250, max_connections=1, description="", allowed_categories="all", tenant_id=None):
+def add_package(name, code, duration_days=30, price_pkr=150, max_connections=1, description="", allowed_categories="all", tenant_id=None):
     conn = get_db()
     now_str = datetime.now().isoformat()
     cursor = conn.cursor()
