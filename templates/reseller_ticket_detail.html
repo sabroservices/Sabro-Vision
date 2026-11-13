@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Ticket {{ ticket.ticket_number }} - {{ (tenant and tenant.service_name) or 'Reseller' }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6 max-w-4xl mx-auto">
+
+    <!-- Back to tickets -->
+    <div class="flex items-center justify-between">
+        <a href="{{ url_for('reseller_tickets') }}" class="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 font-semibold transition-colors">
+            <i class="fa-solid fa-arrow-left text-[10px]"></i>
+            <span>Back to Support Queue</span>
+        </a>
+
+        <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold {% if ticket.status == 'resolved' or ticket.status == 'closed' %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30{% else %}bg-amber-500/20 text-amber-300 border border-amber-500/30{% endif %}">
+                {{ ticket.status|upper }}
+            </span>
+            <span class="px-2 py-0.5 rounded-lg bg-obsidian-950 text-slate-300 border border-white/[0.08] text-[10px] uppercase font-mono">
+                {{ ticket.priority }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Ticket Summary Card -->
+    <div class="cinema-glass-card rounded-3xl p-6 border border-white/[0.08] bg-obsidian-900/90 shadow-2xl space-y-4">
+        <div class="flex items-center justify-between pb-4 border-b border-white/[0.06] flex-wrap gap-2">
+            <div>
+                <span class="text-[10px] font-mono text-cyan-400 font-bold">{{ ticket.ticket_number }} • {{ ticket.category|upper }}</span>
+                <h1 class="text-xl font-black text-white mt-0.5">{{ ticket.subject }}</h1>
+            </div>
+            <div class="text-right text-xs text-slate-400">
+                <div>Customer: <strong class="text-white font-mono">{{ ticket.subscriber_username or 'Customer' }}</strong></div>
+                <div class="text-[10px]">{{ ticket.subscriber_phone or '' }}</div>
+            </div>
+        </div>
+
+        <!-- Conversation Timeline -->
+        <div class="space-y-4 pt-2">
+            {% for msg in ticket.messages %}
+            <div class="p-4 rounded-2xl border {% if msg.sender_type == 'customer' %}bg-obsidian-950/80 border-white/[0.06] mr-8{% else %}bg-gradient-to-r from-cyan-950/30 to-indigo-950/30 border-cyan-500/30 ml-8{% endif %} space-y-2">
+                <div class="flex items-center justify-between text-[11px]">
+                    <span class="font-bold {% if msg.sender_type == 'customer' %}text-slate-300{% else %}text-cyan-300{% endif %} flex items-center gap-1.5">
+                        <i class="fa-solid {% if msg.sender_type == 'customer' %}fa-user{% else %}fa-headset{% endif %} text-[10px]"></i>
+                        <span>{{ msg.sender_name }} ({{ msg.sender_type|capitalize }})</span>
+                    </span>
+                    <span class="text-[10px] text-slate-500 font-mono">{{ msg.created_at[:16] }}</span>
+                </div>
+                <p class="text-xs text-slate-200 whitespace-pre-line leading-relaxed">{{ msg.message }}</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Reply & Status Form -->
+        <form action="{{ url_for('reseller_reply_ticket', ticket_id=ticket.id) }}" method="POST" class="pt-4 border-t border-white/[0.06] space-y-4">
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">Send Reply to Customer</label>
+                <textarea name="message" required rows="3" placeholder="Type your response to the customer..."
+                          class="w-full bg-obsidian-950 text-white text-xs px-4 py-3 rounded-2xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 leading-relaxed"></textarea>
+            </div>
+
+            <div class="flex items-center justify-between gap-3 flex-wrap">
+                <div class="flex items-center gap-2">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Update Status:</label>
+                    <select name="status" class="bg-obsidian-950 text-white text-xs px-3 py-1.5 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400">
+                        <option value="in_progress" {% if ticket.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                        <option value="resolved" {% if ticket.status == 'resolved' %}selected{% endif %}>Resolved</option>
+                        <option value="closed" {% if ticket.status == 'closed' %}selected{% endif %}>Closed</option>
+                        <option value="open" {% if ticket.status == 'open' %}selected{% endif %}>Open</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-shimmer glow-cyan px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 text-white text-xs font-bold shadow-md shadow-cyan-500/25 flex items-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Send Reply</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}
