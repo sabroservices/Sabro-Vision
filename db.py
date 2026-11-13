@@ -501,12 +501,12 @@ def init_db(force_reset=False):
 
 
     # Seed strictly 2 official packages:
-    # 1. Sabro Broadband All-Access Pass: 0 PKR, all categories, 2 screens (code='basic')
-    # 2. Sabro Vision Commercial Pass: 150 PKR, all categories, 1 screen (code='all_in_one')
+    # 1. Sabro Broadband All-Access Pass: 0 PKR, all categories, all benefits (code='basic')
+    # 2. Sabro Vision Commercial Pass: 250 PKR, all categories, 1 screen (code='all_in_one')
     now_str = datetime.now().isoformat()
     official_pkgs = [
-        ("Sabro Broadband All-Access Pass", "basic", 30, 0, 2, 1, "Complimentary 100% FREE with Sabro Networks Fiber Broadband. 2 Screens. All 11,459+ channels unlocked with zero charges.", "all"),
-        ("Sabro Vision Commercial Pass", "all_in_one", 30, 150, 1, 1, "Commercial All-Access Pass for outside customers. Stream all 11,459+ live channels, sports, and movies in 1080p Full HD on 1 screen. Flat 150 PKR.", "all")
+        ("Sabro Broadband All-Access Pass", "basic", 30, 0, 4, 1, "Complimentary 100% FREE for Sabro Networks Fiber Broadband Subscribers. All benefits included, all 11,459+ channels unlocked with zero charges.", "all"),
+        ("Sabro Vision Commercial Pass", "all_in_one", 30, 250, 1, 1, "Commercial All-Access Pass for non-Sabro outside customers. Stream all 11,459+ live channels, sports, and movies in 1080p Full HD on 1 screen. Flat 250 PKR (250 RS).", "all")
     ]
 
     for p in official_pkgs:
@@ -522,10 +522,10 @@ def init_db(force_reset=False):
                 is_active = 1
         """, (p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], now_str))
 
-    # Deactivate all legacy packages so ONLY the 2 official packages remain active
-    cursor.execute("UPDATE packages SET is_active = 0 WHERE code NOT IN ('basic', 'all_in_one')")
-    cursor.execute("UPDATE packages SET name = 'Sabro Vision Commercial Pass', price_pkr = 150, allowed_categories = 'all', max_connections = 1, is_active = 1 WHERE code = 'all_in_one'")
-    cursor.execute("UPDATE packages SET name = 'Sabro Broadband All-Access Pass', price_pkr = 0, allowed_categories = 'all', max_connections = 2, is_active = 1 WHERE code = 'basic'")
+    # Hard-purge all legacy packages so ONLY the 2 official packages exist in the database
+    cursor.execute("DELETE FROM packages WHERE code NOT IN ('basic', 'all_in_one')")
+    cursor.execute("UPDATE packages SET name = 'Sabro Vision Commercial Pass', price_pkr = 250, allowed_categories = 'all', max_connections = 1, is_active = 1 WHERE code = 'all_in_one'")
+    cursor.execute("UPDATE packages SET name = 'Sabro Broadband All-Access Pass', price_pkr = 0, allowed_categories = 'all', max_connections = 4, is_active = 1 WHERE code = 'basic'")
 
     conn.commit()
     conn.close()
