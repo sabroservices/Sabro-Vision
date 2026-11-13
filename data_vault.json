@@ -1,6 +1,6 @@
 {
   "platform": "SABRO VISION",
-  "exported_at": "2026-11-13T21:49:46.497328",
+  "exported_at": "2026-11-13T21:49:47.298063",
   "version": "1.0",
   "tables": {
     "settings": [
@@ -366,6 +366,38 @@
         "device_token": "f8049cd7-dfe6-43e0-a4e1-175ff192baef",
         "package_id": null,
         "notes": ""
+      },
+      {
+        "id": 19,
+        "key_code": "SABRO-FREE-EC09D9-3477",
+        "user_type": "subscriber",
+        "customer_name": "Comedy Lover",
+        "phone": "",
+        "duration_days": 30,
+        "created_at": "2026-11-13T21:49:47.012346",
+        "activated_at": "2026-11-13T21:49:47.062445",
+        "expires_at": "2026-12-13T21:49:47.062445",
+        "status": "active",
+        "max_devices": 1,
+        "device_token": "b3886450-1fbb-491a-8dba-ba7f4e032f08",
+        "package_id": 6,
+        "notes": ""
+      },
+      {
+        "id": 20,
+        "key_code": "SABRO-FREE-911C89-F141",
+        "user_type": "subscriber",
+        "customer_name": "Master VIP User",
+        "phone": "",
+        "duration_days": 30,
+        "created_at": "2026-11-13T21:49:47.029375",
+        "activated_at": null,
+        "expires_at": null,
+        "status": "unused",
+        "max_devices": 1,
+        "device_token": null,
+        "package_id": 3,
+        "notes": ""
       }
     ],
     "subscribers": [
@@ -602,6 +634,24 @@
         "last_login_at": "2026-11-13T21:49:46.248056",
         "plain_password": "sabro6719",
         "notes": null
+      },
+      {
+        "id": 14,
+        "username": "sabro_ec09d9",
+        "password_hash": "scrypt:32768:8:1$VOwgIBmARltNh8fb$81691b53c97fa50f1c8831f932dff6968af5b442c38658fbda4c7ea0efab5223c6684c6ffc4d16e3962cca6a3a2fb295f64afa721a18fec97929b77bddbf281b",
+        "phone": "",
+        "full_name": "Subscriber EC09D9",
+        "email": null,
+        "pppoe_username": null,
+        "zone": null,
+        "fat_id": null,
+        "active_key_code": "SABRO-FREE-EC09D9-3477",
+        "package_id": 6,
+        "status": "active",
+        "created_at": "2026-11-13T21:49:47.062445",
+        "last_login_at": "2026-11-13T21:49:47.062445",
+        "plain_password": "sabro3903",
+        "notes": null
       }
     ],
     "subscriptions": [
@@ -624,6 +674,16 @@
         "status": "active",
         "auto_renew": 0,
         "created_at": "2026-11-13T21:49:45.931213"
+      },
+      {
+        "id": 3,
+        "subscriber_id": 14,
+        "package_id": 6,
+        "start_date": "2026-11-13T21:49:47.062445",
+        "expiry_date": "2026-12-13T21:49:47.062445",
+        "status": "active",
+        "auto_renew": 0,
+        "created_at": "2026-11-13T21:49:47.062445"
       }
     ],
     "payment_receipts": [
