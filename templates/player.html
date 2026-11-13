@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 
 {% block title %}
-    {% if active_channel %}{{ active_channel.name }} - {% endif %}{{ settings.platform_name }}
+    {% if active_channel %}{{ active_channel.name }} - {% endif %}{{ settings.platform_name }} • Netflix-Grade IPTV
 {% endblock %}
 
 {% block content %}
-<div class="space-y-6">
+<div class="space-y-8 pb-12">
 
-    <!-- 1. CINEMA VIDEO PLAYER SECTION -->
-    <div class="cinema-glass-card rounded-3xl overflow-hidden shadow-2xl border border-orange-500/30 shadow-[0_0_50px_rgba(255,107,0,0.2)] bg-black relative">
-        <div class="relative aspect-video w-full max-h-[70vh] mx-auto flex items-center justify-center bg-black group" id="playerContainer">
+    <!-- 1. CINEMA VIDEO PLAYER STAGE -->
+    <div id="cinemaStage" class="cinema-glass-card rounded-3xl overflow-hidden shadow-2xl border border-orange-500/30 shadow-[0_0_50px_rgba(255,107,0,0.2)] bg-black relative transition-all">
+        <div class="relative aspect-video w-full max-h-[72vh] mx-auto flex items-center justify-center bg-black group" id="playerContainer">
             
             <!-- Native HTML5 Video element -->
             <video id="iptvVideo" class="w-full h-full object-contain cursor-pointer" playsinline autoplay controls></video>
@@ -35,7 +35,7 @@
                     </p>
                 </div>
                 <div class="flex gap-3 justify-center">
-                    <button type="button" onclick="reloadCurrentStream()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold flex items-center gap-2 shadow-lg shadow-brand-600/30">
+                    <button type="button" onclick="reloadCurrentStream()" class="px-4 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-semibold flex items-center gap-2 shadow-lg shadow-orange-600/30">
                         <i class="fa-solid fa-rotate-right"></i>
                         <span>Retry Stream</span>
                     </button>
@@ -47,17 +47,17 @@
             </div>
 
             <!-- Top Floating Info Pill (Channel Name & Badges) -->
-            <div class="absolute top-4 left-4 z-10 flex items-center gap-2 pointer-events-none">
+            <div class="absolute top-4 left-4 z-10 flex items-center gap-2 pointer-events-none flex-wrap">
                 <span class="px-3.5 py-1.5 rounded-2xl bg-black/85 backdrop-blur-md border border-white/10 text-xs font-bold text-white flex items-center gap-2.5 shadow-xl">
                     <div class="flex items-end gap-0.5 h-3">
-                        <span class="w-0.5 bg-brand-400 rounded-full eq-bar-1"></span>
-                        <span class="w-0.5 bg-orange-400 rounded-full eq-bar-2"></span>
-                        <span class="w-0.5 bg-brand-400 rounded-full eq-bar-3"></span>
+                        <span class="w-0.5 bg-orange-400 rounded-full eq-bar-1"></span>
+                        <span class="w-0.5 bg-amber-400 rounded-full eq-bar-2"></span>
+                        <span class="w-0.5 bg-orange-400 rounded-full eq-bar-3"></span>
                     </div>
                     <span id="activeChannelName">{{ active_channel.name if active_channel else 'Select Channel' }}</span>
                 </span>
                 {% if active_channel %}
-                <span class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-brand-600 to-amber-600 backdrop-blur-md text-[10px] font-black uppercase tracking-wider text-white shadow-lg border border-white/10" id="activeChannelCategory">
+                <span class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 backdrop-blur-md text-[10px] font-black uppercase tracking-wider text-white shadow-lg border border-white/10" id="activeChannelCategory">
                     {{ active_channel.category }}
                 </span>
                 <span class="px-2.5 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold font-mono hidden sm:inline shadow-sm">
@@ -71,7 +71,7 @@
 
             <!-- Top Right Player Controls -->
             <div class="absolute top-4 right-4 z-10 flex items-center gap-2">
-                <button type="button" onclick="toggleTheaterMode()" class="p-2.5 rounded-xl bg-black/75 hover:bg-black/95 text-white/90 hover:text-white backdrop-blur-md border border-white/10 text-xs shadow-lg transition-all" title="Theater Mode">
+                <button type="button" onclick="toggleTheaterMode()" class="p-2.5 rounded-xl bg-black/75 hover:bg-black/95 text-white/90 hover:text-white backdrop-blur-md border border-white/10 text-xs shadow-lg transition-all" title="Theater Mode (F)">
                     <i class="fa-solid fa-expand"></i>
                 </button>
                 <button type="button" onclick="togglePictureInPicture()" class="p-2.5 rounded-xl bg-black/75 hover:bg-black/95 text-white/90 hover:text-white backdrop-blur-md border border-white/10 text-xs shadow-lg transition-all" title="Picture-in-Picture">
@@ -86,7 +86,7 @@
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 rounded-2xl bg-obsidian-950 border border-white/10 p-1.5 flex items-center justify-center shrink-0 overflow-hidden shadow-md">
                     {% if active_channel.logo %}
-                    <img src="{{ active_channel.logo }}" alt="{{ active_channel.name }}" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/100x100/0f172a/38bdf8?text=TV';">
+                    <img id="subChannelLogo" src="{{ active_channel.logo }}" alt="{{ active_channel.name }}" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/100x100/140d08/ff6b00?text=TV';">
                     {% else %}
                     <i class="fa-solid fa-tv text-slate-400 text-lg"></i>
                     {% endif %}
@@ -97,14 +97,17 @@
                         <button type="button" onclick="toggleFavorite({{ active_channel.id }})" id="favBtn-{{ active_channel.id }}" class="text-sm {% if active_channel.id in fav_ids %}text-rose-500{% else %}text-slate-500 hover:text-rose-400{% endif %} transition-colors" title="Toggle Favorite">
                             <i class="{% if active_channel.id in fav_ids %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
                         </button>
+                        <button type="button" onclick="openChannelDetails({{ active_channel.id }}, '{{ active_channel.name|replace('\'', '\\\'') }}', '{{ active_channel.category }}', '{{ active_channel.stream_url|replace('\'', '\\\'') }}', '{{ active_channel.logo or '' }}', '{{ active_channel.health_status or 'online' }}')" class="text-xs text-slate-400 hover:text-orange-400 transition-colors p-1" title="Stream Information">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </button>
                     </div>
                     <div class="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
-                        <span class="text-brand-400 font-semibold" id="subChannelCat">{{ active_channel.group_title or active_channel.category }}</span>
+                        <span class="text-orange-400 font-semibold" id="subChannelCat">{{ active_channel.group_title or active_channel.category }}</span>
                         <span>•</span>
-                        <span>Low Latency Relay</span>
+                        <span>Low Latency Direct Feed</span>
                         <span>•</span>
                         <span class="text-emerald-400 flex items-center gap-1 font-medium">
-                            <i class="fa-solid fa-circle-check text-[10px]"></i> Sabro High-Speed Fiber Stream
+                            <i class="fa-solid fa-circle-check text-[10px]"></i> Sabro Fiber Verified Stream
                         </span>
                     </div>
                 </div>
@@ -122,14 +125,86 @@
         {% endif %}
     </div>
 
-    <!-- Multinational Multi-Device Experience Switcher Bar -->
+    <!-- 2. NETFLIX HERO SPOTLIGHT BILLBOARD (When on Home View) -->
+    {% if is_home_rails and hero_channel %}
+    <div class="netflix-hero relative rounded-3xl overflow-hidden border border-orange-500/25 shadow-2xl p-6 sm:p-10 lg:p-12 min-h-[340px] sm:min-h-[420px] flex flex-col justify-end">
+        <!-- Backdrop Ambient Glow & Vignette -->
+        <div class="netflix-hero-overlay absolute inset-0 bg-gradient-to-t from-obsidian-950 via-obsidian-950/85 to-transparent z-10"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-obsidian-950 via-obsidian-950/80 to-transparent z-10"></div>
+        
+        <!-- Background Graphic / Logo Watermark -->
+        <div class="absolute right-6 sm:right-16 top-1/2 -translate-y-1/2 opacity-20 pointer-events-none z-0 max-w-xs sm:max-w-md">
+            {% if hero_channel.logo %}
+            <img src="{{ hero_channel.logo }}" alt="{{ hero_channel.name }}" class="w-64 sm:w-80 h-64 sm:h-80 object-contain filter drop-shadow-[0_0_60px_rgba(255,107,0,0.4)]">
+            {% else %}
+            <i class="fa-solid fa-satellite-dish text-[160px] text-orange-500/40"></i>
+            {% endif %}
+        </div>
+
+        <!-- Hero Content Layer -->
+        <div class="relative z-20 max-w-2xl space-y-4">
+            <div class="flex items-center gap-2.5 flex-wrap">
+                <span class="px-3 py-1 rounded-full bg-rose-600 text-white font-black text-[10px] tracking-widest uppercase flex items-center gap-1.5 shadow-lg shadow-rose-600/40">
+                    <span class="w-2 h-2 rounded-full bg-white live-pulse"></span>
+                    FEATURED LIVE
+                </span>
+                <span class="px-3 py-1 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/40 font-bold text-[10px] tracking-wider uppercase">
+                    {{ hero_channel.category }}
+                </span>
+                <span class="px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono text-[10px] font-bold">
+                    1080p FHD
+                </span>
+                <span class="px-2.5 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono text-[10px] font-bold">
+                    Dolby 5.1
+                </span>
+                <span class="px-2.5 py-0.5 rounded-lg bg-white/10 text-slate-300 font-mono text-[10px] font-medium">
+                    Sabro Fiber Verified
+                </span>
+            </div>
+
+            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
+                {{ hero_channel.name }}
+            </h1>
+
+            <p class="text-xs sm:text-sm text-slate-300 font-medium max-w-xl leading-relaxed">
+                Stream {{ hero_channel.name }} live in stunning high-definition with zero buffering. Optimized with adaptive bitrate HLS delivery across Pakistan over Sabro Networks fiber.
+            </p>
+
+            <div class="flex items-center gap-3 pt-2 flex-wrap">
+                <button type="button" 
+                        onclick="loadChannel({{ hero_channel.id }}, '{{ hero_channel.name|replace('\'', '\\\'') }}', '{{ hero_channel.category }}', '{{ hero_channel.stream_url|replace('\'', '\\\'') }}')" 
+                        class="px-6 py-3 rounded-2xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-extrabold text-sm flex items-center gap-2.5 shadow-xl shadow-orange-600/40 hover:scale-105 transition-all">
+                    <i class="fa-solid fa-play text-xs"></i>
+                    <span>Watch Live</span>
+                </button>
+
+                <button type="button" 
+                        onclick="toggleFavorite({{ hero_channel.id }})" 
+                        id="heroFavBtn-{{ hero_channel.id }}"
+                        class="px-4 py-3 rounded-2xl bg-obsidian-900/90 hover:bg-obsidian-800 text-slate-200 border border-white/15 text-sm font-bold flex items-center gap-2 backdrop-blur-md transition-all">
+                    <i class="{% if hero_channel.id in fav_ids %}fa-solid text-rose-500{% else %}fa-regular text-slate-400{% endif %} fa-heart"></i>
+                    <span>My List</span>
+                </button>
+
+                <button type="button" 
+                        onclick="openChannelDetails({{ hero_channel.id }}, '{{ hero_channel.name|replace('\'', '\\\'') }}', '{{ hero_channel.category }}', '{{ hero_channel.stream_url|replace('\'', '\\\'') }}', '{{ hero_channel.logo or '' }}', '{{ hero_channel.health_status or 'online' }}')" 
+                        class="px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white border border-white/10 text-sm font-bold flex items-center gap-2 backdrop-blur-md transition-all">
+                    <i class="fa-solid fa-circle-info text-orange-400"></i>
+                    <span>More Info</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- 3. MULTI-DEVICE EXPERIENCE SWITCHER BAR -->
     <div class="cinema-glass-card rounded-2xl p-3 px-4 border border-white/[0.08] flex items-center justify-between gap-4 flex-wrap text-xs">
         <div class="flex items-center gap-2.5">
             <span class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-300 font-extrabold uppercase text-[10px] tracking-wider border border-orange-500/30 flex items-center gap-1.5">
                 <i class="fa-solid fa-layer-group text-amber-300"></i>
                 <span>Multi-Screen</span>
             </span>
-            <span class="text-slate-300 font-medium hidden sm:inline">Streaming in <strong>Web TV Mode</strong>. Switch to other platforms:</span>
+            <span class="text-slate-300 font-medium hidden sm:inline">Streaming in <strong>Web TV Mode</strong>. Switch to other devices:</span>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
             <a href="{{ url_for('tv_player') }}" class="px-3 py-1.5 rounded-xl bg-orange-600/20 hover:bg-orange-600/30 border border-orange-500/40 text-orange-300 font-bold flex items-center gap-1.5 transition-all" title="Launch 10-Foot D-Pad Remote Mode">
@@ -150,11 +225,11 @@
         </div>
     </div>
 
-    <!-- 2. CATEGORY PILLS BAR -->
+    <!-- 4. CATEGORY PILLS BAR -->
     <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
         <a href="{{ url_for('index', category='All') }}" 
            class="px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2
-                  {% if selected_category == 'All' %}bg-brand-600 text-white shadow-lg shadow-brand-600/30 border border-brand-500/50{% else %}cinema-glass-card text-slate-300 hover:text-white{% endif %}">
+                  {% if selected_category == 'All' and not fav_only %}bg-orange-600 text-white shadow-lg shadow-orange-600/30 border border-orange-500/50{% else %}cinema-glass-card text-slate-300 hover:text-white{% endif %}">
             <i class="fa-solid fa-border-all"></i>
             <span>All Channels</span>
         </a>
@@ -163,7 +238,7 @@
         {% if cat.channel_count > 0 %}
         <a href="{{ url_for('index', category=cat.name) }}" 
            class="px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2
-                  {% if selected_category == cat.name %}bg-brand-600 text-white shadow-lg shadow-brand-600/30 border border-brand-500/50{% else %}cinema-glass-card text-slate-300 hover:text-white{% endif %}">
+                  {% if selected_category == cat.name %}bg-orange-600 text-white shadow-lg shadow-orange-600/30 border border-orange-500/50{% else %}cinema-glass-card text-slate-300 hover:text-white{% endif %}">
             {% if cat.name == 'Sports' or cat.icon == 'trophy' %}<i class="fa-solid fa-trophy text-amber-400"></i>
             {% elif cat.name == 'News' or cat.icon == 'newspaper' %}<i class="fa-solid fa-newspaper text-sky-400"></i>
             {% elif cat.name == 'Islamic' or cat.icon == 'moon' %}<i class="fa-solid fa-moon text-emerald-400"></i>
@@ -185,14 +260,487 @@
         {% endfor %}
     </div>
 
-    <!-- 3. CHANNELS GRID SECTION -->
-    <div class="space-y-4">
-        <div class="flex items-center justify-between">
+    <!-- 5. NETFLIX HORIZONTAL CATEGORY RAILS (Active on Home View) -->
+    {% if is_home_rails %}
+    <div class="space-y-10">
+
+        <!-- RAIL 1: TOP 10 LIVE STREAMS TODAY -->
+        {% if top10_channels %}
+        <div class="space-y-3">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                    <span class="px-2.5 py-1 rounded-lg bg-orange-600/20 text-orange-400 border border-orange-500/30 text-xs">
+                        <i class="fa-solid fa-bolt"></i>
+                    </span>
+                    <span>Top 10 Live Streams Today</span>
+                    <span class="text-xs font-semibold text-slate-400 hidden sm:inline">• Pakistan & Global</span>
+                </h3>
+            </div>
+
+            <div class="netflix-rail-wrapper relative group">
+                <button type="button" onclick="scrollRail('top10Rail', -1)" class="netflix-arrow-left" aria-label="Scroll Left">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+
+                <div id="top10Rail" class="netflix-rail">
+                    {% for ch in top10_channels %}
+                    <div class="netflix-card flex-shrink-0 group/card channel-card"
+                         data-id="{{ ch.id }}"
+                         data-name="{{ ch.name }}"
+                         data-category="{{ ch.category }}"
+                         data-url="{{ ch.stream_url }}"
+                         onclick="onChannelClick(this)">
+                        
+                        <!-- Oversized Top 10 Stylized Rank Number -->
+                        <span class="netflix-rank-number">#{{ loop.index }}</span>
+
+                        <!-- Card Top Bar: Category badge & Actions -->
+                        <div class="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5">
+                            <button type="button" onclick="event.stopPropagation(); toggleFavorite({{ ch.id }});" id="fav-{{ ch.id }}" class="p-1 text-xs {% if ch.id in fav_ids %}text-rose-500{% else %}text-slate-400 hover:text-white{% endif %} transition-colors" title="My List">
+                                <i class="{% if ch.id in fav_ids %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+                            </button>
+                            <button type="button" onclick="event.stopPropagation(); openChannelDetails({{ ch.id }}, '{{ ch.name|replace('\'', '\\\'') }}', '{{ ch.category }}', '{{ ch.stream_url|replace('\'', '\\\'') }}', '{{ ch.logo or '' }}', '{{ ch.health_status or 'online' }}')" class="p-1 text-xs text-slate-400 hover:text-orange-400 transition-colors" title="Details">
+                                <i class="fa-solid fa-circle-info"></i>
+                            </button>
+                        </div>
+
+                        <!-- Card Background & Channel Logo -->
+                        <div class="w-full h-full p-4 flex flex-col justify-center items-center relative z-10 pl-16">
+                            {% if ch.logo %}
+                            <img src="{{ ch.logo }}" alt="{{ ch.name }}" class="max-h-20 max-w-[130px] object-contain filter drop-shadow group-hover/card:scale-110 transition-transform" onerror="this.onerror=null; this.src='https://placehold.co/120x80/140d08/ff6b00?text=TV';">
+                            {% else %}
+                            <i class="fa-solid fa-satellite-dish text-3xl text-orange-500/80 mb-2"></i>
+                            {% endif %}
+                            <h4 class="text-xs font-bold text-white text-center truncate max-w-full mt-2 group-hover/card:text-orange-400 transition-colors">
+                                {{ ch.name }}
+                            </h4>
+                            <div class="flex items-center gap-1.5 mt-1 text-[9px] text-slate-400 font-semibold uppercase tracking-wider">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse"></span>
+                                <span>LIVE • {{ ch.category }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Hover Play Indicator Overlay -->
+                        <div class="absolute inset-0 bg-orange-600/20 backdrop-blur-[2px] opacity-0 group-hover/card:opacity-100 transition-opacity flex items-center justify-center z-15 pointer-events-none">
+                            <div class="w-10 h-10 rounded-full bg-orange-500 text-white flex items-center justify-center shadow-xl shadow-orange-500/40">
+                                <i class="fa-solid fa-play text-xs ml-0.5"></i>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <button type="button" onclick="scrollRail('top10Rail', 1)" class="netflix-arrow-right" aria-label="Scroll Right">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- RAIL 2: LIVE SPORTS ARENA -->
+        {% if sports_channels %}
+        <div class="space-y-3">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                    <span class="px-2.5 py-1 rounded-lg bg-amber-600/20 text-amber-400 border border-amber-500/30 text-xs">
+                        <i class="fa-solid fa-trophy"></i>
+                    </span>
+                    <span>Live Sports Arena</span>
+                    <span class="text-xs font-semibold text-slate-400 hidden sm:inline">• Cricket, Football & Racing</span>
+                </h3>
+                <a href="{{ url_for('index', category='Sports') }}" class="text-xs font-bold text-orange-400 hover:text-orange-300 flex items-center gap-1 transition-colors">
+                    <span>Explore All (476)</span>
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </a>
+            </div>
+
+            <div class="netflix-rail-wrapper relative group">
+                <button type="button" onclick="scrollRail('sportsRail', -1)" class="netflix-arrow-left" aria-label="Scroll Left">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+
+                <div id="sportsRail" class="netflix-rail">
+                    {% for ch in sports_channels %}
+                    <div class="netflix-card flex-shrink-0 group/card channel-card"
+                         data-id="{{ ch.id }}"
+                         data-name="{{ ch.name }}"
+                         data-category="{{ ch.category }}"
+                         data-url="{{ ch.stream_url }}"
+                         onclick="onChannelClick(this)">
+                        
+                        <div class="absolute top-2.5 left-2.5 z-20">
+                            <span class="px-2 py-0.5 rounded-md bg-obsidian-950/80 text-[9px] font-black uppercase text-amber-400 border border-amber-500/30">
+                                SPORTS
+                            </span>
+                        </div>
+
+                        <div class="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5">
+                            <button type="button" onclick="event.stopPropagation(); toggleFavorite({{ ch.id }});" id="fav-{{ ch.id }}" class="p-1 text-xs {% if ch.id in fav_ids %}text-rose-500{% else %}text-slate-400 hover:text-white{% endif %} transition-colors">
+                                <i class="{% if ch.id in fav_ids %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+                            </button>
+                            <button type="button" onclick="event.stopPropagation(); openChannelDetails({{ ch.id }}, '{{ ch.name|replace('\'', '\\\'') }}', '{{ ch.category }}', '{{ ch.stream_url|replace('\'', '\\\'') }}', '{{ ch.logo or '' }}', '{{ ch.health_status or 'online' }}')" class="p-1 text-xs text-slate-400 hover:text-orange-400 transition-colors">
+                                <i class="fa-solid fa-circle-info"></i>
+                            </button>
+                        </div>
+
+                        <div class="w-full h-full p-4 flex flex-col justify-center items-center relative z-10">
+                            {% if ch.logo %}
+                            <img src="{{ ch.logo }}" alt="{{ ch.name }}" class="max-h-20 max-w-[130px] object-contain filter drop-shadow group-hover/card:scale-110 transition-transform" onerror="this.onerror=null; this.src='https://placehold.co/120x80/140d08/ff6b00?text=Sports';">
+                            {% else %}
+                            <i class="fa-solid fa-trophy text-3xl text-amber-400 mb-2"></i>
+                            {% endif %}
+                            <h4 class="text-xs font-bold text-white text-center truncate max-w-full mt-2 group-hover/card:text-orange-400 transition-colors">
+                                {{ ch.name }}
+                            </h4>
+                            <div class="flex items-center gap-1.5 mt-1 text-[9px] text-slate-400 font-semibold uppercase tracking-wider">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse"></span>
+                                <span>LIVE • 1080p FHD</span>
+                            </div>
+                        </div>
+
+                        <div class="absolute inset-0 bg-orange-600/20 backdrop-blur-[2px] opacity-0 group-hover/card:opacity-100 transition-opacity flex items-center justify-center z-15 pointer-events-none">
+                            <div class="w-10 h-10 rounded-full bg-orange-500 text-white flex items-center justify-center shadow-xl shadow-orange-500/40">
+                                <i class="fa-solid fa-play text-xs ml-0.5"></i>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <button type="button" onclick="scrollRail('sportsRail', 1)" class="netflix-arrow-right" aria-label="Scroll Right">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- RAIL 3: CINEMA & BLOCKBUSTER MOVIES -->
+        {% if movies_channels %}
+        <div class="space-y-3">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                    <span class="px-2.5 py-1 rounded-lg bg-rose-600/20 text-rose-400 border border-rose-500/30 text-xs">
+                        <i class="fa-solid fa-film"></i>
+                    </span>
+                    <span>Cinema & Blockbuster Movies</span>
+                    <span class="text-xs font-semibold text-slate-400 hidden sm:inline">• Hollywood, Bollywood & Classics</span>
+                </h3>
+                <a href="{{ url_for('index', category='Movies') }}" class="text-xs font-bold text-orange-400 hover:text-orange-300 flex items-center gap-1 transition-colors">
+                    <span>Explore All (771)</span>
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </a>
+            </div>
+
+            <div class="netflix-rail-wrapper relative group">
+                <button type="button" onclick="scrollRail('moviesRail', -1)" class="netflix-arrow-left" aria-label="Scroll Left">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+
+                <div id="moviesRail" class="netflix-rail">
+                    {% for ch in movies_channels %}
+                    <div class="netflix-card flex-shrink-0 group/card channel-card"
+                         data-id="{{ ch.id }}"
+                         data-name="{{ ch.name }}"
+                         data-category="{{ ch.category }}"
+                         data-url="{{ ch.stream_url }}"
+                         onclick="onChannelClick(this)">
+                        
+                        <div class="absolute top-2.5 left-2.5 z-20">
+                            <span class="px-2 py-0.5 rounded-md bg-obsidian-950/80 text-[9px] font-black uppercase text-rose-400 border border-rose-500/30">
+                                MOVIES
+                            </span>
+                        </div>
+
+                        <div class="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5">
+                            <button type="button" onclick="event.stopPropagation(); toggleFavorite({{ ch.id }});" id="fav-{{ ch.id }}" class="p-1 text-xs {% if ch.id in fav_ids %}text-rose-500{% else %}text-slate-400 hover:text-white{% endif %} transition-colors">
+                                <i class="{% if ch.id in fav_ids %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+                            </button>
+                            <button type="button" onclick="event.stopPropagation(); openChannelDetails({{ ch.id }}, '{{ ch.name|replace('\'', '\\\'') }}', '{{ ch.category }}', '{{ ch.stream_url|replace('\'', '\\\'') }}', '{{ ch.logo or '' }}', '{{ ch.health_status or 'online' }}')" class="p-1 text-xs text-slate-400 hover:text-orange-400 transition-colors">
+                                <i class="fa-solid fa-circle-info"></i>
+                            </button>
+                        </div>
+
+                        <div class="w-full h-full p-4 flex flex-col justify-center items-center relative z-10">
+                            {% if ch.logo %}
+                            <img src="{{ ch.logo }}" alt="{{ ch.name }}" class="max-h-20 max-w-[130px] object-contain filter drop-shadow group-hover/card:scale-110 transition-transform" onerror="this.onerror=null; this.src='https://placehold.co/120x80/140d08/ff6b00?text=Cinema';">
+                            {% else %}
+                            <i class="fa-solid fa-film text-3xl text-rose-400 mb-2"></i>
+                            {% endif %}
+                            <h4 class="text-xs font-bold text-white text-center truncate max-w-full mt-2 group-hover/card:text-orange-400 transition-colors">
+                                {{ ch.name }}
+                            </h4>
+                            <div class="flex items-center gap-1.5 mt-1 text-[9px] text-slate-400 font-semibold uppercase tracking-wider">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse"></span>
+                                <span>LIVE CINEMA</span>
+                            </div>
+                        </div>
+
+                        <div class="absolute inset-0 bg-orange-600/20 backdrop-blur-[2px] opacity-0 group-hover/card:opacity-100 transition-opacity flex items-center justify-center z-15 pointer-events-none">
+                            <div class="w-10 h-10 rounded-full bg-orange-500 text-white flex items-center justify-center shadow-xl shadow-orange-500/40">
+                                <i class="fa-solid fa-play text-xs ml-0.5"></i>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <button type="button" onclick="scrollRail('moviesRail', 1)" class="netflix-arrow-right" aria-label="Scroll Right">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- RAIL 4: 24/7 GLOBAL & NATIONAL NEWS -->
+        {% if news_channels %}
+        <div class="space-y-3">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                    <span class="px-2.5 py-1 rounded-lg bg-sky-600/20 text-sky-400 border border-sky-500/30 text-xs">
+                        <i class="fa-solid fa-newspaper"></i>
+                    </span>
+                    <span>24/7 Global & National News</span>
+                    <span class="text-xs font-semibold text-slate-400 hidden sm:inline">• Breaking Headlines & Live Reports</span>
+                </h3>
+                <a href="{{ url_for('index', category='News') }}" class="text-xs font-bold text-orange-400 hover:text-orange-300 flex items-center gap-1 transition-colors">
+                    <span>Explore All (1,132)</span>
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </a>
+            </div>
+
+            <div class="netflix-rail-wrapper relative group">
+                <button type="button" onclick="scrollRail('newsRail', -1)" class="netflix-arrow-left" aria-label="Scroll Left">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+
+                <div id="newsRail" class="netflix-rail">
+                    {% for ch in news_channels %}
+                    <div class="netflix-card flex-shrink-0 group/card channel-card"
+                         data-id="{{ ch.id }}"
+                         data-name="{{ ch.name }}"
+                         data-category="{{ ch.category }}"
+                         data-url="{{ ch.stream_url }}"
+                         onclick="onChannelClick(this)">
+                        
+                        <div class="absolute top-2.5 left-2.5 z-20">
+                            <span class="px-2 py-0.5 rounded-md bg-obsidian-950/80 text-[9px] font-black uppercase text-sky-400 border border-sky-500/30">
+                                NEWS
+                            </span>
+                        </div>
+
+                        <div class="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5">
+                            <button type="button" onclick="event.stopPropagation(); toggleFavorite({{ ch.id }});" id="fav-{{ ch.id }}" class="p-1 text-xs {% if ch.id in fav_ids %}text-rose-500{% else %}text-slate-400 hover:text-white{% endif %} transition-colors">
+                                <i class="{% if ch.id in fav_ids %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+                            </button>
+                            <button type="button" onclick="event.stopPropagation(); openChannelDetails({{ ch.id }}, '{{ ch.name|replace('\'', '\\\'') }}', '{{ ch.category }}', '{{ ch.stream_url|replace('\'', '\\\'') }}', '{{ ch.logo or '' }}', '{{ ch.health_status or 'online' }}')" class="p-1 text-xs text-slate-400 hover:text-orange-400 transition-colors">
+                                <i class="fa-solid fa-circle-info"></i>
+                            </button>
+                        </div>
+
+                        <div class="w-full h-full p-4 flex flex-col justify-center items-center relative z-10">
+                            {% if ch.logo %}
+                            <img src="{{ ch.logo }}" alt="{{ ch.name }}" class="max-h-20 max-w-[130px] object-contain filter drop-shadow group-hover/card:scale-110 transition-transform" onerror="this.onerror=null; this.src='https://placehold.co/120x80/140d08/ff6b00?text=News';">
+                            {% else %}
+                            <i class="fa-solid fa-newspaper text-3xl text-sky-400 mb-2"></i>
+                            {% endif %}
+                            <h4 class="text-xs font-bold text-white text-center truncate max-w-full mt-2 group-hover/card:text-orange-400 transition-colors">
+                                {{ ch.name }}
+                            </h4>
+                            <div class="flex items-center gap-1.5 mt-1 text-[9px] text-slate-400 font-semibold uppercase tracking-wider">
+                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500 live-pulse"></span>
+                                <span>LIVE BULLETIN</span>
+                            </div>
+                        </div>
+
+                        <div class="absolute inset-0 bg-orange-600/20 backdrop-blur-[2px] opacity-0 group-hover/card:opacity-100 transition-opacity flex items-center justify-center z-15 pointer-events-none">
+                            <div class="w-10 h-10 rounded-full bg-orange-500 text-white flex items-center justify-center shadow-xl shadow-orange-500/40">
+                                <i class="fa-solid fa-play text-xs ml-0.5"></i>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <button type="button" onclick="scrollRail('newsRail', 1)" class="netflix-arrow-right" aria-label="Scroll Right">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- RAIL 5: ENTERTAINMENT & SERIALS -->
+        {% if entertainment_channels %}
+        <div class="space-y-3">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                    <span class="px-2.5 py-1 rounded-lg bg-purple-600/20 text-purple-400 border border-purple-500/30 text-xs">
+                        <i class="fa-solid fa-masks-theater"></i>
+                    </span>
+                    <span>Entertainment & Serials</span>
+                    <span class="text-xs font-semibold text-slate-400 hidden sm:inline">• Top Dramas, Reality & Comedy</span>
+                </h3>
+                <a href="{{ url_for('index', category='Entertainment') }}" class="text-xs font-bold text-orange-400 hover:text-orange-300 flex items-center gap-1 transition-colors">
+                    <span>Explore All (5,327)</span>
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </a>
+            </div>
+
+            <div class="netflix-rail-wrapper relative group">
+                <button type="button" onclick="scrollRail('entRail', -1)" class="netflix-arrow-left" aria-label="Scroll Left">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+
+                <div id="entRail" class="netflix-rail">
+                    {% for ch in entertainment_channels %}
+                    <div class="netflix-card flex-shrink-0 group/card channel-card"
+                         data-id="{{ ch.id }}"
+                         data-name="{{ ch.name }}"
+                         data-category="{{ ch.category }}"
+                         data-url="{{ ch.stream_url }}"
+                         onclick="onChannelClick(this)">
+                        
+                        <div class="absolute top-2.5 left-2.5 z-20">
+                            <span class="px-2 py-0.5 rounded-md bg-obsidian-950/80 text-[9px] font-black uppercase text-purple-400 border border-purple-500/30">
+                                ENTERTAINMENT
+                            </span>
+                        </div>
+
+                        <div class="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5">
+                            <button type="button" onclick="event.stopPropagation(); toggleFavorite({{ ch.id }});" id="fav-{{ ch.id }}" class="p-1 text-xs {% if ch.id in fav_ids %}text-rose-500{% else %}text-slate-400 hover:text-white{% endif %} transition-colors">
+                                <i class="{% if ch.id in fav_ids %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+                            </button>
+                            <button type="button" onclick="event.stopPropagation(); openChannelDetails({{ ch.id }}, '{{ ch.name|replace('\'', '\\\'') }}', '{{ ch.category }}', '{{ ch.stream_url|replace('\'', '\\\'') }}', '{{ ch.logo or '' }}', '{{ ch.health_status or 'online' }}')" class="p-1 text-xs text-slate-400 hover:text-orange-400 transition-colors">
+                                <i class="fa-solid fa-circle-info"></i>
+                            </button>
+                        </div>
+
+                        <div class="w-full h-full p-4 flex flex-col justify-center items-center relative z-10">
+                            {% if ch.logo %}
+                            <img src="{{ ch.logo }}" alt="{{ ch.name }}" class="max-h-20 max-w-[130px] object-contain filter drop-shadow group-hover/card:scale-110 transition-transform" onerror="this.onerror=null; this.src='https://placehold.co/120x80/140d08/ff6b00?text=Ent';">
+                            {% else %}
+                            <i class="fa-solid fa-masks-theater text-3xl text-purple-400 mb-2"></i>
+                            {% endif %}
+                            <h4 class="text-xs font-bold text-white text-center truncate max-w-full mt-2 group-hover/card:text-orange-400 transition-colors">
+                                {{ ch.name }}
+                            </h4>
+                            <div class="flex items-center gap-1.5 mt-1 text-[9px] text-slate-400 font-semibold uppercase tracking-wider">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse"></span>
+                                <span>LIVE DRAMA</span>
+                            </div>
+                        </div>
+
+                        <div class="absolute inset-0 bg-orange-600/20 backdrop-blur-[2px] opacity-0 group-hover/card:opacity-100 transition-opacity flex items-center justify-center z-15 pointer-events-none">
+                            <div class="w-10 h-10 rounded-full bg-orange-500 text-white flex items-center justify-center shadow-xl shadow-orange-500/40">
+                                <i class="fa-solid fa-play text-xs ml-0.5"></i>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <button type="button" onclick="scrollRail('entRail', 1)" class="netflix-arrow-right" aria-label="Scroll Right">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- RAIL 6: KIDS & ANIMATION -->
+        {% if kids_channels %}
+        <div class="space-y-3">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                    <span class="px-2.5 py-1 rounded-lg bg-pink-600/20 text-pink-400 border border-pink-500/30 text-xs">
+                        <i class="fa-solid fa-face-smile"></i>
+                    </span>
+                    <span>Kids & Cartoons</span>
+                    <span class="text-xs font-semibold text-slate-400 hidden sm:inline">• Family & Safe Youth Feeds</span>
+                </h3>
+                <a href="{{ url_for('index', category='Kids') }}" class="text-xs font-bold text-orange-400 hover:text-orange-300 flex items-center gap-1 transition-colors">
+                    <span>Explore All (595)</span>
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </a>
+            </div>
+
+            <div class="netflix-rail-wrapper relative group">
+                <button type="button" onclick="scrollRail('kidsRail', -1)" class="netflix-arrow-left" aria-label="Scroll Left">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+
+                <div id="kidsRail" class="netflix-rail">
+                    {% for ch in kids_channels %}
+                    <div class="netflix-card flex-shrink-0 group/card channel-card"
+                         data-id="{{ ch.id }}"
+                         data-name="{{ ch.name }}"
+                         data-category="{{ ch.category }}"
+                         data-url="{{ ch.stream_url }}"
+                         onclick="onChannelClick(this)">
+                        
+                        <div class="absolute top-2.5 left-2.5 z-20">
+                            <span class="px-2 py-0.5 rounded-md bg-obsidian-950/80 text-[9px] font-black uppercase text-pink-400 border border-pink-500/30">
+                                KIDS
+                            </span>
+                        </div>
+
+                        <div class="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5">
+                            <button type="button" onclick="event.stopPropagation(); toggleFavorite({{ ch.id }});" id="fav-{{ ch.id }}" class="p-1 text-xs {% if ch.id in fav_ids %}text-rose-500{% else %}text-slate-400 hover:text-white{% endif %} transition-colors">
+                                <i class="{% if ch.id in fav_ids %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+                            </button>
+                            <button type="button" onclick="event.stopPropagation(); openChannelDetails({{ ch.id }}, '{{ ch.name|replace('\'', '\\\'') }}', '{{ ch.category }}', '{{ ch.stream_url|replace('\'', '\\\'') }}', '{{ ch.logo or '' }}', '{{ ch.health_status or 'online' }}')" class="p-1 text-xs text-slate-400 hover:text-orange-400 transition-colors">
+                                <i class="fa-solid fa-circle-info"></i>
+                            </button>
+                        </div>
+
+                        <div class="w-full h-full p-4 flex flex-col justify-center items-center relative z-10">
+                            {% if ch.logo %}
+                            <img src="{{ ch.logo }}" alt="{{ ch.name }}" class="max-h-20 max-w-[130px] object-contain filter drop-shadow group-hover/card:scale-110 transition-transform" onerror="this.onerror=null; this.src='https://placehold.co/120x80/140d08/ff6b00?text=Kids';">
+                            {% else %}
+                            <i class="fa-solid fa-face-smile text-3xl text-pink-400 mb-2"></i>
+                            {% endif %}
+                            <h4 class="text-xs font-bold text-white text-center truncate max-w-full mt-2 group-hover/card:text-orange-400 transition-colors">
+                                {{ ch.name }}
+                            </h4>
+                            <div class="flex items-center gap-1.5 mt-1 text-[9px] text-slate-400 font-semibold uppercase tracking-wider">
+                                <span class="w-1.5 h-1.5 rounded-full bg-pink-400 live-pulse"></span>
+                                <span>KIDS STREAM</span>
+                            </div>
+                        </div>
+
+                        <div class="absolute inset-0 bg-orange-600/20 backdrop-blur-[2px] opacity-0 group-hover/card:opacity-100 transition-opacity flex items-center justify-center z-15 pointer-events-none">
+                            <div class="w-10 h-10 rounded-full bg-orange-500 text-white flex items-center justify-center shadow-xl shadow-orange-500/40">
+                                <i class="fa-solid fa-play text-xs ml-0.5"></i>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <button type="button" onclick="scrollRail('kidsRail', 1)" class="netflix-arrow-right" aria-label="Scroll Right">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+    {% endif %}
+
+    <!-- 6. ALL CHANNELS GRID / BROWSER SECTION -->
+    <div class="space-y-4 pt-4">
+        <div class="flex items-center justify-between flex-wrap gap-3">
             <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2 flex-wrap">
-                <i class="fa-solid fa-layer-group text-brand-400"></i>
-                <span>Available Channels ({{ channels|length }}{% if total_channel_count and total_channel_count > channels|length %} of {{ total_channel_count }}{% endif %})</span>
+                <i class="fa-solid fa-layer-group text-orange-400"></i>
+                <span>
+                    {% if is_home_rails %}
+                        All Channels Quick Browse ({{ channels|length }}{% if total_channel_count and total_channel_count > channels|length %} of {{ total_channel_count }}{% endif %})
+                    {% elif fav_only %}
+                        My List / Favorite Channels ({{ channels|length }})
+                    {% else %}
+                        {{ selected_category }} Channels ({{ channels|length }}{% if total_channel_count and total_channel_count > channels|length %} of {{ total_channel_count }}{% endif %})
+                    {% endif %}
+                </span>
                 {% if package_name %}
-                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold {% if is_all_access %}bg-amber-500/20 text-amber-300 border border-amber-500/30{% else %}bg-purple-500/20 text-purple-300 border border-purple-500/30{% endif %}">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold {% if is_all_access %}bg-amber-500/20 text-amber-300 border border-amber-500/30{% else %}bg-orange-500/20 text-orange-300 border border-orange-500/30{% endif %}">
                     <i class="fa-solid fa-box-archive text-[9px]"></i>
                     <span>{{ package_name }}</span>
                 </span>
@@ -212,7 +760,7 @@
                 </a>
                 <div class="w-36 sm:w-56">
                     <input type="text" id="channelFilterInput" placeholder="Quick filter..." 
-                           class="w-full bg-obsidian-900/90 text-xs text-slate-200 px-3.5 py-1.5 rounded-xl border border-white/[0.08] focus:outline-none focus:border-brand-500">
+                           class="w-full bg-obsidian-900/90 text-xs text-slate-200 px-3.5 py-1.5 rounded-xl border border-white/[0.08] focus:outline-none focus:border-orange-500">
                 </div>
             </div>
         </div>
@@ -240,16 +788,21 @@
                         <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0" title="Slow stream (>2.5s)"></span>
                         {% endif %}
                     </div>
-                    <button type="button" onclick="event.stopPropagation(); toggleFavorite({{ ch.id }});" id="fav-{{ ch.id }}" 
-                            class="text-xs {% if ch.id in fav_ids %}text-rose-500{% else %}text-slate-600 group-hover:text-slate-400{% endif %} hover:scale-125 transition-all">
-                        <i class="{% if ch.id in fav_ids %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
-                    </button>
+                    <div class="flex items-center gap-1">
+                        <button type="button" onclick="event.stopPropagation(); openChannelDetails({{ ch.id }}, '{{ ch.name|replace('\'', '\\\'') }}', '{{ ch.category }}', '{{ ch.stream_url|replace('\'', '\\\'') }}', '{{ ch.logo or '' }}', '{{ ch.health_status or 'online' }}')" class="text-xs text-slate-500 hover:text-orange-400 p-0.5" title="Details">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </button>
+                        <button type="button" onclick="event.stopPropagation(); toggleFavorite({{ ch.id }});" id="fav-{{ ch.id }}" 
+                                class="text-xs {% if ch.id in fav_ids %}text-rose-500{% else %}text-slate-600 group-hover:text-slate-400{% endif %} hover:scale-125 transition-all p-0.5">
+                            <i class="{% if ch.id in fav_ids %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Channel Logo -->
                 <div class="h-20 w-full flex items-center justify-center p-2 rounded-xl bg-obsidian-950/90 mb-2 overflow-hidden border border-white/[0.04]">
                     {% if ch.logo %}
-                    <img src="{{ ch.logo }}" alt="{{ ch.name }}" class="max-h-full max-w-full object-contain filter group-hover:scale-105 transition-transform" onerror="this.onerror=null; this.src='https://placehold.co/120x80/0f172a/38bdf8?text=TV';">
+                    <img src="{{ ch.logo }}" alt="{{ ch.name }}" class="max-h-full max-w-full object-contain filter group-hover:scale-105 transition-transform" onerror="this.onerror=null; this.src='https://placehold.co/120x80/140d08/ff6b00?text=TV';">
                     {% else %}
                     <div class="w-10 h-10 rounded-full bg-obsidian-800 flex items-center justify-center text-slate-400">
                         <i class="fa-solid fa-satellite-dish text-base"></i>
@@ -259,7 +812,7 @@
 
                 <!-- Channel Title & Play Action -->
                 <div>
-                    <h4 class="text-xs font-semibold text-white truncate text-center group-hover:text-brand-400 transition-colors">
+                    <h4 class="text-xs font-semibold text-white truncate text-center group-hover:text-orange-400 transition-colors">
                         {{ ch.name }}
                     </h4>
                     <div class="flex items-center justify-center gap-1.5 mt-1 text-[10px] text-slate-400">
@@ -269,8 +822,8 @@
                 </div>
 
                 <!-- Play Overlay Hint on Hover -->
-                <div class="absolute inset-0 bg-brand-600/20 backdrop-blur-[2px] rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                    <div class="w-10 h-10 rounded-full bg-brand-500 text-white flex items-center justify-center shadow-xl shadow-brand-500/40 transform group-hover:scale-110 transition-transform">
+                <div class="absolute inset-0 bg-orange-600/20 backdrop-blur-[2px] rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                    <div class="w-10 h-10 rounded-full bg-orange-500 text-white flex items-center justify-center shadow-xl shadow-orange-500/40 transform group-hover:scale-110 transition-transform">
                         <i class="fa-solid fa-play text-xs ml-0.5"></i>
                     </div>
                 </div>
@@ -282,13 +835,75 @@
             <i class="fa-solid fa-tv text-slate-600 text-5xl mb-4"></i>
             <h3 class="text-base font-bold text-white">No channels found in this category</h3>
             <p class="text-slate-400 text-xs mt-1">Select another category or clear your search keyword.</p>
-            <a href="{{ url_for('index') }}" class="inline-block mt-4 px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-lg shadow-brand-600/30">
+            <a href="{{ url_for('index') }}" class="inline-block mt-4 px-4 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold shadow-lg shadow-orange-600/30">
                 View All Channels
             </a>
         </div>
         {% endif %}
     </div>
 
+</div>
+
+<!-- 7. NETFLIX CHANNEL DETAILS MODAL -->
+<div id="channelDetailsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden transition-opacity" onclick="if(event.target === this) closeChannelDetails()">
+    <div class="cinema-glass-card rounded-3xl max-w-lg w-full overflow-hidden border border-orange-500/40 shadow-2xl shadow-orange-500/30 transform transition-all relative">
+        <!-- Close Button -->
+        <button type="button" onclick="closeChannelDetails()" class="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-obsidian-900/90 text-slate-400 hover:text-white border border-white/10 flex items-center justify-center transition-colors">
+            <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+
+        <!-- Modal Header / Backdrop Banner -->
+        <div class="h-44 bg-gradient-to-tr from-orange-950 via-obsidian-900 to-amber-950/40 relative flex items-center justify-center p-6 border-b border-white/[0.08]">
+            <div id="modalChannelLogoWrap" class="w-24 h-24 rounded-2xl bg-obsidian-950/90 border border-white/10 p-2 flex items-center justify-center shadow-xl">
+                <img id="modalChannelLogo" src="" alt="Channel Logo" class="max-h-full max-w-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/120x80/140d08/ff6b00?text=TV';">
+            </div>
+            <div class="absolute bottom-3 left-4 flex items-center gap-2">
+                <span id="modalChannelCatBadge" class="px-2.5 py-0.5 rounded-md bg-orange-600 text-white font-black text-[9px] uppercase tracking-wider shadow">
+                    CATEGORY
+                </span>
+                <span id="modalChannelHealthBadge" class="px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold text-[9px] flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse"></span>
+                    <span>ONLINE FEED</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Modal Body Content -->
+        <div class="p-6 space-y-4">
+            <div>
+                <h3 id="modalChannelTitle" class="text-xl font-black text-white tracking-tight">Channel Title</h3>
+                <p class="text-xs text-slate-400 mt-1">Sabro Vision Ultra HD Direct Broadcast Stream • HLS Multi-bitrate Adaptive</p>
+            </div>
+
+            <!-- Technical Attributes Grid -->
+            <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                <div class="p-2.5 rounded-xl bg-obsidian-900/90 border border-white/[0.06]">
+                    <span class="text-[9px] uppercase text-slate-500 font-bold block">Resolution</span>
+                    <span class="text-white font-mono font-bold mt-0.5 block">1080p FHD</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-obsidian-900/90 border border-white/[0.06]">
+                    <span class="text-[9px] uppercase text-slate-500 font-bold block">Audio Format</span>
+                    <span class="text-white font-mono font-bold mt-0.5 block">Dolby Stereo</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-obsidian-900/90 border border-white/[0.06]">
+                    <span class="text-[9px] uppercase text-slate-500 font-bold block">Relay Speed</span>
+                    <span class="text-emerald-400 font-mono font-bold mt-0.5 block">&lt; 150ms</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-3 pt-2">
+                <button type="button" id="modalPlayBtn" class="flex-1 py-3 rounded-2xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-xl shadow-orange-600/30 transition-all">
+                    <i class="fa-solid fa-play text-xs"></i>
+                    <span>Watch Stream Now</span>
+                </button>
+                <button type="button" id="modalFavBtn" class="px-4 py-3 rounded-2xl bg-obsidian-900 hover:bg-obsidian-800 text-slate-200 border border-white/10 font-bold text-xs flex items-center gap-1.5 transition-all">
+                    <i class="fa-regular fa-heart"></i>
+                    <span>My List</span>
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
@@ -301,7 +916,8 @@
             id: {{ ch.id }},
             name: {{ ch.name|tojson }},
             category: {{ ch.category|tojson }},
-            url: {{ ch.stream_url|tojson }}
+            url: {{ ch.stream_url|tojson }},
+            logo: {{ (ch.logo or '')|tojson }}
         },
         {% endfor %}
     ];
@@ -430,9 +1046,9 @@
 
         document.querySelectorAll('.channel-card').forEach(card => {
             if (parseInt(card.getAttribute('data-id')) === id) {
-                card.classList.add('border-orange-500', 'ring-2', 'ring-orange-500/30');
+                card.classList.add('border-orange-500', 'ring-2', 'ring-orange-500/40');
             } else {
-                card.classList.remove('border-orange-500', 'ring-2', 'ring-orange-500/30');
+                card.classList.remove('border-orange-500', 'ring-2', 'ring-orange-500/40');
             }
         });
 
@@ -441,7 +1057,7 @@
         window.history.pushState({}, '', `/?channel_id=${id}`);
         playStream(id, rawUrl);
         
-        const container = document.getElementById('playerContainer');
+        const container = document.getElementById('cinemaStage');
         if (container) {
             container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
@@ -489,6 +1105,52 @@
         }
     }
 
+    // Horizontal Rail Smooth Scroll Controller
+    function scrollRail(railId, direction) {
+        const rail = document.getElementById(railId);
+        if (!rail) return;
+        const scrollDistance = 560 * direction;
+        rail.scrollBy({ left: scrollDistance, behavior: 'smooth' });
+    }
+
+    // Netflix Channel Details Modal Controller
+    let currentModalChannelId = null;
+    function openChannelDetails(id, name, category, url, logo, health) {
+        currentModalChannelId = id;
+        const modal = document.getElementById('channelDetailsModal');
+        const titleElem = document.getElementById('modalChannelTitle');
+        const catBadge = document.getElementById('modalChannelCatBadge');
+        const logoElem = document.getElementById('modalChannelLogo');
+        const playBtn = document.getElementById('modalPlayBtn');
+        const favBtn = document.getElementById('modalFavBtn');
+
+        if (titleElem) titleElem.innerText = name;
+        if (catBadge) catBadge.innerText = category;
+        if (logoElem) {
+            logoElem.src = logo && logo !== 'None' ? logo : 'https://placehold.co/120x80/140d08/ff6b00?text=' + encodeURIComponent(name);
+        }
+        if (playBtn) {
+            playBtn.onclick = function() {
+                closeChannelDetails();
+                loadChannel(id, name, category, url);
+            };
+        }
+        if (favBtn) {
+            favBtn.onclick = function() {
+                toggleFavorite(id);
+            };
+        }
+
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+    }
+
+    function closeChannelDetails() {
+        const modal = document.getElementById('channelDetailsModal');
+        if (modal) modal.classList.add('hidden');
+    }
+
     // Favorites AJAX Toggle
     function toggleFavorite(channelId) {
         fetch('/api/favorite/toggle', {
@@ -499,17 +1161,22 @@
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                const btns = [document.getElementById(`fav-${channelId}`), document.getElementById(`favBtn-${channelId}`)];
+                const btns = [
+                    document.getElementById(`fav-${channelId}`), 
+                    document.getElementById(`favBtn-${channelId}`),
+                    document.getElementById(`heroFavBtn-${channelId}`),
+                    document.getElementById('modalFavBtn')
+                ];
                 btns.forEach(btn => {
                     if (btn) {
                         const icon = btn.querySelector('i');
                         if (data.is_favorite) {
                             btn.classList.add('text-rose-500');
-                            btn.classList.remove('text-slate-600', 'text-slate-500');
+                            btn.classList.remove('text-slate-600', 'text-slate-500', 'text-slate-400');
                             if (icon) { icon.classList.remove('fa-regular'); icon.classList.add('fa-solid'); }
                         } else {
                             btn.classList.remove('text-rose-500');
-                            btn.classList.add('text-slate-500');
+                            btn.classList.add('text-slate-400');
                             if (icon) { icon.classList.remove('fa-solid'); icon.classList.add('fa-regular'); }
                         }
                     }
@@ -523,7 +1190,7 @@
     if (filterInput) {
         filterInput.addEventListener('input', function(e) {
             const query = e.target.value.toLowerCase().trim();
-            const cards = document.querySelectorAll('.channel-card');
+            const cards = document.querySelectorAll('#channelsGrid .channel-card');
             cards.forEach(card => {
                 const name = (card.getAttribute('data-name') || '').toLowerCase();
                 const cat = (card.getAttribute('data-category') || '').toLowerCase();
@@ -540,7 +1207,9 @@
     document.addEventListener('keydown', function(e) {
         if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
 
-        if (e.key === ' ' || e.code === 'Space') {
+        if (e.key === 'Escape') {
+            closeChannelDetails();
+        } else if (e.key === ' ' || e.code === 'Space') {
             e.preventDefault();
             if (video.paused) video.play(); else video.pause();
         } else if (e.key === 'f' || e.key === 'F') {
