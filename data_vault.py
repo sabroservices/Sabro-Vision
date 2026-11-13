@@ -121,6 +121,7 @@ def import_vault_snapshot(snapshot: dict) -> int:
     try:
         conn = db.get_db()
         cursor = conn.cursor()
+        cursor.execute("PRAGMA foreign_keys = OFF")
 
         for table, rows in snapshot.get("tables", {}).items():
             if not rows or table not in DYNAMIC_TABLES:
@@ -142,6 +143,18 @@ def import_vault_snapshot(snapshot: dict) -> int:
                     sql = f'INSERT OR IGNORE INTO admin_users ({col_names}) VALUES ({placeholders})'
                     cursor.execute(sql, tuple(row.values()))
                     restored_total += 1
+                elif table == "tenants":
+                    cursor.execute("SELECT id FROM tenants WHERE id = ? OR code = ?", (row.get("id"), row.get("code")))
+                    if not cursor.fetchone():
+                        sql = f'INSERT OR REPLACE INTO tenants ({col_names}) VALUES ({placeholders})'
+                        cursor.execute(sql, tuple(row.values()))
+                        restored_total += 1
+                elif table == "reseller_users":
+                    cursor.execute("SELECT id FROM reseller_users WHERE username = ?", (row.get("username"),))
+                    if not cursor.fetchone():
+                        sql = f'INSERT OR REPLACE INTO reseller_users ({col_names}) VALUES ({placeholders})'
+                        cursor.execute(sql, tuple(row.values()))
+                        restored_total += 1
                 elif table == "access_keys":
                     # Upsert on key_code
                     cursor.execute("SELECT id FROM access_keys WHERE key_code = ?", (row.get("key_code"),))
@@ -157,7 +170,7 @@ def import_vault_snapshot(snapshot: dict) -> int:
                         sql = f'INSERT OR REPLACE INTO subscribers ({col_names}) VALUES ({placeholders})'
                         cursor.execute(sql, tuple(row.values()))
                         restored_total += 1
-                elif table in ("payment_receipts", "reseller_inquiries", "favorites", "subscriptions", "audit_logs"):
+                elif table in ("payment_receipts", "reseller_inquiries", "favorites", "subscriptions", "audit_logs", "support_tickets", "ticket_messages", "notifications", "isp_verifications", "schema_migrations"):
                     # Check by ID if present
                     row_id = row.get("id")
                     if row_id:
@@ -171,6 +184,7 @@ def import_vault_snapshot(snapshot: dict) -> int:
                         cursor.execute(sql, tuple(row.values()))
                         restored_total += 1
 
+        cursor.execute("PRAGMA foreign_keys = ON")
         conn.commit()
         conn.close()
         checkpoint_wal()
