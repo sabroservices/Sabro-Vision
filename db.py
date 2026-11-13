@@ -1512,18 +1512,23 @@ def get_expiration_queue(within_days=7):
 # ----------------------------------------------------
 # SABRO VISION v1.0 - Customer Management & Sector Mapping
 # ----------------------------------------------------
-def get_subscribers(search=None, status=None, zone=None, limit=None, offset=0):
+def get_subscribers(search=None, status=None, zone=None, limit=None, offset=0, tenant_id=None):
     conn = get_db()
     query = """
-        SELECT sub.*, p.name as package_name, s.expiry_date as sub_expiry
+        SELECT sub.*, p.name as package_name, s.expiry_date as sub_expiry,
+               t.service_name as tenant_service_name, t.code as tenant_code
         FROM subscribers sub
         LEFT JOIN subscriptions s ON s.subscriber_id = sub.id AND s.id = (
             SELECT id FROM subscriptions WHERE subscriber_id = sub.id ORDER BY id DESC LIMIT 1
         )
         LEFT JOIN packages p ON p.id = sub.package_id
+        LEFT JOIN tenants t ON t.id = sub.tenant_id
         WHERE 1=1
     """
     params = []
+    if tenant_id is not None:
+        query += " AND sub.tenant_id = ?"
+        params.append(int(tenant_id))
     if status and status != 'all':
         query += " AND sub.status = ?"
         params.append(status)
@@ -1544,10 +1549,13 @@ def get_subscribers(search=None, status=None, zone=None, limit=None, offset=0):
     conn.close()
     return [dict(r) for r in rows]
 
-def get_subscribers_count(search=None, status=None, zone=None):
+def get_subscribers_count(search=None, status=None, zone=None, tenant_id=None):
     conn = get_db()
     query = "SELECT COUNT(*) as c FROM subscribers sub WHERE 1=1"
     params = []
+    if tenant_id is not None:
+        query += " AND sub.tenant_id = ?"
+        params.append(int(tenant_id))
     if status and status != 'all':
         query += " AND sub.status = ?"
         params.append(status)
@@ -1563,7 +1571,7 @@ def get_subscribers_count(search=None, status=None, zone=None):
     conn.close()
     return c
 
-def add_subscriber(username, password, full_name="", phone="", pppoe_username="", zone="", fat_id="", email="", package_id=None, notes=""):
+def add_subscriber(username, password, full_name="", phone="", pppoe_username="", zone="", fat_id="", email="", package_id=None, notes="", tenant_id=1, is_sabro_isp=0):
     clean_user = username.strip().lower()
     if not clean_user or len(clean_user) < 3:
         return False, "Username must be at least 3 characters", None
@@ -1580,9 +1588,9 @@ def add_subscriber(username, password, full_name="", phone="", pppoe_username=""
     pw_hash = generate_password_hash(password)
     cursor = conn.cursor()
     cursor.execute("""
-        INSERT INTO subscribers (username, password_hash, plain_password, full_name, phone, email, pppoe_username, zone, fat_id, package_id, status, notes, created_at, last_login_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)
-    """, (clean_user, pw_hash, password, full_name.strip(), phone.strip(), email.strip(), pppoe_username.strip(), zone.strip(), fat_id.strip(), package_id, notes.strip(), now_str, now_str))
+        INSERT INTO subscribers (username, password_hash, plain_password, full_name, phone, email, pppoe_username, zone, fat_id, package_id, status, notes, tenant_id, is_sabro_isp, created_at, last_login_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?)
+    """, (clean_user, pw_hash, password, full_name.strip(), phone.strip(), email.strip(), pppoe_username.strip(), zone.strip(), fat_id.strip(), package_id, notes.strip(), int(tenant_id or 1), int(is_sabro_isp or 0), now_str, now_str))
     conn.commit()
     new_id = cursor.lastrowid
     
