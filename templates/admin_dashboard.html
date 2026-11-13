@@ -144,6 +144,78 @@
         </div>
     </div>
 
+    <!-- SaaS Multi-Tenant & Entitlement Breakdown -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Sabro Fiber vs Outsider Breakdown -->
+        <div class="cinema-glass-card rounded-2xl p-5 border border-white/[0.08] bg-obsidian-900/80 space-y-3">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-users-viewfinder text-cyan-400"></i>
+                    <span>Customer Entitlements</span>
+                </span>
+                <span class="text-[10px] text-slate-400 font-mono">Live Sync</span>
+            </div>
+            <div class="grid grid-cols-2 gap-3 pt-1">
+                <div class="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/20">
+                    <span class="block text-[10px] font-bold uppercase text-emerald-400">Sabro Free</span>
+                    <span class="text-2xl font-black text-white">{{ analytics.active_sabro_free_users or 0 }}</span>
+                    <span class="text-[9px] text-slate-400 block mt-0.5">Broadband verified</span>
+                </div>
+                <div class="p-3 rounded-xl bg-cyan-950/20 border border-cyan-500/20">
+                    <span class="block text-[10px] font-bold uppercase text-cyan-400">Outside Paid</span>
+                    <span class="text-2xl font-black text-white">{{ analytics.outside_paid_customers or 0 }}</span>
+                    <span class="text-[9px] text-slate-400 block mt-0.5">Commercial users</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SaaS Tenants & White-Label ISPs -->
+        <div class="cinema-glass-card rounded-2xl p-5 border border-white/[0.08] bg-obsidian-900/80 space-y-3">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-network-wired text-indigo-400"></i>
+                    <span>White-Label Tenants</span>
+                </span>
+                <a href="{{ url_for('admin_resellers') }}" class="text-[10px] text-indigo-300 hover:underline font-bold">Manage &rarr;</a>
+            </div>
+            <div class="grid grid-cols-2 gap-3 pt-1">
+                <div class="p-3 rounded-xl bg-indigo-950/20 border border-indigo-500/20">
+                    <span class="block text-[10px] font-bold uppercase text-indigo-400">Active ISPs</span>
+                    <span class="text-2xl font-black text-white">{{ analytics.total_active_resellers or 0 }}</span>
+                    <span class="text-[9px] text-slate-400 block mt-0.5">Live partner brands</span>
+                </div>
+                <div class="p-3 rounded-xl bg-purple-950/20 border border-purple-500/20">
+                    <span class="block text-[10px] font-bold uppercase text-purple-400">Partner Leads</span>
+                    <span class="text-2xl font-black text-white">{{ analytics.total_resellers or 0 }}</span>
+                    <span class="text-[9px] text-slate-400 block mt-0.5">Inquiries received</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenue Segments (Sabro Direct vs Resellers) -->
+        <div class="cinema-glass-card rounded-2xl p-5 border border-white/[0.08] bg-obsidian-900/80 space-y-3">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-coins text-amber-400"></i>
+                    <span>Revenue Breakdown</span>
+                </span>
+                <a href="{{ url_for('admin_payments') }}" class="text-[10px] text-amber-300 hover:underline font-bold">Queue &rarr;</a>
+            </div>
+            <div class="grid grid-cols-2 gap-3 pt-1">
+                <div class="p-3 rounded-xl bg-amber-950/20 border border-amber-500/20">
+                    <span class="block text-[10px] font-bold uppercase text-amber-400">Outside Direct</span>
+                    <span class="text-xl font-black text-white">{{ analytics.outside_revenue_pkr or 0 }} <span class="text-[10px] text-amber-400">PKR</span></span>
+                    <span class="text-[9px] text-slate-400 block mt-0.5">Retail subscribers</span>
+                </div>
+                <div class="p-3 rounded-xl bg-amber-950/20 border border-amber-500/20">
+                    <span class="block text-[10px] font-bold uppercase text-amber-400">Reseller SaaS</span>
+                    <span class="text-xl font-black text-white">{{ analytics.reseller_revenue_pkr or 0 }} <span class="text-[10px] text-amber-400">PKR</span></span>
+                    <span class="text-[9px] text-slate-400 block mt-0.5">Wholesale ISP revenue</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Quick Access Key Generator Bar -->
     <div class="cinema-glass-card rounded-2xl p-6 border border-white/[0.08]">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
