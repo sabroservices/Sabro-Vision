@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Customers - {{ (tenant and tenant.service_name) or 'Reseller' }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Header & Navigation -->
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-4 flex-wrap gap-4">
+        <div class="flex items-center gap-2 overflow-x-auto scrollbar-none text-xs font-bold">
+            <a href="{{ url_for('reseller_dashboard') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-cyan-400"></i>
+                <span>Overview</span>
+            </a>
+            <a href="{{ url_for('reseller_customers') }}" class="px-3.5 py-2 rounded-xl bg-cyan-600 text-white shadow-md shadow-cyan-600/30 flex items-center gap-2">
+                <i class="fa-solid fa-users"></i>
+                <span>Customers</span>
+            </a>
+            <a href="{{ url_for('reseller_packages') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-boxes-stacked text-purple-400"></i>
+                <span>Packages & Pricing</span>
+            </a>
+            <a href="{{ url_for('reseller_payments') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice-dollar text-amber-400"></i>
+                <span>Payment Queue</span>
+            </a>
+            <a href="{{ url_for('reseller_branding') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-palette text-pink-400"></i>
+                <span>White-Label Branding</span>
+            </a>
+            <a href="{{ url_for('reseller_tickets') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-headset text-emerald-400"></i>
+                <span>Customer Support</span>
+            </a>
+        </div>
+
+        <button type="button" onclick="document.getElementById('addCustomerModal').classList.remove('hidden')" class="btn-shimmer glow-cyan px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 text-white text-xs font-bold shadow-md shadow-cyan-500/25 flex items-center gap-2">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Add New Customer</span>
+        </button>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="cinema-glass-card rounded-2xl p-4 border border-white/[0.08] bg-obsidian-900/80 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <form method="GET" action="{{ url_for('reseller_customers') }}" class="flex items-center gap-2 w-full sm:w-auto flex-1">
+            <div class="relative w-full max-w-md">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" name="search" value="{{ search or '' }}" placeholder="Search customer username, phone, or name..."
+                       class="w-full bg-obsidian-950 text-xs text-white pl-9 pr-4 py-2.5 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 transition-all font-mono">
+            </div>
+            <button type="submit" class="px-3.5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold shrink-0">
+                Search
+            </button>
+            {% if search %}
+            <a href="{{ url_for('reseller_customers') }}" class="px-3 py-2.5 rounded-xl bg-obsidian-950 text-slate-400 hover:text-white border border-white/[0.08] text-xs">
+                Clear
+            </a>
+            {% endif %}
+        </form>
+
+        <div class="text-xs text-slate-400 font-medium">
+            Showing <strong class="text-cyan-300">{{ customers|length }}</strong> customer accounts
+        </div>
+    </div>
+
+    <!-- Customer Table -->
+    <div class="cinema-glass-card rounded-3xl p-6 border border-white/[0.08] bg-obsidian-900/80">
+        {% if customers %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead>
+                    <tr class="text-slate-400 border-b border-white/[0.06] text-[10px] uppercase font-bold tracking-wider">
+                        <th class="pb-3">Username & Auth</th>
+                        <th class="pb-3">Customer Details</th>
+                        <th class="pb-3">Package / Expiry</th>
+                        <th class="pb-3">Status</th>
+                        <th class="pb-3 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/[0.04]">
+                    {% for sub in customers %}
+                    <tr class="hover:bg-white/[0.02] transition-colors">
+                        <td class="py-3">
+                            <div class="font-mono font-bold text-cyan-300 text-sm">{{ sub.username }}</div>
+                            <div class="text-[10px] text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
+                                <span>Pass: <strong class="text-emerald-300">{{ sub.plain_password or '••••••••' }}</strong></span>
+                                {% if sub.plain_password %}
+                                <button type="button" onclick="navigator.clipboard.writeText('{{ sub.plain_password }}'); alert('Password copied!');" class="hover:text-white" title="Copy Password">
+                                    <i class="fa-regular fa-copy text-[10px]"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="py-3">
+                            <div class="font-semibold text-white">{{ sub.full_name or '—' }}</div>
+                            <div class="text-[10px] text-slate-400">Phone: {{ sub.phone or '—' }}</div>
+                            {% if sub.pppoe_username %}
+                            <div class="text-[10px] text-indigo-300 font-mono">PPPoE: {{ sub.pppoe_username }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="py-3">
+                            <div class="font-bold text-slate-200">{{ sub.package_name or 'Basic' }}</div>
+                            <div class="text-[10px] text-slate-400">
+                                {% if sub.sub_expiry %}
+                                Expires: <strong class="text-slate-300">{{ sub.sub_expiry[:10] }}</strong>
+                                {% else %}
+                                Active Account
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="py-3">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold {% if sub.status == 'active' %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30{% else %}bg-rose-500/20 text-rose-300 border border-rose-500/30{% endif %}">
+                                {{ sub.status|upper }}
+                            </span>
+                        </td>
+                        <td class="py-3 text-right">
+                            <div class="flex items-center justify-end gap-1.5">
+                                <form action="{{ url_for('reseller_toggle_customer', sub_id=sub.id) }}" method="POST" class="inline">
+                                    <button type="submit" class="px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all {% if sub.status == 'active' %}bg-rose-950/40 text-rose-300 border-rose-800/50 hover:bg-rose-900/60{% else %}bg-emerald-950/40 text-emerald-300 border-emerald-800/50 hover:bg-emerald-900/60{% endif %}" title="Toggle Active/Suspended">
+                                        {{ 'Suspend' if sub.status == 'active' else 'Activate' }}
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-10 text-center space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-users-slash"></i>
+            </div>
+            <h3 class="text-sm font-bold text-white">No Customers Match Search</h3>
+            <p class="text-xs text-slate-400">Try adjusting your search criteria or add a new customer.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Add Customer Modal -->
+<div id="addCustomerModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian-950/80 backdrop-blur-md">
+    <div class="cinema-glass-card w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-white/[0.1] bg-obsidian-900 shadow-2xl relative">
+        <div class="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-5">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-white">Create New Customer</h3>
+                    <p class="text-[11px] text-slate-400">Assign IPTV streaming access for your subscriber</p>
+                </div>
+            </div>
+            <button type="button" onclick="document.getElementById('addCustomerModal').classList.add('hidden')" class="text-slate-400 hover:text-white p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <form action="{{ url_for('reseller_add_customer') }}" method="POST" class="space-y-4 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">Username *</label>
+                    <input type="text" name="username" required placeholder="e.g. customer101"
+                           class="w-full bg-obsidian-950 text-white px-3.5 py-2.5 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 font-mono">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">Password *</label>
+                    <input type="text" name="password" required placeholder="Min 6 characters"
+                           class="w-full bg-obsidian-950 text-white px-3.5 py-2.5 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 font-mono">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">Full Name</label>
+                    <input type="text" name="full_name" placeholder="Subscriber name"
+                           class="w-full bg-obsidian-950 text-white px-3.5 py-2.5 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">Phone Number</label>
+                    <input type="text" name="phone" placeholder="0300-1234567"
+                           class="w-full bg-obsidian-950 text-white px-3.5 py-2.5 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 font-mono">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">Package</label>
+                    <select name="package_id" class="w-full bg-obsidian-950 text-white px-3.5 py-2.5 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400">
+                        {% for pkg in packages %}
+                        <option value="{{ pkg.id }}">{{ pkg.name }} ({{ pkg.price_pkr }} PKR / {{ pkg.duration_days }}d)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">ISP / PPPoE Username</label>
+                    <input type="text" name="pppoe_username" placeholder="Optional broadband ID"
+                           class="w-full bg-obsidian-950 text-white px-3.5 py-2.5 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 font-mono">
+                </div>
+            </div>
+
+            <div class="pt-3 flex items-center justify-end gap-2 border-t border-white/[0.08]">
+                <button type="button" onclick="document.getElementById('addCustomerModal').classList.add('hidden')" class="px-4 py-2.5 rounded-xl bg-obsidian-950 text-slate-400 hover:text-white border border-white/[0.08] font-semibold">
+                    Cancel
+                </button>
+                <button type="submit" class="btn-shimmer glow-cyan px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 text-white font-bold shadow-md shadow-cyan-500/25">
+                    Save Customer Account
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
