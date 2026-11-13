@@ -1891,9 +1891,24 @@ def get_dashboard_analytics():
     rev_row = conn.execute("SELECT SUM(amount_pkr) as s FROM payment_receipts WHERE status = 'approved'").fetchone()
     total_revenue_pkr = rev_row["s"] or 0
 
+    outside_rev_row = conn.execute("SELECT SUM(amount_pkr) as s FROM payment_receipts WHERE status = 'approved' AND (tenant_id = 1 OR tenant_id IS NULL)").fetchone()
+    outside_revenue_pkr = outside_rev_row["s"] or 0
+
+    reseller_rev_row = conn.execute("SELECT SUM(amount_pkr) as s FROM payment_receipts WHERE status = 'approved' AND tenant_id > 1").fetchone()
+    reseller_revenue_pkr = reseller_rev_row["s"] or 0
+
     pending_payments = conn.execute("SELECT COUNT(*) as c FROM payment_receipts WHERE status = 'pending'").fetchone()["c"]
     pending_resellers = conn.execute("SELECT COUNT(*) as c FROM reseller_inquiries WHERE status = 'pending'").fetchone()["c"]
     total_resellers = conn.execute("SELECT COUNT(*) as c FROM reseller_inquiries").fetchone()["c"]
+
+    # Active Sabro ISP free users vs outside paid customers
+    active_sabro_free = conn.execute("SELECT COUNT(*) as c FROM subscribers WHERE is_sabro_isp = 1 AND status = 'active'").fetchone()["c"]
+    outside_paid_customers = conn.execute("SELECT COUNT(*) as c FROM subscribers WHERE is_sabro_isp = 0 AND status = 'active'").fetchone()["c"]
+    total_active_tenants = conn.execute("SELECT COUNT(*) as c FROM tenants WHERE status = 'active' AND id != 1").fetchone()["c"]
+    total_all_tenants = conn.execute("SELECT COUNT(*) as c FROM tenants").fetchone()["c"]
+    total_expired = conn.execute("SELECT COUNT(*) as c FROM subscribers WHERE status = 'expired'").fetchone()["c"]
+    total_suspended = conn.execute("SELECT COUNT(*) as c FROM subscribers WHERE status = 'suspended'").fetchone()["c"]
+    open_tickets = conn.execute("SELECT COUNT(*) as c FROM support_tickets WHERE status IN ('open', 'in_progress')").fetchone()["c"]
 
     target_7d = (datetime.now() + timedelta(days=7)).isoformat()
     now_iso = datetime.now().isoformat()
@@ -1910,12 +1925,22 @@ def get_dashboard_analytics():
 
     return {
         "total_subscribers": total_subs,
+        "total_registered_users": total_subs,
         "active_subscribers": active_subs,
+        "active_sabro_free_users": active_sabro_free,
+        "outside_paid_customers": outside_paid_customers,
         "total_channels": total_channels,
         "total_revenue_pkr": total_revenue_pkr,
+        "outside_revenue_pkr": outside_revenue_pkr,
+        "reseller_revenue_pkr": reseller_revenue_pkr,
         "pending_payments": pending_payments,
         "pending_resellers": pending_resellers,
         "total_resellers": total_resellers,
+        "total_active_resellers": total_active_tenants,
+        "total_tenants": total_all_tenants,
+        "total_expired_subscriptions": total_expired,
+        "total_suspended_accounts": total_suspended,
+        "open_tickets_count": open_tickets,
         "expiring_soon_count": exp_queue_count,
         "recent_audits": recent_audits,
         "recent_connections": recent_conns,
