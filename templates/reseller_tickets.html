@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Support Tickets - {{ (tenant and tenant.service_name) or 'Reseller' }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Header & Navigation -->
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-4 flex-wrap gap-4">
+        <div class="flex items-center gap-2 overflow-x-auto scrollbar-none text-xs font-bold">
+            <a href="{{ url_for('reseller_dashboard') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-cyan-400"></i>
+                <span>Overview</span>
+            </a>
+            <a href="{{ url_for('reseller_customers') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-users text-cyan-400"></i>
+                <span>Customers</span>
+            </a>
+            <a href="{{ url_for('reseller_packages') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-boxes-stacked text-purple-400"></i>
+                <span>Packages & Pricing</span>
+            </a>
+            <a href="{{ url_for('reseller_payments') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice-dollar text-amber-400"></i>
+                <span>Payment Queue</span>
+            </a>
+            <a href="{{ url_for('reseller_branding') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-palette text-pink-400"></i>
+                <span>White-Label Branding</span>
+            </a>
+            <a href="{{ url_for('reseller_tickets') }}" class="px-3.5 py-2 rounded-xl bg-cyan-600 text-white shadow-md shadow-cyan-600/30 flex items-center gap-2">
+                <i class="fa-solid fa-headset"></i>
+                <span>Customer Support</span>
+            </a>
+        </div>
+
+        <div class="text-xs text-slate-400 font-medium">
+            <strong class="text-cyan-400 font-mono">{{ tickets|length }}</strong> support tickets
+        </div>
+    </div>
+
+    <!-- Tickets Table -->
+    <div class="cinema-glass-card rounded-3xl p-6 border border-white/[0.08] bg-obsidian-900/80">
+        {% if tickets %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead>
+                    <tr class="text-slate-400 border-b border-white/[0.06] text-[10px] uppercase font-bold tracking-wider">
+                        <th class="pb-3">Ticket ID & Subject</th>
+                        <th class="pb-3">Customer</th>
+                        <th class="pb-3">Category</th>
+                        <th class="pb-3">Priority</th>
+                        <th class="pb-3">Status</th>
+                        <th class="pb-3">Updated</th>
+                        <th class="pb-3 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/[0.04]">
+                    {% for t in tickets %}
+                    <tr class="hover:bg-white/[0.02] transition-colors">
+                        <td class="py-3">
+                            <span class="font-mono font-bold text-cyan-300">{{ t.ticket_number }}</span>
+                            <div class="font-semibold text-white mt-0.5">{{ t.subject }}</div>
+                        </td>
+                        <td class="py-3 text-slate-300 font-mono">
+                            {{ t.subscriber_username or 'Customer' }}
+                        </td>
+                        <td class="py-3">
+                            <span class="px-2 py-0.5 rounded-lg bg-obsidian-950 text-slate-300 border border-white/[0.08] text-[10px] uppercase">
+                                {{ t.category }}
+                            </span>
+                        </td>
+                        <td class="py-3">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if t.priority == 'urgent' or t.priority == 'high' %}bg-rose-500/20 text-rose-300 border border-rose-500/30{% else %}bg-slate-500/20 text-slate-300 border border-slate-500/30{% endif %}">
+                                {{ t.priority|upper }}
+                            </span>
+                        </td>
+                        <td class="py-3">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold {% if t.status == 'resolved' or t.status == 'closed' %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30{% elif t.status == 'in_progress' %}bg-cyan-500/20 text-cyan-300 border border-cyan-500/30{% else %}bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse{% endif %}">
+                                {{ t.status|upper }}
+                            </span>
+                        </td>
+                        <td class="py-3 text-[11px] text-slate-400">
+                            {{ t.updated_at[:10] }}
+                        </td>
+                        <td class="py-3 text-right">
+                            <a href="{{ url_for('reseller_ticket_detail', ticket_id=t.id) }}" class="px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-[10px] shadow-sm inline-flex items-center gap-1">
+                                <span>Reply & Manage</span>
+                                <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-10 text-center space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-headset"></i>
+            </div>
+            <h3 class="text-sm font-bold text-white">No Support Tickets Pending</h3>
+            <p class="text-xs text-slate-400">Your customer support queue is currently clear.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
