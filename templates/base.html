@@ -176,8 +176,8 @@
     <!-- Top Navigation Bar -->
     <header class="sticky top-0 z-50 cinema-glass border-b border-orange-500/15 shadow-[0_4px_30px_rgba(0,0,0,0.6)]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4 relative z-10">
-            <!-- Brand Logo -->
-            <div class="flex items-center gap-3">
+            <!-- Brand Logo & Netflix Nav Links -->
+            <div class="flex items-center gap-5">
                 <a href="{{ url_for('index') }}" class="flex items-center gap-3 group">
                     <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-orange-600 via-orange-500 to-amber-500 flex items-center justify-center shadow-lg shadow-orange-500/30 group-hover:scale-105 transition-transform border border-white/20">
                         <i class="fa-solid fa-satellite-dish text-white text-base"></i>
@@ -192,9 +192,21 @@
                                 LIVE
                             </span>
                         </div>
-                        <p class="text-[10px] text-slate-400 hidden sm:block truncate max-w-xs font-semibold">{{ settings.tagline }}</p>
+                        <p class="text-[10px] text-slate-400 hidden xl:block truncate max-w-xs font-semibold">{{ settings.tagline }}</p>
                     </div>
                 </a>
+
+                <!-- Netflix Nav Links (Desktop) -->
+                <nav class="hidden lg:flex items-center gap-1 text-xs font-semibold text-slate-300">
+                    <a href="{{ url_for('index') }}" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-white/5 transition-colors {% if request.path == '/' and not request.args.get('category') and not request.args.get('fav_only') %}text-orange-400 font-bold bg-white/[0.04]{% endif %}">Home</a>
+                    <a href="{{ url_for('index', category='All') }}" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-white/5 transition-colors {% if request.args.get('category') == 'All' %}text-orange-400 font-bold bg-white/[0.04]{% endif %}">Live TV</a>
+                    <a href="{{ url_for('index', category='Sports') }}" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-white/5 transition-colors {% if request.args.get('category') == 'Sports' %}text-orange-400 font-bold bg-white/[0.04]{% endif %}">Sports</a>
+                    <a href="{{ url_for('index', category='Movies') }}" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-white/5 transition-colors {% if request.args.get('category') == 'Movies' %}text-orange-400 font-bold bg-white/[0.04]{% endif %}">Movies</a>
+                    <a href="{{ url_for('index', category='News') }}" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-white/5 transition-colors {% if request.args.get('category') == 'News' %}text-orange-400 font-bold bg-white/[0.04]{% endif %}">News</a>
+                    <a href="{{ url_for('index', fav_only='1') }}" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-white/5 transition-colors {% if request.args.get('fav_only') == '1' %}text-orange-400 font-bold bg-white/[0.04]{% endif %}">
+                        <i class="fa-solid fa-heart text-rose-500 mr-1"></i>My List
+                    </a>
+                </nav>
             </div>
 
             <!-- Global Search & Center Controls -->
