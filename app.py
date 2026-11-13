@@ -24,6 +24,9 @@ import requests
 import db
 import seeds
 import iptv_parser
+import isp_integration
+import payment_gateway
+from flask import g
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -48,7 +51,39 @@ def enforce_https_and_gatekeeper_shift():
         secure_url = request.url.replace("http://", "https://", 1)
         return redirect(secure_url, code=301)
 
-    # 2. Shift all visitors arriving at root "/" to /gatekeeper if unauthenticated
+    # 2. Multi-Tenant SaaS: Dynamic Tenant Resolution
+    tenant_obj = None
+    tenant_slug = request.args.get("tenant")
+    if tenant_slug:
+        tenant_obj = db.get_tenant_by_code(tenant_slug)
+        if tenant_obj:
+            session["tenant_id"] = tenant_obj["id"]
+
+    if not tenant_obj and session.get("reseller_tenant_id"):
+        tenant_obj = db.get_tenant_by_id(session["reseller_tenant_id"])
+
+    if not tenant_obj and session.get("tenant_id"):
+        tenant_obj = db.get_tenant_by_id(session["tenant_id"])
+
+    if not tenant_obj and host:
+        tenant_obj = db.get_tenant_by_domain(host)
+
+    if not tenant_obj:
+        tenant_obj = db.get_tenant_by_id(1)
+
+    g.tenant = tenant_obj or {
+        "id": 1,
+        "code": "sabro",
+        "name": "Sabro Networks",
+        "company_name": "Sabro Networks ISP",
+        "service_name": "SABRO VISION",
+        "tagline": "Ultra High-Definition IPTV Middleware - Sabro Networks",
+        "brand_color_primary": "#00f0ff",
+        "brand_color_secondary": "#6366f1",
+        "status": "active"
+    }
+
+    # 3. Shift all visitors arriving at root "/" to /gatekeeper if unauthenticated
     if request.path == "/":
         key_code = session.get("key_code")
         device_token = request.cookies.get("sabro_device_id")
@@ -60,6 +95,20 @@ def enforce_https_and_gatekeeper_shift():
             # Shift into /gatekeeper with full HTTPS scheme on Render
             scheme = "https" if ("onrender.com" in host or proto == "https") else request.scheme
             return redirect(url_for("gatekeeper", _external=True, _scheme=scheme), code=302)
+
+@app.context_processor
+def inject_global_template_context():
+    t = getattr(g, "tenant", None) or db.get_tenant_by_id(1)
+    notif_count = 0
+    sub_id = session.get("subscriber_id")
+    if sub_id:
+        notif_list = db.get_notifications(tenant_id=t.get("id", 1), subscriber_id=sub_id, limit=5)
+        notif_count = sum(1 for n in notif_list if not n.get("is_read"))
+    return {
+        "tenant": t,
+        "current_tenant": t,
+        "unread_notifications_count": notif_count
+    }
 
 # Persistent Secret Key
 _settings = db.get_settings()
