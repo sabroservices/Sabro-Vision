@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}My Payment Receipts & Invoices - {{ (tenant and tenant.service_name) or settings.platform_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-8 space-y-6">
+
+    <div class="flex items-center justify-between pb-4 border-b border-white/[0.08] flex-wrap gap-4">
+        <div>
+            <h1 class="text-2xl font-black text-white tracking-tight">Payment Receipts & Invoices</h1>
+            <p class="text-xs text-slate-400 mt-1">Review your transaction history and subscription invoices.</p>
+        </div>
+
+        <a href="{{ url_for('payment_submit_page') }}" class="btn-shimmer glow-cyan px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 text-white text-xs font-bold shadow-md shadow-cyan-500/25 flex items-center gap-2">
+            <i class="fa-solid fa-receipt"></i>
+            <span>Submit New Payment</span>
+        </a>
+    </div>
+
+    <!-- Receipts Card -->
+    <div class="cinema-glass-card rounded-3xl p-6 border border-white/[0.08] bg-obsidian-900/80">
+        {% if receipts %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead>
+                    <tr class="text-slate-400 border-b border-white/[0.06] text-[10px] uppercase font-bold tracking-wider">
+                        <th class="pb-3">Invoice #</th>
+                        <th class="pb-3">Date</th>
+                        <th class="pb-3">Method & Ref</th>
+                        <th class="pb-3">Amount</th>
+                        <th class="pb-3">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/[0.04]">
+                    {% for r in receipts %}
+                    <tr class="hover:bg-white/[0.02]">
+                        <td class="py-3 font-mono font-bold text-cyan-300">
+                            {{ r.invoice_number or ('# ' ~ r.id) }}
+                        </td>
+                        <td class="py-3 text-slate-400">{{ r.created_at[:10] }}</td>
+                        <td class="py-3">
+                            <div class="font-semibold text-white">{{ r.payment_method }}</div>
+                            {% if r.transaction_ref %}
+                            <div class="text-[10px] font-mono text-slate-400">Ref: {{ r.transaction_ref }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="py-3 font-bold text-emerald-400 text-sm">{{ r.amount_pkr }} PKR</td>
+                        <td class="py-3">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold {% if r.status == 'approved' %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30{% elif r.status == 'rejected' %}bg-rose-500/20 text-rose-300 border border-rose-500/30{% else %}bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse{% endif %}">
+                                {{ r.status|upper }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-10 text-center space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-receipt"></i>
+            </div>
+            <h3 class="text-sm font-bold text-white">No Payment Records Found</h3>
+            <p class="text-xs text-slate-400 max-w-sm mx-auto">When you purchase a subscription or renew your pass, your invoices and receipts will appear here.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
