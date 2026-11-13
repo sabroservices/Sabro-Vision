@@ -35,6 +35,44 @@
             </div>
         </div>
 
+        {% if subscriber.is_sabro_isp %}
+        <!-- Sabro Networks ISP Customer Entitlement Status -->
+        <div class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-obsidian-950 to-cyan-950/40 border border-emerald-500/40 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg shrink-0">
+                    <i class="fa-solid fa-gift"></i>
+                </div>
+                <div>
+                    <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-black uppercase tracking-wider">
+                        100% FREE / SABRO NETWORKS CUSTOMER
+                    </span>
+                    <p class="text-xs text-slate-300 mt-0.5">Complimentary IPTV access included with your Sabro Networks Fiber Broadband connection.</p>
+                </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold uppercase shrink-0">
+                Active ISP Fiber
+            </span>
+        </div>
+        {% endif %}
+
+        <!-- Quick Hub Actions -->
+        <div class="grid grid-cols-2 gap-3 mb-6">
+            <a href="{{ url_for('customer_tickets') }}" class="p-3.5 rounded-2xl bg-obsidian-950/80 hover:bg-white/[0.04] border border-white/[0.08] flex items-center justify-between text-xs transition-all">
+                <span class="flex items-center gap-2 text-slate-200 font-bold">
+                    <i class="fa-solid fa-headset text-cyan-400"></i>
+                    <span>Support Helpdesk</span>
+                </span>
+                <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+            </a>
+            <a href="{{ url_for('customer_payment_history') }}" class="p-3.5 rounded-2xl bg-obsidian-950/80 hover:bg-white/[0.04] border border-white/[0.08] flex items-center justify-between text-xs transition-all">
+                <span class="flex items-center gap-2 text-slate-200 font-bold">
+                    <i class="fa-solid fa-receipt text-amber-400"></i>
+                    <span>Payment History</span>
+                </span>
+                <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+            </a>
+        </div>
+
         <!-- Account Credentials Box -->
         <div class="space-y-3 mb-6 p-4 sm:p-5 rounded-2xl bg-obsidian-950/80 border border-white/[0.08]">
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center justify-between">
