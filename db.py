@@ -2058,3 +2058,369 @@ def update_reseller_inquiry_status(inquiry_id, status):
     conn.close()
     notify_vault_write()
 
+# ====================================================
+# MULTI-TENANT SAAS & RESELLER HELPERS
+# ====================================================
+
+def get_tenants(status=None):
+    conn = get_db()
+    if status:
+        rows = conn.execute("SELECT * FROM tenants WHERE status = ? ORDER BY id ASC", (status,)).fetchall()
+    else:
+        rows = conn.execute("SELECT * FROM tenants ORDER BY id ASC").fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def get_tenant_by_id(tenant_id):
+    if not tenant_id:
+        return None
+    conn = get_db()
+    row = conn.execute("SELECT * FROM tenants WHERE id = ?", (int(tenant_id),)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+def get_tenant_by_code(code):
+    if not code:
+        return None
+    conn = get_db()
+    row = conn.execute("SELECT * FROM tenants WHERE LOWER(code) = LOWER(?)", (code.strip(),)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+def get_tenant_by_domain(domain_or_host):
+    if not domain_or_host:
+        return None
+    host = domain_or_host.split(":")[0].strip().lower()
+    conn = get_db()
+    row = conn.execute("""
+        SELECT * FROM tenants 
+        WHERE LOWER(custom_domain) = ? OR LOWER(subdomain) = ?
+    """, (host, host)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+def create_tenant(data: dict) -> int:
+    conn = get_db()
+    now_str = datetime.now().isoformat()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO tenants (
+            code, name, company_name, service_name, tagline, custom_domain, subdomain,
+            logo_url, brand_color_primary, brand_color_secondary, contact_name,
+            email, phone, whatsapp, welcome_message, support_email, support_phone,
+            status, max_customers, max_active_subs, max_devices_per_user,
+            allowed_features, created_at, notes
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        data.get("code", "").strip().lower(),
+        data.get("name", "New ISP Partner"),
+        data.get("company_name", ""),
+        data.get("service_name", "Vision TV"),
+        data.get("tagline", ""),
+        data.get("custom_domain") or None,
+        data.get("subdomain") or None,
+        data.get("logo_url") or "",
+        data.get("brand_color_primary", "#00f0ff"),
+        data.get("brand_color_secondary", "#6366f1"),
+        data.get("contact_name", ""),
+        data.get("email", ""),
+        data.get("phone", ""),
+        data.get("whatsapp", ""),
+        data.get("welcome_message", ""),
+        data.get("support_email", ""),
+        data.get("support_phone", ""),
+        data.get("status", "active"),
+        int(data.get("max_customers", 500)),
+        int(data.get("max_active_subs", 500)),
+        int(data.get("max_devices_per_user", 1)),
+        data.get("allowed_features", "all"),
+        now_str,
+        data.get("notes", "")
+    ))
+    tenant_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    notify_vault_write()
+    return tenant_id
+
+def update_tenant(tenant_id: int, data: dict) -> bool:
+    conn = get_db()
+    fields = []
+    params = []
+    allowed_keys = [
+        "name", "company_name", "service_name", "tagline", "custom_domain", "subdomain",
+        "logo_url", "brand_color_primary", "brand_color_secondary", "contact_name",
+        "email", "phone", "whatsapp", "welcome_message", "support_email", "support_phone",
+        "status", "max_customers", "max_active_subs", "max_devices_per_user",
+        "allowed_features", "notes"
+    ]
+    for k in allowed_keys:
+        if k in data:
+            fields.append(f"{k} = ?")
+            params.append(data[k])
+    if not fields:
+        conn.close()
+        return False
+    params.append(int(tenant_id))
+    conn.execute(f"UPDATE tenants SET {', '.join(fields)} WHERE id = ?", params)
+    conn.commit()
+    conn.close()
+    notify_vault_write()
+    return True
+
+def delete_tenant(tenant_id: int, soft_delete=True) -> bool:
+    if int(tenant_id) == 1:
+        return False  # Cannot delete platform master tenant
+    conn = get_db()
+    if soft_delete:
+        conn.execute("UPDATE tenants SET status = 'suspended' WHERE id = ?", (int(tenant_id),))
+    else:
+        conn.execute("DELETE FROM tenants WHERE id = ?", (int(tenant_id),))
+    conn.commit()
+    conn.close()
+    notify_vault_write()
+    return True
+
+def get_tenant_metrics(tenant_id: int) -> dict:
+    conn = get_db()
+    tid = int(tenant_id)
+    cust_count = conn.execute("SELECT COUNT(*) FROM subscribers WHERE tenant_id = ?", (tid,)).fetchone()[0]
+    active_subs = conn.execute("SELECT COUNT(*) FROM subscribers WHERE tenant_id = ? AND status = 'active'", (tid,)).fetchone()[0]
+    keys_count = conn.execute("SELECT COUNT(*) FROM access_keys WHERE tenant_id = ?", (tid,)).fetchone()[0]
+    rev_row = conn.execute("SELECT COALESCE(SUM(amount_pkr), 0) FROM payment_receipts WHERE tenant_id = ? AND status = 'approved'", (tid,)).fetchone()
+    total_rev = rev_row[0] if rev_row else 0
+    open_tickets = conn.execute("SELECT COUNT(*) FROM support_tickets WHERE tenant_id = ? AND status IN ('open', 'in_progress')", (tid,)).fetchone()[0]
+    tenant_row = conn.execute("SELECT * FROM tenants WHERE id = ?", (tid,)).fetchone()
+    conn.close()
+    return {
+        "tenant": dict(tenant_row) if tenant_row else None,
+        "total_customers": cust_count,
+        "active_subscribers": active_subs,
+        "total_keys": keys_count,
+        "total_revenue_pkr": total_rev,
+        "open_tickets": open_tickets
+    }
+
+# ----------------------------------------------------
+# Reseller Authentication & User Helpers
+# ----------------------------------------------------
+def authenticate_reseller(username, password):
+    if not username or not password:
+        return None
+    conn = get_db()
+    row = conn.execute("""
+        SELECT ru.*, t.code as tenant_code, t.name as tenant_name, t.service_name,
+               t.status as tenant_status, t.brand_color_primary, t.brand_color_secondary,
+               t.logo_url, t.company_name
+        FROM reseller_users ru
+        JOIN tenants t ON ru.tenant_id = t.id
+        WHERE LOWER(ru.username) = LOWER(?) AND ru.status = 'active'
+    """, (username.strip(),)).fetchone()
+    if not row:
+        conn.close()
+        return None
+    from werkzeug.security import check_password_hash
+    if check_password_hash(row["password_hash"], password):
+        now_str = datetime.now().isoformat()
+        conn.execute("UPDATE reseller_users SET last_login_at = ? WHERE id = ?", (now_str, row["id"]))
+        conn.commit()
+        res = dict(row)
+        conn.close()
+        return res
+    conn.close()
+    return None
+
+def create_reseller_user(tenant_id, username, password, full_name='', email='', phone='', role='owner'):
+    conn = get_db()
+    now_str = datetime.now().isoformat()
+    pwd_hash = generate_password_hash(password)
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO reseller_users (tenant_id, username, password_hash, full_name, email, phone, role, status, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?)
+    """, (int(tenant_id), username.strip(), pwd_hash, full_name, email, phone, role, now_str))
+    uid = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    notify_vault_write()
+    return uid
+
+def get_reseller_users(tenant_id):
+    conn = get_db()
+    rows = conn.execute("""
+        SELECT id, tenant_id, username, full_name, email, phone, role, status, created_at, last_login_at
+        FROM reseller_users WHERE tenant_id = ? ORDER BY id ASC
+    """, (int(tenant_id),)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+# ----------------------------------------------------
+# Multi-Tenant Support Tickets Helpers
+# ----------------------------------------------------
+def create_support_ticket(tenant_id, subscriber_id, subject, category, priority, initial_message, sender_name):
+    conn = get_db()
+    now_str = datetime.now().isoformat()
+    ticket_num = f"TCK-{datetime.now().strftime('%y%m')}-{secrets.token_hex(2).upper()}"
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO support_tickets (ticket_number, tenant_id, subscriber_id, subject, category, priority, status, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?)
+    """, (ticket_num, int(tenant_id) if tenant_id else 1, int(subscriber_id) if subscriber_id else None, subject.strip(), category, priority, now_str, now_str))
+    t_id = cursor.lastrowid
+
+    if initial_message:
+        cursor.execute("""
+            INSERT INTO ticket_messages (ticket_id, sender_type, sender_name, message, created_at)
+            VALUES (?, 'customer', ?, ?, ?)
+        """, (t_id, sender_name or "Subscriber", initial_message.strip(), now_str))
+
+    conn.commit()
+    conn.close()
+    notify_vault_write()
+    return t_id, ticket_num
+
+def get_support_tickets(tenant_id=None, subscriber_id=None, status=None):
+    conn = get_db()
+    query = """
+        SELECT st.*, s.username as subscriber_username, t.service_name as tenant_service_name,
+               (SELECT COUNT(*) FROM ticket_messages WHERE ticket_id = st.id) as message_count
+        FROM support_tickets st
+        LEFT JOIN subscribers s ON st.subscriber_id = s.id
+        LEFT JOIN tenants t ON st.tenant_id = t.id
+        WHERE 1=1
+    """
+    params = []
+    if tenant_id is not None:
+        query += " AND st.tenant_id = ?"
+        params.append(int(tenant_id))
+    if subscriber_id is not None:
+        query += " AND st.subscriber_id = ?"
+        params.append(int(subscriber_id))
+    if status and status != 'all':
+        query += " AND st.status = ?"
+        params.append(status)
+    query += " ORDER BY st.updated_at DESC"
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def get_support_ticket(ticket_id, tenant_id=None, subscriber_id=None):
+    conn = get_db()
+    query = """
+        SELECT st.*, s.username as subscriber_username, s.phone as subscriber_phone, t.service_name as tenant_service_name
+        FROM support_tickets st
+        LEFT JOIN subscribers s ON st.subscriber_id = s.id
+        LEFT JOIN tenants t ON st.tenant_id = t.id
+        WHERE st.id = ?
+    """
+    params = [int(ticket_id)]
+    if tenant_id is not None:
+        query += " AND st.tenant_id = ?"
+        params.append(int(tenant_id))
+    if subscriber_id is not None:
+        query += " AND st.subscriber_id = ?"
+        params.append(int(subscriber_id))
+    row = conn.execute(query, params).fetchone()
+    if not row:
+        conn.close()
+        return None
+    t = dict(row)
+    msg_rows = conn.execute("""
+        SELECT * FROM ticket_messages WHERE ticket_id = ? ORDER BY id ASC
+    """, (int(ticket_id),)).fetchall()
+    t["messages"] = [dict(m) for m in msg_rows]
+    conn.close()
+    return t
+
+def add_ticket_message(ticket_id, sender_type, sender_name, message):
+    conn = get_db()
+    now_str = datetime.now().isoformat()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO ticket_messages (ticket_id, sender_type, sender_name, message, created_at)
+        VALUES (?, ?, ?, ?, ?)
+    """, (int(ticket_id), sender_type, sender_name, message.strip(), now_str))
+    cursor.execute("UPDATE support_tickets SET updated_at = ? WHERE id = ?", (now_str, int(ticket_id)))
+    conn.commit()
+    mid = cursor.lastrowid
+    conn.close()
+    notify_vault_write()
+    return mid
+
+def update_ticket_status(ticket_id, status):
+    conn = get_db()
+    now_str = datetime.now().isoformat()
+    conn.execute("UPDATE support_tickets SET status = ?, updated_at = ? WHERE id = ?", (status, now_str, int(ticket_id)))
+    conn.commit()
+    conn.close()
+    notify_vault_write()
+
+# ----------------------------------------------------
+# Notification Helpers
+# ----------------------------------------------------
+def create_notification(tenant_id, subscriber_id, title, message, notif_type='info'):
+    conn = get_db()
+    now_str = datetime.now().isoformat()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO notifications (tenant_id, subscriber_id, title, message, type, is_read, created_at)
+        VALUES (?, ?, ?, ?, ?, 0, ?)
+    """, (int(tenant_id) if tenant_id else 1, int(subscriber_id) if subscriber_id else None, title.strip(), message.strip(), notif_type, now_str))
+    nid = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    notify_vault_write()
+    return nid
+
+def get_notifications(tenant_id=None, subscriber_id=None, limit=20):
+    conn = get_db()
+    query = "SELECT * FROM notifications WHERE 1=1"
+    params = []
+    if subscriber_id:
+        query += " AND (subscriber_id = ? OR subscriber_id IS NULL)"
+        params.append(int(subscriber_id))
+    if tenant_id:
+        query += " AND (tenant_id = ? OR tenant_id IS NULL)"
+        params.append(int(tenant_id))
+    query += " ORDER BY id DESC LIMIT ?"
+    params.append(int(limit))
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def mark_notification_read(notif_id, subscriber_id=None):
+    conn = get_db()
+    if subscriber_id:
+        conn.execute("UPDATE notifications SET is_read = 1 WHERE id = ? AND subscriber_id = ?", (int(notif_id), int(subscriber_id)))
+    else:
+        conn.execute("UPDATE notifications SET is_read = 1 WHERE id = ?", (int(notif_id),))
+    conn.commit()
+    conn.close()
+
+# ----------------------------------------------------
+# Sabro Networks ISP Integration Helpers
+# ----------------------------------------------------
+def link_subscriber_to_isp(subscriber_id, pppoe_username, is_sabro_isp=1, isp_status='verified_active'):
+    conn = get_db()
+    now_str = datetime.now().isoformat()
+    conn.execute("""
+        UPDATE subscribers 
+        SET pppoe_username = ?, is_sabro_isp = ?, isp_status = ?, isp_verified_at = ?
+        WHERE id = ?
+    """, (pppoe_username.strip(), int(is_sabro_isp), isp_status, now_str, int(subscriber_id)))
+    conn.commit()
+    conn.close()
+    notify_vault_write()
+
+def unlink_subscriber_from_isp(subscriber_id):
+    conn = get_db()
+    conn.execute("""
+        UPDATE subscribers 
+        SET is_sabro_isp = 0, isp_status = 'unlinked'
+        WHERE id = ?
+    """, (int(subscriber_id),))
+    conn.commit()
+    conn.close()
+    notify_vault_write()
+
+
