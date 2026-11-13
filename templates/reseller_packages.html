@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Packages & Pricing - {{ (tenant and tenant.service_name) or 'Reseller' }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Header & Navigation -->
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-4 flex-wrap gap-4">
+        <div class="flex items-center gap-2 overflow-x-auto scrollbar-none text-xs font-bold">
+            <a href="{{ url_for('reseller_dashboard') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-cyan-400"></i>
+                <span>Overview</span>
+            </a>
+            <a href="{{ url_for('reseller_customers') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-users text-cyan-400"></i>
+                <span>Customers</span>
+            </a>
+            <a href="{{ url_for('reseller_packages') }}" class="px-3.5 py-2 rounded-xl bg-cyan-600 text-white shadow-md shadow-cyan-600/30 flex items-center gap-2">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                <span>Packages & Pricing</span>
+            </a>
+            <a href="{{ url_for('reseller_payments') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice-dollar text-amber-400"></i>
+                <span>Payment Queue</span>
+            </a>
+            <a href="{{ url_for('reseller_branding') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-palette text-pink-400"></i>
+                <span>White-Label Branding</span>
+            </a>
+            <a href="{{ url_for('reseller_tickets') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-headset text-emerald-400"></i>
+                <span>Customer Support</span>
+            </a>
+        </div>
+
+        <button type="button" onclick="document.getElementById('addPackageModal').classList.remove('hidden')" class="btn-shimmer glow-cyan px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 text-white text-xs font-bold shadow-md shadow-cyan-500/25 flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i>
+            <span>Create Custom Package</span>
+        </button>
+    </div>
+
+    <!-- Packages Table -->
+    <div class="cinema-glass-card rounded-3xl p-6 border border-white/[0.08] bg-obsidian-900/80">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead>
+                    <tr class="text-slate-400 border-b border-white/[0.06] text-[10px] uppercase font-bold tracking-wider">
+                        <th class="pb-3">Package Name & Code</th>
+                        <th class="pb-3">Pricing (PKR)</th>
+                        <th class="pb-3">Duration</th>
+                        <th class="pb-3">Screens / Devices</th>
+                        <th class="pb-3">Included Categories</th>
+                        <th class="pb-3">Scope</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/[0.04]">
+                    {% for pkg in packages %}
+                    <tr class="hover:bg-white/[0.02] transition-colors">
+                        <td class="py-3">
+                            <div class="font-bold text-white text-sm">{{ pkg.name }}</div>
+                            <div class="text-[10px] text-cyan-400 font-mono">{{ pkg.code }}</div>
+                        </td>
+                        <td class="py-3">
+                            <span class="text-base font-black text-emerald-400">{{ pkg.price_pkr }} PKR</span>
+                        </td>
+                        <td class="py-3 text-slate-300">{{ pkg.duration_days }} days</td>
+                        <td class="py-3 text-slate-300">
+                            <span class="inline-flex items-center gap-1">
+                                <i class="fa-solid fa-tv text-cyan-400 text-[10px]"></i>
+                                <span>{{ pkg.max_connections }} Screen{% if pkg.max_connections > 1 %}s{% endif %}</span>
+                            </span>
+                        </td>
+                        <td class="py-3">
+                            <span class="px-2 py-0.5 rounded-lg bg-obsidian-950 text-slate-300 border border-white/[0.08] text-[10px] font-mono">
+                                {{ pkg.allowed_categories or 'All Channels' }}
+                            </span>
+                        </td>
+                        <td class="py-3">
+                            {% if pkg.tenant_id %}
+                            <span class="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[10px] font-bold">Custom</span>
+                            {% else %}
+                            <span class="px-2 py-0.5 rounded-full bg-slate-500/20 text-slate-300 border border-slate-500/30 text-[10px] font-bold">Platform Default</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Create Custom Package Modal -->
+<div id="addPackageModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian-950/80 backdrop-blur-md">
+    <div class="cinema-glass-card w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-white/[0.1] bg-obsidian-900 shadow-2xl relative">
+        <div class="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-5">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-white">Create Custom Package</h3>
+                    <p class="text-[11px] text-slate-400">Offer your own custom pricing and screen limits to your subscribers</p>
+                </div>
+            </div>
+            <button type="button" onclick="document.getElementById('addPackageModal').classList.add('hidden')" class="text-slate-400 hover:text-white p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <form action="{{ url_for('reseller_create_package') }}" method="POST" class="space-y-4 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">Package Name *</label>
+                    <input type="text" name="name" required placeholder="e.g. VIP Fiber Ultra"
+                           class="w-full bg-obsidian-950 text-white px-3.5 py-2.5 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">Package Code (Slug) *</label>
+                    <input type="text" name="code" required placeholder="e.g. vip_fiber"
+                           class="w-full bg-obsidian-950 text-white px-3.5 py-2.5 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 font-mono">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">Price (PKR) *</label>
+                    <input type="number" name="price_pkr" required value="250" min="0"
+                           class="w-full bg-obsidian-950 text-white px-3.5 py-2.5 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 font-mono">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">Duration (Days)</label>
+                    <input type="number" name="duration_days" required value="30" min="1"
+                           class="w-full bg-obsidian-950 text-white px-3.5 py-2.5 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 font-mono">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">Max Screens</label>
+                    <input type="number" name="max_connections" required value="1" min="1" max="10"
+                           class="w-full bg-obsidian-950 text-white px-3.5 py-2.5 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 font-mono">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">Allowed Channel Categories</label>
+                <input type="text" name="allowed_categories" value="all" placeholder="e.g. all or Sports,News,Movies"
+                       class="w-full bg-obsidian-950 text-white px-3.5 py-2.5 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 font-mono">
+                <span class="text-[9px] text-slate-400 mt-1 block">Leave 'all' for complete 11,459 channel lineup, or comma-separated category names.</span>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">Description</label>
+                <textarea name="description" rows="2" placeholder="Brief summary of what this package includes"
+                          class="w-full bg-obsidian-950 text-white px-3.5 py-2 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400"></textarea>
+            </div>
+
+            <div class="pt-3 flex items-center justify-end gap-2 border-t border-white/[0.08]">
+                <button type="button" onclick="document.getElementById('addPackageModal').classList.add('hidden')" class="px-4 py-2.5 rounded-xl bg-obsidian-950 text-slate-400 hover:text-white border border-white/[0.08] font-semibold">
+                    Cancel
+                </button>
+                <button type="submit" class="btn-shimmer glow-cyan px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 text-white font-bold shadow-md shadow-cyan-500/25">
+                    Save Package
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
