@@ -1986,6 +1986,485 @@ def admin_test_batch():
     flash(f"Tested {res['tested']} channels: {res['online']} Online, {res['offline']} Offline.", "success")
     return redirect(url_for("admin_channels"))
 
+# ====================================================
+# SABRO NETWORKS ISP INTEGRATION & FREE VERIFICATION
+# ====================================================
+@app.route("/api/isp/verify", methods=["GET", "POST"])
+def api_isp_verify():
+    """
+    Verifies if a customer has an active broadband internet subscription with Sabro Networks.
+    Active broadband users receive Sabro Vision 100% FREE without purchasing a paid pass.
+    """
+    if request.method == "POST":
+        identifier = request.form.get("identifier") or request.form.get("pppoe_username") or request.form.get("phone") or ""
+    else:
+        identifier = request.args.get("identifier") or request.args.get("pppoe_username") or request.args.get("phone") or ""
+
+    if not identifier:
+        return jsonify({"success": False, "error": "Identifier required (PPPoE username or phone)"}), 400
+
+    client = isp_integration.get_isp_client(db.get_settings())
+    res = client.verify_subscriber(identifier, db.get_db())
+
+    if res.get("verified") and res.get("is_active"):
+        # Auto-link or auto-provision free account if logged in
+        if session.get("subscriber_id"):
+            db.link_subscriber_to_isp(session["subscriber_id"], res.get("pppoe_username", identifier))
+            # Auto-assign basic free pass
+            basic_pkg = db.get_package_by_code("basic")
+            if basic_pkg:
+                db.activate_subscriber_subscription(session["subscriber_id"], basic_pkg["id"], days=365)
+        return jsonify({
+            "success": True,
+            "verified": True,
+            "is_active": True,
+            "message": "Verified active Sabro Networks customer! 100% FREE IPTV access granted.",
+            "data": res
+        })
+    else:
+        return jsonify({
+            "success": False,
+            "verified": False,
+            "is_active": False,
+            "message": res.get("message", "Broadband subscription not found or inactive."),
+            "data": res
+        }), 404
+
+@app.route("/admin/customers/verify-isp/<int:sub_id>", methods=["POST"])
+@admin_required
+def admin_verify_isp_subscriber(sub_id):
+    sub = db.get_subscriber_by_id(sub_id)
+    if not sub:
+        flash("Subscriber not found.", "error")
+        return redirect(url_for("admin_customers"))
+    
+    action = request.form.get("action", "link")
+    if action == "link":
+        pppoe = request.form.get("pppoe_username", sub.get("pppoe_username") or sub["username"])
+        db.link_subscriber_to_isp(sub_id, pppoe, is_sabro_isp=1, isp_status="verified_active")
+        basic_pkg = db.get_package_by_code("basic")
+        if basic_pkg:
+            db.activate_subscriber_subscription(sub_id, basic_pkg["id"], days=365)
+        flash(f"Subscriber '{sub['username']}' verified as active Sabro Networks customer (100% FREE Access Activated).", "success")
+    else:
+        db.unlink_subscriber_from_isp(sub_id)
+        flash(f"Sabro Networks ISP entitlement removed for subscriber '{sub['username']}'.", "info")
+    return redirect(url_for("admin_customers"))
+
+# ====================================================
+# WHITE-LABEL RESELLER & ISP SAAS ROUTES
+# ====================================================
+@app.route("/reseller/login", methods=["GET", "POST"])
+def reseller_login():
+    if session.get("reseller_id") and session.get("reseller_tenant_id"):
+        return redirect(url_for("reseller_dashboard"))
+
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "").strip()
+        user = db.authenticate_reseller(username, password)
+        if user:
+            session["reseller_id"] = user["id"]
+            session["reseller_tenant_id"] = user["tenant_id"]
+            session["reseller_username"] = user["username"]
+            session["reseller_role"] = user["role"]
+            flash(f"Welcome back to {user.get('service_name', 'Reseller Console')}!", "success")
+            return redirect(url_for("reseller_dashboard"))
+        flash("Invalid reseller username or password.", "danger")
+
+    return render_template("reseller_login.html")
+
+@app.route("/reseller/logout")
+def reseller_logout():
+    session.pop("reseller_id", None)
+    session.pop("reseller_tenant_id", None)
+    session.pop("reseller_username", None)
+    session.pop("reseller_role", None)
+    flash("Signed out from reseller console.", "info")
+    return redirect(url_for("reseller_login"))
+
+@app.route("/reseller/dashboard")
+@reseller_required
+def reseller_dashboard():
+    tenant_id = g.reseller_tenant_id
+    metrics = db.get_tenant_metrics(tenant_id)
+    customers = db.get_subscribers(limit=10, tenant_id=tenant_id)
+    return render_template("reseller_dashboard.html", metrics=metrics, customers=customers, tenant=g.reseller_tenant)
+
+@app.route("/reseller/customers")
+@reseller_required
+def reseller_customers():
+    tenant_id = g.reseller_tenant_id
+    search = request.args.get("search", "").strip()
+    status = request.args.get("status", "all")
+    customers = db.get_subscribers(search=search if search else None, status=status, limit=200, tenant_id=tenant_id)
+    packages = db.get_packages(tenant_id=tenant_id)
+    return render_template("reseller_customers.html", customers=customers, packages=packages, search=search, tenant=g.reseller_tenant)
+
+@app.route("/reseller/customers/add", methods=["POST"])
+@reseller_required
+def reseller_add_customer():
+    tenant_id = g.reseller_tenant_id
+    metrics = db.get_tenant_metrics(tenant_id)
+    max_cust = g.reseller_tenant.get("max_customers", 500)
+    if metrics["total_customers"] >= max_cust:
+        flash(f"Tenant customer limit reached ({metrics['total_customers']}/{max_cust}). Contact Sabro Networks to upgrade.", "danger")
+        return redirect(url_for("reseller_customers"))
+
+    username = request.form.get("username", "").strip()
+    password = request.form.get("password", "").strip()
+    full_name = request.form.get("full_name", "").strip()
+    phone = request.form.get("phone", "").strip()
+    pppoe = request.form.get("pppoe_username", "").strip()
+    pkg_id = request.form.get("package_id")
+
+    ok, msg, sub_data = db.add_subscriber(
+        username=username,
+        password=password,
+        full_name=full_name,
+        phone=phone,
+        pppoe_username=pppoe,
+        package_id=int(pkg_id) if pkg_id else None,
+        tenant_id=tenant_id
+    )
+    if ok:
+        flash(f"Customer '{username}' created successfully!", "success")
+    else:
+        flash(f"Could not create customer: {msg}", "danger")
+    return redirect(url_for("reseller_customers"))
+
+@app.route("/reseller/customers/toggle/<int:sub_id>", methods=["POST"])
+@reseller_required
+def reseller_toggle_customer(sub_id):
+    tenant_id = g.reseller_tenant_id
+    sub = db.get_subscriber_by_id(sub_id)
+    if not sub or sub.get("tenant_id") != tenant_id:
+        flash("Permission denied. Customer does not belong to your tenant.", "danger")
+        return redirect(url_for("reseller_customers"))
+
+    new_status = "suspended" if sub["status"] == "active" else "active"
+    db.update_subscriber(sub_id, full_name=sub["full_name"], phone=sub["phone"], pppoe_username=sub.get("pppoe_username") or "", zone=sub.get("zone") or "", fat_id=sub.get("fat_id") or "", email=sub.get("email") or "", status=new_status, notes=sub.get("notes") or "")
+    flash(f"Customer status updated to {new_status.upper()}.", "success")
+    return redirect(url_for("reseller_customers"))
+
+@app.route("/reseller/packages")
+@reseller_required
+def reseller_packages():
+    tenant_id = g.reseller_tenant_id
+    pkgs = db.get_packages(active_only=False, tenant_id=tenant_id)
+    return render_template("reseller_packages.html", packages=pkgs, tenant=g.reseller_tenant)
+
+@app.route("/reseller/packages/create", methods=["POST"])
+@reseller_required
+def reseller_create_package():
+    tenant_id = g.reseller_tenant_id
+    name = request.form.get("name", "").strip()
+    code = f"{g.reseller_tenant['code']}_{request.form.get('code', '').strip().lower()}"
+    price = safe_int(request.form.get("price_pkr"), 250, min_val=0)
+    duration = safe_int(request.form.get("duration_days"), 30, min_val=1)
+    max_conn = safe_int(request.form.get("max_connections"), 1, min_val=1, max_val=10)
+    allowed_cats = request.form.get("allowed_categories", "all").strip()
+    description = request.form.get("description", "").strip()
+
+    db.add_package(name, code, duration_days=duration, price_pkr=price, max_connections=max_conn, description=description, allowed_categories=allowed_cats)
+    flash(f"Custom package '{name}' created successfully!", "success")
+    return redirect(url_for("reseller_packages"))
+
+@app.route("/reseller/payments")
+@reseller_required
+def reseller_payments():
+    tenant_id = g.reseller_tenant_id
+    receipts = db.get_payment_receipts(status=None, limit=100, tenant_id=tenant_id)
+    return render_template("reseller_payments.html", receipts=receipts, tenant=g.reseller_tenant)
+
+@app.route("/reseller/payments/approve/<int:receipt_id>", methods=["POST"])
+@reseller_required
+def reseller_approve_payment(receipt_id):
+    tenant_id = g.reseller_tenant_id
+    ok, msg = db.approve_payment_receipt(receipt_id, admin_user=session.get("reseller_username", "Reseller"), tenant_id=tenant_id)
+    if ok:
+        flash(msg, "success")
+    else:
+        flash(msg, "danger")
+    return redirect(url_for("reseller_payments"))
+
+@app.route("/reseller/payments/reject/<int:receipt_id>", methods=["POST"])
+@reseller_required
+def reseller_reject_payment(receipt_id):
+    tenant_id = g.reseller_tenant_id
+    notes = request.form.get("notes", "Rejected by reseller staff")
+    ok, msg = db.reject_payment_receipt(receipt_id, admin_user=session.get("reseller_username", "Reseller"), notes=notes, tenant_id=tenant_id)
+    flash(msg, "info")
+    return redirect(url_for("reseller_payments"))
+
+@app.route("/reseller/branding")
+@reseller_required
+def reseller_branding():
+    return render_template("reseller_branding.html", tenant=g.reseller_tenant)
+
+@app.route("/reseller/branding/update", methods=["POST"])
+@reseller_required
+def reseller_update_branding():
+    tenant_id = g.reseller_tenant_id
+    data = {
+        "service_name": request.form.get("service_name", "").strip(),
+        "company_name": request.form.get("company_name", "").strip(),
+        "logo_url": request.form.get("logo_url", "").strip(),
+        "tagline": request.form.get("tagline", "").strip(),
+        "brand_color_primary": request.form.get("brand_color_primary_text") or request.form.get("brand_color_primary") or "#00f0ff",
+        "brand_color_secondary": request.form.get("brand_color_secondary_text") or request.form.get("brand_color_secondary") or "#6366f1",
+        "support_phone": request.form.get("support_phone", "").strip(),
+        "support_email": request.form.get("support_email", "").strip(),
+        "welcome_message": request.form.get("welcome_message", "").strip()
+    }
+    db.update_tenant(tenant_id, data)
+    flash("White-label branding and contact settings updated successfully!", "success")
+    return redirect(url_for("reseller_branding"))
+
+@app.route("/reseller/tickets")
+@reseller_required
+def reseller_tickets():
+    tenant_id = g.reseller_tenant_id
+    status = request.args.get("status", "all")
+    tickets = db.get_support_tickets(tenant_id=tenant_id, status=status)
+    return render_template("reseller_tickets.html", tickets=tickets, tenant=g.reseller_tenant)
+
+@app.route("/reseller/tickets/<int:ticket_id>")
+@reseller_required
+def reseller_ticket_detail(ticket_id):
+    tenant_id = g.reseller_tenant_id
+    ticket = db.get_support_ticket(ticket_id, tenant_id=tenant_id)
+    if not ticket:
+        flash("Ticket not found or permission denied.", "danger")
+        return redirect(url_for("reseller_tickets"))
+    return render_template("reseller_ticket_detail.html", ticket=ticket, tenant=g.reseller_tenant)
+
+@app.route("/reseller/tickets/reply/<int:ticket_id>", methods=["POST"])
+@reseller_required
+def reseller_reply_ticket(ticket_id):
+    tenant_id = g.reseller_tenant_id
+    ticket = db.get_support_ticket(ticket_id, tenant_id=tenant_id)
+    if not ticket:
+        flash("Ticket not found or permission denied.", "danger")
+        return redirect(url_for("reseller_tickets"))
+
+    message = request.form.get("message", "").strip()
+    new_status = request.form.get("status", "in_progress")
+    if message:
+        db.add_ticket_message(ticket_id, sender_type="reseller", sender_name=session.get("reseller_username", "Support"), message=message)
+        db.update_ticket_status(ticket_id, new_status)
+        if ticket.get("subscriber_id"):
+            db.create_notification(tenant_id, ticket["subscriber_id"], "New Support Reply", f"Our support team replied to your ticket '{ticket['subject']}'.", "info")
+        flash("Reply sent to customer.", "success")
+    return redirect(url_for("reseller_ticket_detail", ticket_id=ticket_id))
+
+@app.route("/reseller/staff")
+@reseller_required
+def reseller_staff():
+    tenant_id = g.reseller_tenant_id
+    staff = db.get_reseller_users(tenant_id)
+    return render_template("reseller_staff.html", staff_users=staff, tenant=g.reseller_tenant)
+
+@app.route("/reseller/staff/add", methods=["POST"])
+@reseller_required
+def reseller_add_staff():
+    tenant_id = g.reseller_tenant_id
+    username = request.form.get("username", "").strip()
+    password = request.form.get("password", "").strip()
+    full_name = request.form.get("full_name", "").strip()
+    role = request.form.get("role", "staff")
+    try:
+        db.create_reseller_user(tenant_id, username, password, full_name=full_name, role=role)
+        flash(f"Staff account '{username}' created successfully!", "success")
+    except Exception as e:
+        flash(f"Could not create staff account: {e}", "danger")
+    return redirect(url_for("reseller_staff"))
+
+@app.route("/reseller/reports/export-customers")
+@reseller_required
+def reseller_export_customers():
+    tenant_id = g.reseller_tenant_id
+    customers = db.get_subscribers(limit=5000, tenant_id=tenant_id)
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["ID", "Username", "Full Name", "Phone", "PPPoE Username", "Package", "Status", "Expiry Date"])
+    for c in customers:
+        writer.writerow([c.get("id"), c.get("username"), c.get("full_name"), c.get("phone"), c.get("pppoe_username"), c.get("package_name"), c.get("status"), c.get("sub_expiry")])
+    output.seek(0)
+    return Response(output.getvalue(), mimetype="text/csv", headers={"Content-Disposition": f"attachment; filename=customers_{g.reseller_tenant.get('code')}.csv"})
+
+# ====================================================
+# CUSTOMER PORTAL, SUPPORT TICKETS & BILLING HISTORY
+# ====================================================
+@app.route("/portal")
+def customer_portal():
+    return redirect(url_for("my_account"))
+
+@app.route("/support/tickets")
+def customer_tickets():
+    sub_id = session.get("subscriber_id")
+    if not sub_id:
+        return redirect(url_for("gatekeeper"))
+    tenant_id = getattr(g, "tenant", {}).get("id", 1)
+    tickets = db.get_support_tickets(tenant_id=tenant_id, subscriber_id=sub_id)
+    return render_template("support_tickets.html", tickets=tickets)
+
+@app.route("/support/tickets/new", methods=["POST"])
+def customer_create_ticket():
+    sub_id = session.get("subscriber_id")
+    if not sub_id:
+        return redirect(url_for("gatekeeper"))
+    tenant_id = getattr(g, "tenant", {}).get("id", 1)
+    sub = db.get_subscriber_by_id(sub_id)
+    subject = request.form.get("subject", "").strip()
+    category = request.form.get("category", "general")
+    priority = request.form.get("priority", "medium")
+    message = request.form.get("message", "").strip()
+    if not subject or not message:
+        flash("Subject and message are required.", "danger")
+        return redirect(url_for("customer_tickets"))
+
+    t_id, t_num = db.create_support_ticket(tenant_id, sub_id, subject, category, priority, message, sender_name=sub.get("username") if sub else "Subscriber")
+    flash(f"Support ticket {t_num} opened successfully! Our team will respond shortly.", "success")
+    return redirect(url_for("customer_ticket_detail", ticket_id=t_id))
+
+@app.route("/support/tickets/<int:ticket_id>")
+def customer_ticket_detail(ticket_id):
+    sub_id = session.get("subscriber_id")
+    if not sub_id:
+        return redirect(url_for("gatekeeper"))
+    ticket = db.get_support_ticket(ticket_id, subscriber_id=sub_id)
+    if not ticket:
+        flash("Ticket not found or permission denied.", "danger")
+        return redirect(url_for("customer_tickets"))
+    return render_template("support_ticket_detail.html", ticket=ticket)
+
+@app.route("/support/tickets/reply/<int:ticket_id>", methods=["POST"])
+def customer_reply_ticket(ticket_id):
+    sub_id = session.get("subscriber_id")
+    if not sub_id:
+        return redirect(url_for("gatekeeper"))
+    ticket = db.get_support_ticket(ticket_id, subscriber_id=sub_id)
+    if not ticket:
+        flash("Ticket not found or permission denied.", "danger")
+        return redirect(url_for("customer_tickets"))
+
+    message = request.form.get("message", "").strip()
+    if message:
+        sub = db.get_subscriber_by_id(sub_id)
+        db.add_ticket_message(ticket_id, sender_type="customer", sender_name=sub.get("username") if sub else "Subscriber", message=message)
+        flash("Reply added.", "success")
+    return redirect(url_for("customer_ticket_detail", ticket_id=ticket_id))
+
+@app.route("/payment/history")
+def customer_payment_history():
+    sub_id = session.get("subscriber_id")
+    if not sub_id:
+        return redirect(url_for("gatekeeper"))
+    conn = db.get_db()
+    rows = conn.execute("SELECT * FROM payment_receipts WHERE subscriber_id = ? ORDER BY id DESC", (sub_id,)).fetchall()
+    conn.close()
+    return render_template("payment_history.html", receipts=[dict(r) for r in rows])
+
+@app.route("/api/notifications")
+def api_get_notifications():
+    sub_id = session.get("subscriber_id")
+    if not sub_id:
+        return jsonify({"notifications": []})
+    tenant_id = getattr(g, "tenant", {}).get("id", 1)
+    notifs = db.get_notifications(tenant_id=tenant_id, subscriber_id=sub_id, limit=10)
+    return jsonify({"notifications": notifs})
+
+@app.route("/api/notifications/read/<int:notif_id>", methods=["POST"])
+def api_mark_notification_read(notif_id):
+    sub_id = session.get("subscriber_id")
+    db.mark_notification_read(notif_id, subscriber_id=sub_id)
+    return jsonify({"success": True})
+
+# ====================================================
+# SUPER ADMIN SAAS TENANT CONTROL
+# ====================================================
+@app.route("/admin/resellers/convert/<int:inquiry_id>", methods=["POST"])
+@admin_required
+def admin_convert_reseller(inquiry_id):
+    inquiries = db.get_reseller_inquiries(status=None, limit=1000)
+    target = next((x for x in inquiries if x["id"] == inquiry_id), None)
+    if not target:
+        flash("Inquiry not found.", "error")
+        return redirect(url_for("admin_resellers"))
+
+    raw_code = re.sub(r"[^a-zA-Z0-9]", "", target["company_name"]).lower()[:12] or f"partner{inquiry_id}"
+    code = raw_code
+    counter = 1
+    while db.get_tenant_by_code(code):
+        code = f"{raw_code}{counter}"
+        counter += 1
+
+    temp_password = f"Sabro{secrets.token_hex(3)}"
+    tenant_id = db.create_tenant({
+        "code": code,
+        "name": target["company_name"],
+        "company_name": target["company_name"],
+        "service_name": f"{target['company_name']} TV",
+        "contact_name": target["contact_name"],
+        "phone": target["phone"],
+        "email": target.get("email", ""),
+        "welcome_message": f"Welcome to {target['company_name']} IPTV, powered by Sabro Networks.",
+        "status": "active",
+        "max_customers": 500
+    })
+    
+    owner_username = f"admin_{code}"
+    db.create_reseller_user(tenant_id, owner_username, temp_password, full_name=target["contact_name"], email=target.get("email", ""), phone=target["phone"], role="owner")
+    db.update_reseller_inquiry_status(inquiry_id, "approved")
+    db.log_audit(session.get("admin_user", "admin"), "CONVERT_RESELLER", f"Converted inquiry #{inquiry_id} ({target['company_name']}) to Tenant #{tenant_id} ('{code}'). Owner: {owner_username}")
+    
+    flash(f"🎉 Tenant #{tenant_id} ('{code}') created! Reseller Login: Username: {owner_username} | Temporary Password: {temp_password}", "success")
+    return redirect(url_for("admin_resellers"))
+
+@app.route("/admin/tenants/create", methods=["POST"])
+@admin_required
+def admin_create_tenant():
+    name = request.form.get("name", "").strip()
+    code = re.sub(r"[^a-zA-Z0-9_]", "", request.form.get("code", "").strip().lower())
+    if not code or db.get_tenant_by_code(code):
+        flash("Tenant code must be unique and alphanumeric.", "error")
+        return redirect(url_for("admin_resellers"))
+
+    service_name = request.form.get("service_name") or f"{name} TV"
+    tenant_id = db.create_tenant({
+        "code": code,
+        "name": name,
+        "company_name": name,
+        "service_name": service_name,
+        "status": "active",
+        "max_customers": safe_int(request.form.get("max_customers"), 500)
+    })
+    
+    owner_user = request.form.get("owner_username") or f"admin_{code}"
+    owner_pass = request.form.get("owner_password") or f"Sabro{secrets.token_hex(3)}"
+    db.create_reseller_user(tenant_id, owner_user, owner_pass, full_name=name, role="owner")
+    db.log_audit(session.get("admin_user", "admin"), "CREATE_TENANT", f"Created Tenant #{tenant_id} ('{code}'). Owner: {owner_user}")
+    
+    flash(f"Tenant '{name}' created successfully! Credentials: Username: {owner_user} | Password: {owner_pass}", "success")
+    return redirect(url_for("admin_resellers"))
+
+@app.route("/admin/tenants/toggle/<int:tenant_id>", methods=["POST"])
+@admin_required
+def admin_toggle_tenant(tenant_id):
+    if tenant_id == 1:
+        flash("Cannot suspend master Sabro Networks tenant.", "error")
+        return redirect(url_for("admin_resellers"))
+    tenant = db.get_tenant_by_id(tenant_id)
+    if not tenant:
+        flash("Tenant not found.", "error")
+        return redirect(url_for("admin_resellers"))
+    new_status = "suspended" if tenant["status"] == "active" else "active"
+    db.update_tenant(tenant_id, {"status": new_status})
+    db.log_audit(session.get("admin_user", "admin"), "TOGGLE_TENANT", f"Updated Tenant #{tenant_id} status to '{new_status}'")
+    flash(f"Tenant #{tenant_id} '{tenant['name']}' status changed to {new_status.upper()}.", "success")
+    return redirect(url_for("admin_resellers"))
+
 # ----------------------------------------------------
 # Global Error Handlers
 # ----------------------------------------------------
