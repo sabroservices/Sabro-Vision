@@ -775,6 +775,14 @@ def api_channels():
     )
     return jsonify({"success": True, "channels": channels})
 
+@app.route("/api/channel/<int:channel_id>")
+@subscriber_required
+def api_channel_details(channel_id):
+    ch = db.get_channel_by_id(channel_id)
+    if not ch:
+        return jsonify({"success": False, "error": "Channel not found"}), 404
+    return jsonify({"success": True, "channel": ch})
+
 @app.route("/api/favorite/toggle", methods=["POST"])
 @app.route("/api/favorites/toggle", methods=["POST"])
 @subscriber_required
