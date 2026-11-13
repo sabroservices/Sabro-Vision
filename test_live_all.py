@@ -319,8 +319,8 @@ print("\n[PHASE 12] Tiered Package Channel Isolation & Access Enforcement...")
 
 # 1. Public Packages & Pricing Showcase
 r_pub_pkgs = requests.get(f"{BASE_URL}/packages")
-report("Public /packages page loads with 200 OK", r_pub_pkgs.status_code == 200 and "Sabro All-Access Master VIP" in r_pub_pkgs.text)
-report("Standalone category packages displayed (Comedy, Sports, News)", "Sabro Comedy Club Pass" in r_pub_pkgs.text and "Sabro Sports Elite Pass" in r_pub_pkgs.text)
+report("Public /packages page loads with 200 OK", r_pub_pkgs.status_code == 200 and "Sabro Broadband Pass" in r_pub_pkgs.text)
+report("Official 2-Package System displayed (Sabro Free & Outside 150 PKR)", "Sabro Vision Commercial Pass" in r_pub_pkgs.text and "150" in r_pub_pkgs.text)
 
 # 2. Query available packages from database
 all_pkgs = db.get_packages(active_only=False)
