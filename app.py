@@ -356,6 +356,24 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def reseller_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get("reseller_id") or not session.get("reseller_tenant_id"):
+            flash("Reseller login required to access partner console.", "danger")
+            return redirect(url_for("reseller_login"))
+        t_id = session.get("reseller_tenant_id")
+        tenant = db.get_tenant_by_id(t_id)
+        if not tenant or tenant.get("status") == "suspended":
+            session.pop("reseller_id", None)
+            session.pop("reseller_tenant_id", None)
+            flash("This reseller account is suspended. Contact Sabro Networks support.", "danger")
+            return redirect(url_for("reseller_login"))
+        g.reseller_tenant = tenant
+        g.reseller_tenant_id = t_id
+        return f(*args, **kwargs)
+    return decorated_function
+
 # ----------------------------------------------------
 # Gatekeeper & Direct Sign-In Routes
 # ----------------------------------------------------
