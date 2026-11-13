@@ -130,13 +130,13 @@ class SabroVisionSaaSTestCase(unittest.TestCase):
         self.assertIsNotNone(sub)
         self.assertEqual(sub.get("is_sabro_isp", 0), 0)
 
-        # 3. Customer submits payment receipt for 250 PKR All-In-One Pass
+        # 3. Customer submits payment receipt for 150 PKR All-In-One Pass
         aio_pkg = db.get_package_by_code("all_in_one")
         self.assertIsNotNone(aio_pkg)
         receipt_id = db.submit_payment_receipt(
             subscriber_id=sub["id"],
             package_id=aio_pkg["id"],
-            amount_pkr=250,
+            amount_pkr=150,
             payment_method="JazzCash",
             transaction_ref=f"JC{secrets.token_hex(4).upper()}",
             sender_number="03001234567"
