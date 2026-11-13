@@ -1627,30 +1627,37 @@ def delete_subscriber(sub_id):
 # ----------------------------------------------------
 # SABRO VISION v1.0 - Payment Verification Workflow
 # ----------------------------------------------------
-def submit_payment_receipt(subscriber_id, package_id, amount_pkr, payment_method, transaction_ref="", sender_number="", proof_image="", notes=""):
+def submit_payment_receipt(subscriber_id, package_id, amount_pkr, payment_method, transaction_ref="", sender_number="", proof_image="", notes="", tenant_id=1, invoice_number=None):
     conn = get_db()
     now_str = datetime.now().isoformat()
+    if not invoice_number:
+        invoice_number = f"SABRO-INV-{datetime.now().strftime('%y%m')}-{secrets.token_hex(2).upper()}"
     cursor = conn.cursor()
     cursor.execute("""
-        INSERT INTO payment_receipts (subscriber_id, package_id, amount_pkr, payment_method, transaction_ref, sender_number, proof_image, status, notes, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)
-    """, (subscriber_id, package_id, int(amount_pkr), payment_method, transaction_ref.strip(), sender_number.strip(), proof_image, notes.strip(), now_str))
+        INSERT INTO payment_receipts (subscriber_id, package_id, amount_pkr, payment_method, transaction_ref, sender_number, proof_image, status, notes, tenant_id, invoice_number, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?)
+    """, (subscriber_id, package_id, int(amount_pkr), payment_method, transaction_ref.strip(), sender_number.strip(), proof_image, notes.strip(), int(tenant_id or 1), invoice_number, now_str))
     conn.commit()
     new_id = cursor.lastrowid
     conn.close()
     notify_vault_write()
     return new_id
 
-def get_payment_receipts(status=None, limit=50):
+def get_payment_receipts(status=None, limit=50, tenant_id=None):
     conn = get_db()
     query = """
-        SELECT r.*, sub.username, sub.full_name, sub.phone as sub_phone, p.name as package_name
+        SELECT r.*, sub.username, sub.full_name, sub.phone as sub_phone, p.name as package_name,
+               t.service_name as tenant_service_name
         FROM payment_receipts r
         LEFT JOIN subscribers sub ON sub.id = r.subscriber_id
         LEFT JOIN packages p ON p.id = r.package_id
+        LEFT JOIN tenants t ON t.id = r.tenant_id
         WHERE 1=1
     """
     params = []
+    if tenant_id is not None:
+        query += " AND r.tenant_id = ?"
+        params.append(int(tenant_id))
     if status and status != 'all':
         query += " AND r.status = ?"
         params.append(status)
@@ -1660,12 +1667,17 @@ def get_payment_receipts(status=None, limit=50):
     conn.close()
     return [dict(r) for r in rows]
 
-def approve_payment_receipt(receipt_id, admin_user, notes=""):
+def approve_payment_receipt(receipt_id, admin_user, notes="", tenant_id=None):
     conn = get_db()
-    receipt = conn.execute("SELECT * FROM payment_receipts WHERE id = ?", (receipt_id,)).fetchone()
+    query = "SELECT * FROM payment_receipts WHERE id = ?"
+    params = [receipt_id]
+    if tenant_id is not None:
+        query += " AND tenant_id = ?"
+        params.append(int(tenant_id))
+    receipt = conn.execute(query, params).fetchone()
     if not receipt:
         conn.close()
-        return False, "Receipt not found"
+        return False, "Receipt not found or permission denied"
 
     r_dict = dict(receipt)
     now_str = datetime.now().isoformat()
@@ -1681,20 +1693,52 @@ def approve_payment_receipt(receipt_id, admin_user, notes=""):
     if r_dict["subscriber_id"] and r_dict["package_id"]:
         activate_subscriber_subscription(r_dict["subscriber_id"], r_dict["package_id"])
 
+    # Create celebration notification for customer
+    if r_dict.get("subscriber_id"):
+        create_notification(
+            r_dict.get("tenant_id", 1),
+            r_dict["subscriber_id"],
+            "Payment Approved! 🎉",
+            f"Your payment of PKR {r_dict['amount_pkr']} ({r_dict['payment_method']}) has been verified. Your subscription is now active!",
+            "success"
+        )
+
     log_audit(admin_user, "APPROVE_PAYMENT", f"Approved payment receipt #{receipt_id} for PKR {r_dict['amount_pkr']} ({r_dict['payment_method']})")
     notify_vault_write()
     return True, "Payment approved and subscription automatically activated!"
 
-def reject_payment_receipt(receipt_id, admin_user, notes=""):
+def reject_payment_receipt(receipt_id, admin_user, notes="", tenant_id=None):
     conn = get_db()
+    query = "SELECT * FROM payment_receipts WHERE id = ?"
+    params = [receipt_id]
+    if tenant_id is not None:
+        query += " AND tenant_id = ?"
+        params.append(int(tenant_id))
+    receipt = conn.execute(query, params).fetchone()
+    if not receipt:
+        conn.close()
+        return False, "Receipt not found or permission denied"
+
+    r_dict = dict(receipt)
     now_str = datetime.now().isoformat()
     conn.execute("""
         UPDATE payment_receipts
         SET status = 'rejected', reviewer_admin = ?, reviewed_at = ?, notes = COALESCE(?, notes)
         WHERE id = ?
-    """, (admin_user, now_str, notes if notes else "Rejected by admin", receipt_id))
+    """, (admin_user, now_str, notes if notes else "Rejected by reviewer", receipt_id))
     conn.commit()
     conn.close()
+
+    # Notify customer of rejection reason
+    if r_dict.get("subscriber_id"):
+        create_notification(
+            r_dict.get("tenant_id", 1),
+            r_dict["subscriber_id"],
+            "Payment Verification Update",
+            f"Your payment receipt #{receipt_id} could not be verified. Note: {notes or 'Invalid transaction reference.'}",
+            "danger"
+        )
+
     log_audit(admin_user, "REJECT_PAYMENT", f"Rejected payment receipt #{receipt_id}. Reason: {notes}")
     notify_vault_write()
     return True, "Payment receipt marked as rejected"
