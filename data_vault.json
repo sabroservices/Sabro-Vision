@@ -1,6 +1,6 @@
 {
   "platform": "SABRO VISION",
-  "exported_at": "2026-11-14T00:03:06.580262",
+  "exported_at": "2026-11-14T00:03:06.889402",
   "version": "1.0",
   "tables": {
     "settings": [
@@ -173,6 +173,19 @@
         "role": "owner",
         "status": "active",
         "created_at": "2026-11-14T00:03:06.298603",
+        "last_login_at": null
+      },
+      {
+        "id": 16,
+        "tenant_id": 17,
+        "username": "admin_tenant_02953e",
+        "password_hash": "scrypt:32768:8:1$ICBnOmife4X9hMO8$36382dc5b9ff4cd87790a27fa31783277b5e6b2fc65439b84df505041ce792de0e5726e7c2401a5f3d8f698bb920070395a569a2dd4d79df47463685d6f8dc68",
+        "full_name": "",
+        "email": "",
+        "phone": "",
+        "role": "owner",
+        "status": "active",
+        "created_at": "2026-11-14T00:03:06.597520",
         "last_login_at": null
       }
     ],
