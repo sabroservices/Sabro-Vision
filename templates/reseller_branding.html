@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}White-Label Branding - {{ (tenant and tenant.service_name) or 'Reseller' }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6 max-w-4xl mx-auto">
+
+    <!-- Header & Navigation -->
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-4 flex-wrap gap-4">
+        <div class="flex items-center gap-2 overflow-x-auto scrollbar-none text-xs font-bold">
+            <a href="{{ url_for('reseller_dashboard') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-cyan-400"></i>
+                <span>Overview</span>
+            </a>
+            <a href="{{ url_for('reseller_customers') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-users text-cyan-400"></i>
+                <span>Customers</span>
+            </a>
+            <a href="{{ url_for('reseller_packages') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-boxes-stacked text-purple-400"></i>
+                <span>Packages & Pricing</span>
+            </a>
+            <a href="{{ url_for('reseller_payments') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice-dollar text-amber-400"></i>
+                <span>Payment Queue</span>
+            </a>
+            <a href="{{ url_for('reseller_branding') }}" class="px-3.5 py-2 rounded-xl bg-cyan-600 text-white shadow-md shadow-cyan-600/30 flex items-center gap-2">
+                <i class="fa-solid fa-palette"></i>
+                <span>White-Label Branding</span>
+            </a>
+            <a href="{{ url_for('reseller_tickets') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-headset text-emerald-400"></i>
+                <span>Customer Support</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Live Preview Card -->
+    <div class="cinema-glass-card rounded-3xl p-6 border border-white/[0.1] bg-obsidian-900/90 shadow-2xl relative">
+        <div class="flex items-center justify-between pb-4 border-b border-white/[0.06] mb-5">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                <i class="fa-solid fa-eye text-cyan-400"></i>
+                <span>Live Brand Preview</span>
+            </span>
+            <span class="text-[10px] text-cyan-400 font-semibold lowercase">Updates dynamically</span>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-obsidian-950/80 border border-white/[0.06] flex items-center gap-4">
+            <div id="previewLogo" class="w-16 h-16 rounded-2xl border border-white/20 flex items-center justify-center text-white text-2xl font-bold shadow-lg shrink-0 overflow-hidden" style="background: linear-gradient(135deg, {{ tenant.brand_color_primary or '#00f0ff' }}, {{ tenant.brand_color_secondary or '#6366f1' }});">
+                {% if tenant.logo_url %}
+                <img src="{{ tenant.logo_url }}" class="w-full h-full object-cover">
+                {% else %}
+                <i class="fa-solid fa-tv"></i>
+                {% endif %}
+            </div>
+            <div>
+                <h3 id="previewTitle" class="text-xl font-black text-white tracking-tight">{{ tenant.service_name or 'My Brand TV' }}</h3>
+                <p id="previewCompany" class="text-xs text-slate-400 mt-0.5">Operated by {{ tenant.company_name or 'ISP Partner' }}</p>
+                <div class="mt-2 flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold text-white shadow-sm" style="background-color: {{ tenant.brand_color_primary or '#00f0ff' }}; color: #030712;">
+                        Custom Brand Theme
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Branding Form -->
+    <div class="cinema-glass-card rounded-3xl p-6 sm:p-8 border border-white/[0.08] bg-obsidian-900/80">
+        <form action="{{ url_for('reseller_update_branding') }}" method="POST" class="space-y-5 text-xs">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">Service Name (Branded Platform Title) *</label>
+                    <input type="text" name="service_name" id="inpServiceName" required value="{{ tenant.service_name }}"
+                           class="w-full bg-obsidian-950 text-white px-4 py-3 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 text-sm font-semibold">
+                    <span class="text-[10px] text-slate-400 mt-1 block">Displayed on portal, player header, and smart TV interface.</span>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">Company / ISP Name *</label>
+                    <input type="text" name="company_name" id="inpCompanyName" required value="{{ tenant.company_name or tenant.name }}"
+                           class="w-full bg-obsidian-950 text-white px-4 py-3 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 text-sm">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">Logo URL (PNG/SVG/WebP)</label>
+                    <input type="url" name="logo_url" value="{{ tenant.logo_url or '' }}" placeholder="https://example.com/logo.png"
+                           class="w-full bg-obsidian-950 text-white px-4 py-3 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 font-mono text-xs">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">Tagline / Slogan</label>
+                    <input type="text" name="tagline" value="{{ tenant.tagline or '' }}" placeholder="e.g. Ultra Fast Fiber IPTV"
+                           class="w-full bg-obsidian-950 text-white px-4 py-3 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 text-xs">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">Primary Brand Accent Color</label>
+                    <div class="flex items-center gap-2">
+                        <input type="color" name="brand_color_primary" value="{{ tenant.brand_color_primary or '#00f0ff' }}"
+                               class="w-10 h-10 rounded-xl bg-transparent border-0 cursor-pointer">
+                        <input type="text" name="brand_color_primary_text" value="{{ tenant.brand_color_primary or '#00f0ff' }}"
+                               class="w-full bg-obsidian-950 text-white px-3 py-2 rounded-xl border border-white/[0.1] font-mono text-xs">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">Secondary Brand Color</label>
+                    <div class="flex items-center gap-2">
+                        <input type="color" name="brand_color_secondary" value="{{ tenant.brand_color_secondary or '#6366f1' }}"
+                               class="w-10 h-10 rounded-xl bg-transparent border-0 cursor-pointer">
+                        <input type="text" name="brand_color_secondary_text" value="{{ tenant.brand_color_secondary or '#6366f1' }}"
+                               class="w-full bg-obsidian-950 text-white px-3 py-2 rounded-xl border border-white/[0.1] font-mono text-xs">
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">Support Phone / WhatsApp</label>
+                    <input type="text" name="support_phone" value="{{ tenant.support_phone or '' }}" placeholder="0300-1234567"
+                           class="w-full bg-obsidian-950 text-white px-4 py-3 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 font-mono text-xs">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">Support Email</label>
+                    <input type="email" name="support_email" value="{{ tenant.support_email or '' }}" placeholder="support@yourcompany.com"
+                           class="w-full bg-obsidian-950 text-white px-4 py-3 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 text-xs">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">Custom Welcome Message for Customers</label>
+                <textarea name="welcome_message" rows="3" placeholder="Welcome message shown to your customers on their dashboard"
+                          class="w-full bg-obsidian-950 text-white px-4 py-3 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 text-xs">{{ tenant.welcome_message or '' }}</textarea>
+            </div>
+
+            <div class="pt-4 flex items-center justify-end gap-3 border-t border-white/[0.08]">
+                <button type="submit" class="btn-shimmer glow-cyan px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 hover:from-cyan-400 text-white font-bold shadow-lg shadow-cyan-500/25 flex items-center gap-2">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>Save White-Label Branding</span>
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+{% endblock %}
