@@ -339,8 +339,8 @@ def init_db(force_reset=False):
         custom_domain TEXT UNIQUE,
         subdomain TEXT UNIQUE,
         logo_url TEXT,
-        brand_color_primary TEXT DEFAULT '#00f0ff',
-        brand_color_secondary TEXT DEFAULT '#6366f1',
+        brand_color_primary TEXT DEFAULT '#ff6b00',
+        brand_color_secondary TEXT DEFAULT '#f59e0b',
         contact_name TEXT,
         email TEXT,
         phone TEXT,
@@ -495,7 +495,7 @@ def init_db(force_reset=False):
         ) VALUES (
             1, 'sabro', 'Sabro Networks', 'Sabro Networks ISP', 'SABRO VISION',
             'Ultra High-Definition IPTV Middleware - Sabro Networks',
-            '#00f0ff', '#6366f1', 'active', ?, 'Master platform tenant for Sabro Networks'
+            '#ff6b00', '#f59e0b', 'active', ?, 'Master platform tenant for Sabro Networks'
         )
     """, (now_str,))
 
