@@ -572,6 +572,20 @@ def get_settings():
     settings.setdefault("bank_account_number", "0101-0105678901")
     settings.setdefault("stream_proxy_enabled", "1")
 
+    # ISP Integration Settings (Sabro Networks Broadband Entitlement)
+    settings.setdefault("sabro_isp_api_url", "")
+    settings.setdefault("sabro_isp_api_key", "")
+    settings.setdefault("sabro_isp_auto_verify", "1")
+    settings.setdefault("sabro_isp_free_screens", "1")
+    settings.setdefault("sabro_isp_status", "manual_fallback")
+
+    # Outside Customer & Multi-Screen Pricing Settings
+    settings.setdefault("outside_customer_default_price", "250")
+    settings.setdefault("outside_customer_default_screens", "1")
+    settings.setdefault("expiry_grace_period_days", "0")
+    settings.setdefault("on_expiry_action", "block_stream")
+    settings.setdefault("maintenance_mode", "0")
+
     # Persistent secure session key
     if "session_secret_key" not in settings:
         secret = secrets.token_hex(32)
