@@ -1,6 +1,6 @@
 {
   "platform": "SABRO VISION",
-  "exported_at": "2026-11-14T03:31:36.703794",
+  "exported_at": "2026-11-14T03:31:41.865593",
   "version": "1.0",
   "tables": {
     "settings": [
@@ -249,6 +249,23 @@
         "phone": "",
         "duration_days": 30,
         "created_at": "2026-11-14T03:31:36.703794",
+        "activated_at": null,
+        "expires_at": null,
+        "status": "unused",
+        "max_devices": 1,
+        "device_token": null,
+        "notes": "",
+        "package_id": 11,
+        "tenant_id": 1
+      },
+      {
+        "id": 90,
+        "key_code": "SABRO-FREE-7C444C-A974",
+        "user_type": "subscriber",
+        "customer_name": "VIP",
+        "phone": "",
+        "duration_days": 30,
+        "created_at": "2026-11-14T03:31:41.858243",
         "activated_at": null,
         "expires_at": null,
         "status": "unused",
