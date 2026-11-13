@@ -397,10 +397,6 @@ report("Master VIP user has All-Access (All 11,459 Channels)", "Master VIP" in r
 # Master VIP can stream both Comedy and Sports channels
 r_master_comedy = master_sess.get(f"{BASE_URL}/stream/{sample_comedy_id}", allow_redirects=False)
 r_master_sports = master_sess.get(f"{BASE_URL}/stream/{sample_sports_id}", allow_redirects=False)
-if r_master_comedy.status_code not in (200, 302):
-    print(f"DEBUG: Master comedy status={r_master_comedy.status_code}, text={r_master_comedy.text[:150]}")
-if r_master_sports.status_code not in (200, 302):
-    print(f"DEBUG: Master sports status={r_master_sports.status_code}, text={r_master_sports.text[:150]}")
 report("Master VIP user can stream Comedy channels without restriction", r_master_comedy.status_code in (200, 302))
 report("Master VIP user can stream Sports channels without restriction", r_master_sports.status_code in (200, 302))
 
