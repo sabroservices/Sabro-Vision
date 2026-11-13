@@ -477,30 +477,30 @@
         });
     </script>
     <!-- Mobile Sticky Bottom Navigation Dock (Visible on Mobile Only) -->
-    <nav class="md:hidden fixed bottom-0 inset-x-0 z-40 cinema-glass bg-obsidian-950/95 backdrop-blur-2xl border-t border-white/10 px-2 py-1.5 flex items-center justify-around shadow-2xl">
-        <a href="{{ url_for('index') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-300 hover:text-cyan-400 transition-colors">
-            <i class="fa-solid fa-satellite-dish text-base text-cyan-400"></i>
+    <nav class="md:hidden fixed bottom-0 inset-x-0 z-40 cinema-glass bg-obsidian-950/95 backdrop-blur-2xl border-t border-orange-500/20 px-2 py-1.5 flex items-center justify-around shadow-2xl">
+        <a href="{{ url_for('index') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-300 hover:text-orange-400 transition-colors">
+            <i class="fa-solid fa-satellite-dish text-base text-orange-400"></i>
             <span class="text-[10px] font-bold">Live TV</span>
         </a>
-        <a href="{{ url_for('tv_player') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-300 hover:text-cyan-400 transition-colors">
-            <i class="fa-solid fa-tv text-base text-indigo-400"></i>
+        <a href="{{ url_for('tv_player') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-300 hover:text-orange-400 transition-colors">
+            <i class="fa-solid fa-tv text-base text-amber-400"></i>
             <span class="text-[10px] font-bold">TV Mode</span>
         </a>
-        <a href="{{ url_for('public_packages') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-300 hover:text-cyan-400 transition-colors">
-            <i class="fa-solid fa-boxes-stacked text-base text-purple-400"></i>
+        <a href="{{ url_for('public_packages') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-300 hover:text-orange-400 transition-colors">
+            <i class="fa-solid fa-boxes-stacked text-base text-orange-500"></i>
             <span class="text-[10px] font-bold">Packages</span>
         </a>
-        <a href="{{ url_for('index', fav_only='1') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-300 hover:text-cyan-400 transition-colors">
-            <i class="fa-solid fa-star text-base text-amber-400"></i>
-            <span class="text-[10px] font-bold">Favorites</span>
+        <a href="{{ url_for('index', fav_only='1') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-300 hover:text-rose-400 transition-colors">
+            <i class="fa-solid fa-heart text-base text-rose-500"></i>
+            <span class="text-[10px] font-bold">My List</span>
         </a>
-        <a href="{{ url_for('my_account') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-300 hover:text-cyan-400 transition-colors">
-            <i class="fa-solid fa-user-shield text-base text-emerald-400"></i>
+        <a href="{{ url_for('my_account') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-300 hover:text-orange-400 transition-colors">
+            <i class="fa-solid fa-user-shield text-base text-amber-400"></i>
             <span class="text-[10px] font-bold">Key Vault</span>
         </a>
         {% if is_admin %}
-        <a href="{{ url_for('admin_dashboard') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-300 hover:text-cyan-400 transition-colors">
-            <i class="fa-solid fa-gear text-base text-purple-400"></i>
+        <a href="{{ url_for('admin_dashboard') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-300 hover:text-orange-400 transition-colors">
+            <i class="fa-solid fa-gear text-base text-orange-400"></i>
             <span class="text-[10px] font-bold">Admin</span>
         </a>
         {% endif %}
