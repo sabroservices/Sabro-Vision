@@ -31,18 +31,14 @@ class TestPersistenceAndGatekeeperRedirect(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        """Ensure test artifacts are cleaned up so database remains pristine."""
+        """Ensure test artifacts are cleaned up and a clean baseline vault snapshot is preserved."""
         conn = db.get_db()
         for t in ['access_keys', 'subscribers', 'subscriptions', 'favorites', 'payment_receipts', 'reseller_inquiries', 'audit_logs', 'connection_events']:
             conn.execute(f"DELETE FROM {t}")
         conn.commit()
         conn.close()
         data_vault.truncate_wal()
-        if os.path.exists(data_vault.VAULT_FILE):
-            try:
-                os.remove(data_vault.VAULT_FILE)
-            except OSError:
-                pass
+        data_vault.save_vault_snapshot_to_disk()
 
     def test_01_root_unauthenticated_visitor_shifted_to_gatekeeper(self):
         """Unauthenticated visitor arriving at root '/' must be shifted into '/gatekeeper'"""
