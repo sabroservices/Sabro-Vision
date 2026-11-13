@@ -1,6 +1,6 @@
 {
   "platform": "SABRO VISION",
-  "exported_at": "2026-11-14T03:33:08.613210",
+  "exported_at": "2026-11-14T03:37:29.379027",
   "version": "1.0",
   "tables": {
     "settings": [
@@ -159,60 +159,6 @@
         "allowed_features": "all",
         "created_at": "2026-11-14T02:23:13.184911",
         "notes": ""
-      },
-      {
-        "id": 96,
-        "code": "tenant_33441a",
-        "name": "Alpha Fiber",
-        "company_name": "",
-        "service_name": "Alpha TV",
-        "tagline": "",
-        "custom_domain": null,
-        "subdomain": null,
-        "logo_url": "",
-        "brand_color_primary": "#10b981",
-        "brand_color_secondary": "#6366f1",
-        "contact_name": "",
-        "email": "",
-        "phone": "",
-        "whatsapp": "",
-        "welcome_message": "",
-        "support_email": "",
-        "support_phone": "",
-        "status": "active",
-        "max_customers": 100,
-        "max_active_subs": 500,
-        "max_devices_per_user": 1,
-        "allowed_features": "all",
-        "created_at": "2026-11-14T03:33:08.009710",
-        "notes": ""
-      },
-      {
-        "id": 97,
-        "code": "tenant_fe381f",
-        "name": "Beta Broadband",
-        "company_name": "",
-        "service_name": "Beta Vision",
-        "tagline": "",
-        "custom_domain": null,
-        "subdomain": null,
-        "logo_url": "",
-        "brand_color_primary": "#f59e0b",
-        "brand_color_secondary": "#6366f1",
-        "contact_name": "",
-        "email": "",
-        "phone": "",
-        "whatsapp": "",
-        "welcome_message": "",
-        "support_email": "",
-        "support_phone": "",
-        "status": "active",
-        "max_customers": 100,
-        "max_active_subs": 500,
-        "max_devices_per_user": 1,
-        "allowed_features": "all",
-        "created_at": "2026-11-14T03:33:08.039538",
-        "notes": ""
       }
     ],
     "reseller_users": [
@@ -240,32 +186,6 @@
         "role": "owner",
         "status": "active",
         "created_at": "2026-11-14T02:23:13.450407",
-        "last_login_at": null
-      },
-      {
-        "id": 95,
-        "tenant_id": 96,
-        "username": "admin_tenant_33441a",
-        "password_hash": "scrypt:32768:8:1$NyrOFLYZF8gd0lHr$84e48a7b493f905d98c11975e09aa71fce3ad9c2fddaa449c8c1cf4f1828c6c15855567dc2d68e894c1252ff6d446c88928b26f7c750bb2dae8001621341d416",
-        "full_name": "",
-        "email": "",
-        "phone": "",
-        "role": "owner",
-        "status": "active",
-        "created_at": "2026-11-14T03:33:08.073891",
-        "last_login_at": null
-      },
-      {
-        "id": 96,
-        "tenant_id": 97,
-        "username": "admin_tenant_fe381f",
-        "password_hash": "scrypt:32768:8:1$7FQ1vI3aJExYxrpq$e5bb116887297c63fe4ba7f46335aaf1b9e13123430cd904ac1e5520a1473aec5875616b106488451334ae942a6d93fddd0b2f5e005198f88b7ef9e7e848f197",
-        "full_name": "",
-        "email": "",
-        "phone": "",
-        "role": "owner",
-        "status": "active",
-        "created_at": "2026-11-14T03:33:08.345492",
         "last_login_at": null
       }
     ],
@@ -455,6 +375,23 @@
         "device_token": "b0c43af6-f396-47bb-ab4c-8b1e3e7edac7",
         "notes": "",
         "package_id": 11,
+        "tenant_id": 1
+      },
+      {
+        "id": 97,
+        "key_code": "SABRO-FREE-78DEEB-CF1A",
+        "user_type": "subscriber",
+        "customer_name": "Netflix Test",
+        "phone": "",
+        "duration_days": 30,
+        "created_at": "2026-11-14T03:37:29.147518",
+        "activated_at": "2026-11-14T03:37:29.185021",
+        "expires_at": "2026-12-14T03:37:29.185021",
+        "status": "active",
+        "max_devices": 1,
+        "device_token": "af35168a-c762-4499-9853-7f3d80268a86",
+        "notes": "",
+        "package_id": 1,
         "tenant_id": 1
       }
     ],
@@ -656,6 +593,28 @@
         "is_sabro_isp": 0,
         "isp_status": "unlinked",
         "isp_verified_at": null
+      },
+      {
+        "id": 98,
+        "username": "sabro_78deeb",
+        "password_hash": "scrypt:32768:8:1$9BoFEaE0k6fqHYEe$0d9ee1b4ca5f2692e68bc0492066329ef2fb2ee144f4e830a59f85e068ed26f2e0ec4d4cea65520e7a5d60edc6e2c8f7d3130c0b23eae1015ebb2655abd4e7b5",
+        "phone": "",
+        "full_name": "Subscriber 78DEEB",
+        "active_key_code": "SABRO-FREE-78DEEB-CF1A",
+        "created_at": "2026-11-14T03:37:29.185021",
+        "last_login_at": "2026-11-14T03:37:29.185021",
+        "plain_password": "sabro9251",
+        "pppoe_username": null,
+        "zone": null,
+        "fat_id": null,
+        "email": null,
+        "status": "active",
+        "package_id": 1,
+        "notes": null,
+        "tenant_id": 1,
+        "is_sabro_isp": 0,
+        "isp_status": "unlinked",
+        "isp_verified_at": null
       }
     ],
     "subscriptions": [
@@ -728,6 +687,16 @@
         "status": "expired",
         "auto_renew": 0,
         "created_at": "2026-11-09T03:33:02.891749"
+      },
+      {
+        "id": 47,
+        "subscriber_id": 98,
+        "package_id": 1,
+        "start_date": "2026-11-14T03:37:29.185021",
+        "expiry_date": "2026-12-14T03:37:29.185021",
+        "status": "active",
+        "auto_renew": 0,
+        "created_at": "2026-11-14T03:37:29.185021"
       }
     ],
     "payment_receipts": [
