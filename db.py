@@ -19,6 +19,14 @@ def get_db():
     conn.execute("PRAGMA synchronous = NORMAL")
     return conn
 
+def notify_vault_write():
+    """Flushes SQLite WAL and syncs vault snapshot to disk and remote cloud backends."""
+    try:
+        import data_vault
+        data_vault.on_write_event()
+    except Exception:
+        pass
+
 def init_db(force_reset=False):
     if force_reset and os.path.exists(DB_PATH):
         try:
@@ -400,6 +408,7 @@ def update_setting(key, value):
     """, (key, str(value)))
     conn.commit()
     conn.close()
+    notify_vault_write()
 
 # ----------------------------------------------------
 # Key Management & Voucher Helpers
@@ -424,6 +433,7 @@ def create_access_key(user_type='subscriber', customer_name='', phone='', durati
     
     conn.commit()
     conn.close()
+    notify_vault_write()
     return key_code
 
 def bulk_generate_keys(count=10, user_type='subscriber', duration_days=30, notes='', package_id=None):
@@ -442,6 +452,7 @@ def bulk_generate_keys(count=10, user_type='subscriber', duration_days=30, notes
         
     conn.commit()
     conn.close()
+    notify_vault_write()
     return generated_keys
 
 def validate_key(key_code, device_token=None):
@@ -578,6 +589,7 @@ def renew_key(key_id, extra_days=30):
     """, (new_exp.isoformat(), key_id))
     conn.commit()
     conn.close()
+    notify_vault_write()
     return True, f"Key renewed until {new_exp.strftime('%Y-%m-%d')} (+{extra_days} days)"
 
 def revoke_key(key_id):
@@ -585,6 +597,7 @@ def revoke_key(key_id):
     conn.execute("UPDATE access_keys SET status = 'revoked' WHERE id = ?", (key_id,))
     conn.commit()
     conn.close()
+    notify_vault_write()
     return True
 
 def delete_key(key_id):
@@ -592,6 +605,7 @@ def delete_key(key_id):
     conn.execute("DELETE FROM access_keys WHERE id = ?", (key_id,))
     conn.commit()
     conn.close()
+    notify_vault_write()
     return True
 
 def reset_device_lock(key_id):
@@ -599,6 +613,7 @@ def reset_device_lock(key_id):
     conn.execute("UPDATE access_keys SET device_token = NULL WHERE id = ?", (key_id,))
     conn.commit()
     conn.close()
+    notify_vault_write()
     return True
 
 def get_key_stats():
@@ -827,6 +842,7 @@ def add_channel(name, stream_url, logo="", category="Entertainment", group_title
     conn.commit()
     new_id = cursor.lastrowid
     conn.close()
+    notify_vault_write()
     return new_id
 
 def update_channel(channel_id, name, stream_url, logo="", category="Entertainment", group_title="", is_active=1, stream_type="hls"):
@@ -917,6 +933,7 @@ def create_subscriber(username, password, phone="", full_name="", key_code="", d
     
     sub_row = conn.execute("SELECT * FROM subscribers WHERE id = ?", (new_id,)).fetchone()
     conn.close()
+    notify_vault_write()
     return True, "Account created successfully! Your key is saved safely in your account.", dict(sub_row)
 
 def auto_provision_subscriber_from_key(key_code, device_token=None):
@@ -1037,6 +1054,7 @@ def auto_provision_subscriber_from_key(key_code, device_token=None):
     new_sub_row = conn.execute("SELECT * FROM subscribers WHERE id = ?", (new_sub_id,)).fetchone()
     updated_key_row = conn.execute("SELECT * FROM access_keys WHERE id = ?", (key_data["id"],)).fetchone()
     conn.close()
+    notify_vault_write()
 
     return True, "Account created automatically! Your login credentials are saved safely.", dict(new_sub_row), True, cand_pass, dict(updated_key_row)
 
@@ -1062,6 +1080,7 @@ def authenticate_subscriber(username, password):
     conn.execute("UPDATE subscribers SET last_login_at = ? WHERE id = ?", (now_str, sub_data["id"]))
     conn.commit()
     conn.close()
+    notify_vault_write()
     return True, f"Welcome back, {sub_data['username']}!", sub_data
 
 def get_subscriber_by_id(sub_id):
@@ -1151,6 +1170,7 @@ def link_key_to_subscriber(sub_id, key_code, device_token=None):
     conn.commit()
     sub_row = conn.execute("SELECT * FROM subscribers WHERE id = ?", (sub_id,)).fetchone()
     conn.close()
+    notify_vault_write()
     return True, f"Key {clean_key} safely linked to your account! Subscription active.", dict(sub_row)
 
 # ----------------------------------------------------
@@ -1220,6 +1240,7 @@ def add_package(name, code, duration_days=30, price_pkr=250, max_connections=1, 
     conn.commit()
     new_id = cursor.lastrowid
     conn.close()
+    notify_vault_write()
     return new_id
 
 def update_package(package_id, name, duration_days, price_pkr, max_connections=1, is_active=1, description="", allowed_categories="all"):
@@ -1231,6 +1252,7 @@ def update_package(package_id, name, duration_days, price_pkr, max_connections=1
     """, (name, int(duration_days), int(price_pkr), int(max_connections), int(is_active), description, allowed_categories or "all", package_id))
     conn.commit()
     conn.close()
+    notify_vault_write()
     return True
 
 def get_subscriber_subscription(subscriber_id):
@@ -1273,6 +1295,7 @@ def activate_subscriber_subscription(subscriber_id, package_id, days=None):
     conn.execute("UPDATE subscribers SET status = 'active', package_id = ? WHERE id = ?", (package_id, subscriber_id))
     conn.commit()
     conn.close()
+    notify_vault_write()
     return True, f"Subscription activated until {new_exp.strftime('%Y-%m-%d')} (+{duration} days)"
 
 def get_expiration_queue(within_days=7):
@@ -1371,6 +1394,7 @@ def add_subscriber(username, password, full_name="", phone="", pppoe_username=""
 
     sub_row = conn.execute("SELECT * FROM subscribers WHERE id = ?", (new_id,)).fetchone()
     conn.close()
+    notify_vault_write()
     return True, "Subscriber created successfully", dict(sub_row)
 
 def update_subscriber(sub_id, full_name, phone, pppoe_username="", zone="", fat_id="", email="", status="active", notes=""):
@@ -1382,6 +1406,7 @@ def update_subscriber(sub_id, full_name, phone, pppoe_username="", zone="", fat_
     """, (full_name.strip(), phone.strip(), pppoe_username.strip(), zone.strip(), fat_id.strip(), email.strip(), status, notes.strip(), sub_id))
     conn.commit()
     conn.close()
+    notify_vault_write()
     return True
 
 def delete_subscriber(sub_id):
@@ -1391,6 +1416,7 @@ def delete_subscriber(sub_id):
     conn.execute("DELETE FROM subscribers WHERE id = ?", (sub_id,))
     conn.commit()
     conn.close()
+    notify_vault_write()
     return True
 
 # ----------------------------------------------------
@@ -1407,6 +1433,7 @@ def submit_payment_receipt(subscriber_id, package_id, amount_pkr, payment_method
     conn.commit()
     new_id = cursor.lastrowid
     conn.close()
+    notify_vault_write()
     return new_id
 
 def get_payment_receipts(status=None, limit=50):
@@ -1450,6 +1477,7 @@ def approve_payment_receipt(receipt_id, admin_user, notes=""):
         activate_subscriber_subscription(r_dict["subscriber_id"], r_dict["package_id"])
 
     log_audit(admin_user, "APPROVE_PAYMENT", f"Approved payment receipt #{receipt_id} for PKR {r_dict['amount_pkr']} ({r_dict['payment_method']})")
+    notify_vault_write()
     return True, "Payment approved and subscription automatically activated!"
 
 def reject_payment_receipt(receipt_id, admin_user, notes=""):
@@ -1463,6 +1491,7 @@ def reject_payment_receipt(receipt_id, admin_user, notes=""):
     conn.commit()
     conn.close()
     log_audit(admin_user, "REJECT_PAYMENT", f"Rejected payment receipt #{receipt_id}. Reason: {notes}")
+    notify_vault_write()
     return True, "Payment receipt marked as rejected"
 
 # ----------------------------------------------------
@@ -1809,6 +1838,7 @@ def create_reseller_inquiry(company_name, contact_name, phone, email="", city=""
     conn.commit()
     new_id = cursor.lastrowid
     conn.close()
+    notify_vault_write()
     return new_id
 
 def get_reseller_inquiries(status=None, limit=50):
@@ -1829,4 +1859,5 @@ def update_reseller_inquiry_status(inquiry_id, status):
     conn.execute("UPDATE reseller_inquiries SET status = ? WHERE id = ?", (status, int(inquiry_id)))
     conn.commit()
     conn.close()
+    notify_vault_write()
 

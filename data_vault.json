@@ -1,0 +1,89 @@
+{
+  "platform": "SABRO VISION",
+  "exported_at": "2026-11-13T19:21:32.482224",
+  "version": "1.0",
+  "tables": {
+    "settings": [
+      {
+        "key": "platform_name",
+        "value": "SABRO VISION"
+      },
+      {
+        "key": "tagline",
+        "value": "Exclusive High-Speed Streaming - Powered by Sabro Networks"
+      },
+      {
+        "key": "currency",
+        "value": "PKR"
+      },
+      {
+        "key": "monthly_price",
+        "value": "250"
+      },
+      {
+        "key": "phone",
+        "value": "0300-1234567"
+      },
+      {
+        "key": "whatsapp",
+        "value": "923001234567"
+      },
+      {
+        "key": "jazzcash_title",
+        "value": "Sabro Networks"
+      },
+      {
+        "key": "jazzcash_number",
+        "value": "0300-1234567"
+      },
+      {
+        "key": "easypaisa_title",
+        "value": "Sabro Networks"
+      },
+      {
+        "key": "easypaisa_number",
+        "value": "0300-1234567"
+      },
+      {
+        "key": "bank_name",
+        "value": "Meezan Bank"
+      },
+      {
+        "key": "bank_account_title",
+        "value": "Sabro Networks Vision"
+      },
+      {
+        "key": "bank_account_number",
+        "value": "0101-0105678901"
+      },
+      {
+        "key": "stream_proxy_enabled",
+        "value": "1"
+      },
+      {
+        "key": "announcement",
+        "value": "Welcome to Sabro Vision! Enjoy bufferless Live Sports, News & HD Entertainment."
+      },
+      {
+        "key": "session_secret_key",
+        "value": "c118785c1765e543ae4db6faeeb0fea66eef009cc1e5a5c4114921a0fc8d933f"
+      }
+    ],
+    "admin_users": [
+      {
+        "id": 2,
+        "username": "ahmedbaloch",
+        "password_hash": "scrypt:32768:8:1$JkoQuTjdSdNazPhm$85fa8e982643ffd1fc0df299e5e99bb631e9b1be29940879a04d4c8ffe75005beb3ce77be0e2d3038a89127fc4936b38abb20632945e2f7d48905ed0b8571d97",
+        "role": "admin",
+        "created_at": "2026-11-07T22:41:15.842424"
+      }
+    ],
+    "access_keys": [],
+    "subscribers": [],
+    "subscriptions": [],
+    "payment_receipts": [],
+    "reseller_inquiries": [],
+    "favorites": [],
+    "audit_logs": []
+  }
+}

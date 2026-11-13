@@ -3,42 +3,54 @@
 {% block title %}VIP Access - {{ settings.platform_name }}{% endblock %}
 
 {% block content %}
-<div class="min-h-[75vh] flex flex-col items-center justify-center py-6 sm:py-10 px-4">
+<div class="min-h-[80vh] flex flex-col items-center justify-center py-6 sm:py-12 px-4 relative">
 
-    <!-- Ambient Glowing Backdrop -->
+    <!-- Ambient Glowing Backdrop Lighting -->
     <div class="relative w-full max-w-lg">
-        <div class="absolute -top-16 left-1/2 -translate-x-1/2 w-80 h-80 bg-brand-600/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-96 h-96 bg-brand-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-16 right-0 w-72 h-72 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none"></div>
 
         <!-- Cinema Direct Login Card -->
-        <div class="cinema-glass-card relative rounded-3xl p-6 sm:p-9 border border-white/[0.1] shadow-2xl backdrop-blur-2xl bg-obsidian-900/90 overflow-hidden">
+        <div class="cinema-glass-card relative rounded-3xl p-6 sm:p-9 border border-cyan-500/20 shadow-[0_0_50px_rgba(6,182,212,0.15)] backdrop-blur-2xl bg-obsidian-900/90 overflow-hidden">
             
+            <!-- Live Status & Channels Pill -->
+            <div class="flex items-center justify-between mb-4 px-3 py-1.5 rounded-full bg-cyan-950/40 border border-cyan-500/20 text-[11px]">
+                <span class="inline-flex items-center gap-1.5 text-cyan-300 font-semibold">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 live-pulse"></span>
+                    <span>11,459+ Live Channels & Movies</span>
+                </span>
+                <span class="text-slate-400 font-mono text-[10px]">Ultra HD • Bufferless</span>
+            </div>
+
             <!-- Sleek Top Header -->
             <div class="text-center mb-6">
-                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-600 via-sky-500 to-indigo-600 shadow-xl shadow-brand-500/25 mb-3 border border-white/20">
-                    <i class="fa-solid fa-tv text-white text-xl"></i>
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-600 via-cyan-500 to-indigo-600 shadow-xl shadow-brand-500/30 mb-3 border border-white/20 transform hover:scale-105 transition-transform duration-300">
+                    <i class="fa-solid fa-tv text-white text-2xl"></i>
                 </div>
-                <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                    {{ settings.platform_name }}
+                <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center justify-center gap-2">
+                    <span>{{ settings.platform_name }}</span>
+                    <span class="px-2 py-0.5 rounded-md bg-brand-500/20 text-brand-300 text-[10px] font-mono font-bold uppercase tracking-wider border border-brand-500/30">VIP Portal</span>
                 </h1>
-                <p class="text-xs text-slate-400 mt-1 font-medium">
-                    Direct VIP Access • 11,459+ Live Channels & Movies
+                <p class="text-xs text-slate-300 mt-1 font-medium">
+                    {{ settings.tagline or "Exclusive High-Speed Streaming - Powered by Sabro Networks" }}
                 </p>
             </div>
 
-            <!-- Tab Switcher (Direct Key vs Account Login) -->
+            <!-- Active Session Notice -->
             {% if current_key_info %}
             <div class="mb-5 p-3 rounded-2xl bg-emerald-950/50 border border-emerald-500/30 flex items-center justify-between gap-3 text-xs">
                 <span class="text-emerald-200 font-semibold flex items-center gap-2">
                     <i class="fa-solid fa-circle-check text-emerald-400"></i>
                     <span>Session active ({{ current_key_info.days_left }}d left)</span>
                 </span>
-                <a href="{{ url_for('index') }}" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] transition-all shrink-0">
+                <a href="{{ url_for('index') }}" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] transition-all shrink-0 shadow-md shadow-emerald-600/30">
                     Watch Live TV &rarr;
                 </a>
             </div>
             {% endif %}
 
-            <div class="flex rounded-2xl bg-obsidian-950/80 p-1 mb-6 border border-white/[0.06]">
+            <!-- Dual Tab Switcher -->
+            <div class="flex rounded-2xl bg-obsidian-950/80 p-1 mb-6 border border-white/[0.08] shadow-inner">
                 <button type="button" onclick="switchGatekeeperTab('keyTab', this)" id="btnTabKey" 
                         class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 bg-brand-600 text-white shadow-md shadow-brand-500/30">
                     <i class="fa-solid fa-bolt text-xs text-amber-300"></i>
@@ -51,17 +63,26 @@
                 </button>
             </div>
 
-            <!-- Tab 1: Direct Access Key Input (Primary & Focused) -->
+            <!-- Tab 1: Direct Access Key Input (Primary & Fast) -->
             <div id="keyTab" class="space-y-4">
                 <form action="{{ url_for('activate') }}" method="POST" class="space-y-4">
                     <div>
-                        <label for="key_code" class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-2 text-center">
-                            <i class="fa-solid fa-key text-brand-400 mr-1.5"></i> Enter Monthly Access Key
-                        </label>
+                        <div class="flex items-center justify-between mb-2">
+                            <label for="key_code" class="text-[11px] font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                                <i class="fa-solid fa-key text-brand-400"></i> Enter Monthly Access Key
+                            </label>
+                            <button type="button" onclick="pasteKeyFromClipboard()" class="text-[10px] font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors">
+                                <i class="fa-regular fa-paste"></i>
+                                <span>Paste Key</span>
+                            </button>
+                        </div>
                         <div class="relative">
                             <input type="text" name="key_code" id="key_code" required autofocus
                                    placeholder="SABRO-XXXX-XXXX-XXXX" 
-                                   class="w-full bg-obsidian-950/90 text-lg font-mono tracking-widest text-white px-4 py-3.5 rounded-2xl border border-white/[0.12] focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 uppercase placeholder:text-slate-600 transition-all text-center font-bold shadow-inner">
+                                   autocomplete="off"
+                                   autocapitalize="characters"
+                                   oninput="formatKeyCodeInput(this)"
+                                   class="w-full bg-obsidian-950/90 text-lg sm:text-xl font-mono tracking-widest text-white px-4 py-3.5 rounded-2xl border border-cyan-500/30 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 uppercase placeholder:text-slate-600 transition-all text-center font-bold shadow-inner">
                         </div>
                         <p class="text-[11px] text-slate-400 mt-2 text-center flex items-center justify-center gap-1.5 font-medium">
                             <i class="fa-solid fa-shield-halved text-emerald-400 text-xs"></i> 
@@ -83,7 +104,7 @@
                 </div>
             </div>
 
-            <!-- Tab 2: Username & Password Login (Hidden by default) -->
+            <!-- Tab 2: Username & Password Login -->
             <div id="loginTab" class="space-y-4 hidden">
                 <form action="{{ url_for('user_login') }}" method="POST" class="space-y-4">
                     <div>
@@ -125,7 +146,7 @@
         </div>
 
         <!-- Clean Multi-Screen Sub-bar -->
-        <div class="mt-4 flex items-center justify-between px-3 py-2 rounded-2xl bg-obsidian-900/60 border border-white/[0.06] text-[11px] text-slate-400 flex-wrap gap-2">
+        <div class="mt-4 flex items-center justify-between px-4 py-2.5 rounded-2xl bg-obsidian-900/60 border border-white/[0.08] text-[11px] text-slate-400 flex-wrap gap-2">
             <div class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 live-pulse"></span>
                 <span class="font-bold text-slate-300 uppercase tracking-wider text-[10px]">Multi-Screen Ready:</span>
@@ -144,7 +165,7 @@
         </div>
 
         <!-- Expandable Subscription, Payment & B2B Partner Details (Uncluttered Drawer) -->
-        <details class="group mt-4 rounded-2xl bg-obsidian-900/70 border border-white/[0.08] transition-all duration-300 overflow-hidden">
+        <details class="group mt-4 rounded-2xl bg-obsidian-900/70 border border-white/[0.08] transition-all duration-300 overflow-hidden" open>
             <summary class="cursor-pointer list-none px-4 py-3 flex items-center justify-between text-xs font-semibold text-slate-300 hover:text-white transition-colors select-none">
                 <span class="flex items-center gap-2">
                     <i class="fa-solid fa-circle-question text-cyan-400"></i>
@@ -156,50 +177,52 @@
             <div class="px-4 pb-4 pt-1 space-y-4 border-t border-white/[0.06] text-xs">
                 
                 <!-- Pricing Highlights -->
-                <div class="p-3 rounded-xl bg-obsidian-950/80 border border-white/[0.06] space-y-1.5">
+                <div class="p-3.5 rounded-xl bg-obsidian-950/80 border border-white/[0.06] space-y-2">
                     <div class="flex items-center justify-between">
-                        <span class="text-emerald-400 font-bold text-[11px] uppercase tracking-wide">
-                            <i class="fa-solid fa-check-circle mr-1"></i> Sabro Networks Subscribers (Sabro Networks Users: 100% Free Forever)
+                        <span class="text-emerald-400 font-bold text-[11px] uppercase tracking-wide flex items-center gap-1">
+                            <i class="fa-solid fa-check-circle"></i> Sabro Networks Subscribers (Sabro Networks Users: 100% Free Forever)
                         </span>
                         <span class="text-emerald-400 font-mono text-[10px] font-bold">0 PKR</span>
                     </div>
                     <div class="flex items-center justify-between">
-                        <span class="text-cyan-300 font-bold text-[11px] uppercase tracking-wide">
-                            <i class="fa-solid fa-star mr-1 text-amber-300"></i> Outsiders: Flat 250 PKR (1 Screen)
+                        <span class="text-cyan-300 font-bold text-[11px] uppercase tracking-wide flex items-center gap-1">
+                            <i class="fa-solid fa-star text-amber-300"></i> Outsiders: Flat 250 PKR (1 Screen)
                         </span>
                         <span class="text-cyan-300 font-mono text-[10px] font-bold">PKR 250</span>
                     </div>
-                    <p class="text-[11px] text-slate-400 pt-1">
+                    <p class="text-[11px] text-slate-400 pt-1 leading-relaxed">
                         The <strong class="text-white">All-In-One Monthly Pass</strong> includes all 11,459 channels, live sports, movies, and VOD on 1 Screen.
                     </p>
                 </div>
 
                 <!-- Payment Accounts (JazzCash & EasyPaisa) -->
-                <div class="space-y-1.5">
+                <div class="space-y-2">
                     <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                        Direct Payment Accounts:
+                        Direct Payment Accounts (Instant Activation):
                     </div>
                     <!-- JazzCash -->
-                    <div class="flex items-center justify-between bg-obsidian-950/80 px-3 py-2 rounded-xl border border-white/[0.06]">
+                    <div class="flex items-center justify-between bg-obsidian-950/80 px-3 py-2.5 rounded-xl border border-white/[0.06]">
                         <div class="flex items-center gap-2 text-[11px]">
                             <span class="font-bold text-amber-400">JazzCash:</span>
-                            <span class="text-white font-mono font-semibold">{{ settings.jazzcash_number }}</span>
+                            <span class="text-white font-mono font-semibold" id="valJazzCash">{{ settings.jazzcash_number }}</span>
                             <span class="text-slate-400 text-[10px]">({{ settings.jazzcash_title }})</span>
                         </div>
-                        <button type="button" onclick="navigator.clipboard.writeText('{{ settings.jazzcash_number }}'); alert('JazzCash copied!');" class="text-slate-400 hover:text-white" title="Copy">
-                            <i class="fa-regular fa-copy text-xs"></i>
+                        <button type="button" onclick="copyToClipboard('{{ settings.jazzcash_number }}', this)" class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-[11px] flex items-center gap-1 transition-all" title="Copy Number">
+                            <i class="fa-regular fa-copy"></i>
+                            <span>Copy</span>
                         </button>
                     </div>
 
                     <!-- EasyPaisa -->
-                    <div class="flex items-center justify-between bg-obsidian-950/80 px-3 py-2 rounded-xl border border-white/[0.06]">
+                    <div class="flex items-center justify-between bg-obsidian-950/80 px-3 py-2.5 rounded-xl border border-white/[0.06]">
                         <div class="flex items-center gap-2 text-[11px]">
                             <span class="font-bold text-emerald-400">EasyPaisa:</span>
-                            <span class="text-white font-mono font-semibold">{{ settings.easypaisa_number }}</span>
+                            <span class="text-white font-mono font-semibold" id="valEasyPaisa">{{ settings.easypaisa_number }}</span>
                             <span class="text-slate-400 text-[10px]">({{ settings.easypaisa_title }})</span>
                         </div>
-                        <button type="button" onclick="navigator.clipboard.writeText('{{ settings.easypaisa_number }}'); alert('EasyPaisa copied!');" class="text-slate-400 hover:text-white" title="Copy">
-                            <i class="fa-regular fa-copy text-xs"></i>
+                        <button type="button" onclick="copyToClipboard('{{ settings.easypaisa_number }}', this)" class="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-[11px] flex items-center gap-1 transition-all" title="Copy Number">
+                            <i class="fa-regular fa-copy"></i>
+                            <span>Copy</span>
                         </button>
                     </div>
                 </div>
@@ -208,11 +231,11 @@
                 <div class="flex items-center justify-between gap-2 pt-1">
                     <a href="https://wa.me/{{ clean_whatsapp }}?text=Assalam-o-Alaikum%20Sabro%20IPTV,%20I%20want%20to%20get%20an%20Access%20Key." 
                        target="_blank" 
-                       class="flex-1 py-2 px-3 rounded-xl bg-emerald-600/80 hover:bg-emerald-600 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 transition-all">
+                       class="flex-1 py-2.5 px-3 rounded-xl bg-emerald-600/90 hover:bg-emerald-600 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 transition-all shadow-md shadow-emerald-700/20">
                         <i class="fa-brands fa-whatsapp text-sm"></i>
                         <span>WhatsApp Helpline</span>
                     </a>
-                    <a href="{{ url_for('public_packages') }}" class="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-[11px] transition-all">
+                    <a href="{{ url_for('public_packages') }}" class="py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-[11px] transition-all">
                         <span>Packages</span>
                     </a>
                 </div>
@@ -253,6 +276,46 @@
         } else {
             document.getElementById('user_username').focus();
         }
+    }
+
+    function formatKeyCodeInput(input) {
+        let val = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        if (val.startsWith('SABRO')) {
+            let rest = val.substring(5);
+            let parts = ['SABRO'];
+            for (let i = 0; i < rest.length; i += 4) {
+                parts.push(rest.substring(i, Math.min(i + 4, rest.length)));
+            }
+            input.value = parts.join('-');
+        } else if (val.length > 5) {
+            input.value = val;
+        }
+    }
+
+    async function pasteKeyFromClipboard() {
+        try {
+            const text = await navigator.clipboard.readText();
+            if (text) {
+                const input = document.getElementById('key_code');
+                input.value = text.trim();
+                formatKeyCodeInput(input);
+                input.focus();
+            }
+        } catch (e) {
+            document.getElementById('key_code').focus();
+        }
+    }
+
+    function copyToClipboard(text, btn) {
+        navigator.clipboard.writeText(text).then(() => {
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i> <span>Copied!</span>';
+            setTimeout(() => {
+                btn.innerHTML = orig;
+            }, 2000);
+        }).catch(() => {
+            prompt('Copy number:', text);
+        });
     }
 </script>
 {% endblock %}

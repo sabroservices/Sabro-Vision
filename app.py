@@ -32,7 +32,34 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 # Ensure DB schema and initial seeds are ready (works for both run.py and gunicorn app:app)
 seeds.seed_database(force_reset=False)
 
+# Bootstrap multi-layer persistence (restores vault state from disk across restarts)
+import data_vault
+data_vault.bootstrap_persistence()
+
 APP_START_TIME = datetime.now()
+
+@app.before_request
+def enforce_https_and_gatekeeper_shift():
+    # 1. Enforce HTTPS when running on Render or reverse proxy
+    proto = request.headers.get("X-Forwarded-Proto", "").lower()
+    host = request.headers.get("Host", "").lower()
+    
+    if proto == "http" and ("onrender.com" in host or not app.debug):
+        secure_url = request.url.replace("http://", "https://", 1)
+        return redirect(secure_url, code=301)
+
+    # 2. Shift all visitors arriving at root "/" to /gatekeeper if unauthenticated
+    if request.path == "/":
+        key_code = session.get("key_code")
+        device_token = request.cookies.get("sabro_device_id")
+        is_valid = False
+        if key_code:
+            is_valid, _, _ = db.validate_key(key_code, device_token)
+            
+        if not is_valid:
+            # Shift into /gatekeeper with full HTTPS scheme on Render
+            scheme = "https" if ("onrender.com" in host or proto == "https") else request.scheme
+            return redirect(url_for("gatekeeper", _external=True, _scheme=scheme), code=302)
 
 # Persistent Secret Key
 _settings = db.get_settings()
@@ -1694,6 +1721,87 @@ def admin_audit():
     audit_logs = db.get_audit_logs(limit=100)
     conn_events = db.get_connection_events(limit=100)
     return render_template("admin_audit.html", audit_logs=audit_logs, conn_events=conn_events)
+
+# ----------------------------------------------------
+# SABRO VISION v1.0 - Data Vault & Backup Management
+# ----------------------------------------------------
+@app.route("/admin/backup")
+@admin_required
+def admin_backup():
+    import data_vault
+    db_size = 0
+    if os.path.exists(db.DB_PATH):
+        db_size = round(os.path.getsize(db.DB_PATH) / (1024 * 1024), 2)
+    
+    conn = db.get_db()
+    counts = {
+        "key_count": conn.execute("SELECT COUNT(*) FROM access_keys").fetchone()[0],
+        "subscribers": conn.execute("SELECT COUNT(*) FROM subscribers").fetchone()[0],
+        "channels": conn.execute("SELECT COUNT(*) FROM channels").fetchone()[0],
+        "payments": conn.execute("SELECT COUNT(*) FROM payment_receipts").fetchone()[0],
+        "inquiries": conn.execute("SELECT COUNT(*) FROM reseller_inquiries").fetchone()[0],
+    }
+    conn.close()
+
+    storage_mode = "Persistent Volume" if os.environ.get("DATABASE_PATH") else "Local Vault Engine"
+    vault_exists = os.path.exists(data_vault.VAULT_FILE)
+
+    return render_template(
+        "admin_backup.html",
+        db_path=db.DB_PATH,
+        db_size_mb=db_size,
+        storage_mode=storage_mode,
+        vault_exists=vault_exists,
+        counts=counts
+    )
+
+@app.route("/admin/backup/trigger", methods=["POST"])
+@admin_required
+def admin_trigger_backup():
+    import data_vault
+    data_vault.save_vault_snapshot_to_disk()
+    data_vault.sync_to_github_if_configured()
+    flash("Database WAL checkpointed and Data Vault snapshot saved successfully!", "success")
+    return redirect(url_for("admin_backup"))
+
+@app.route("/admin/backup/download-db")
+@admin_required
+def admin_download_db():
+    import data_vault
+    data_vault.checkpoint_wal()
+    filename = f"sabro_iptv_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
+    return send_file(db.DB_PATH, as_attachment=True, download_name=filename)
+
+@app.route("/admin/backup/download-json")
+@admin_required
+def admin_download_json():
+    import data_vault
+    data_vault.save_vault_snapshot_to_disk()
+    filename = f"sabro_vault_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    return send_file(data_vault.VAULT_FILE, as_attachment=True, download_name=filename)
+
+@app.route("/admin/backup/restore", methods=["POST"])
+@admin_required
+def admin_restore_backup():
+    import data_vault
+    file = request.files.get("backup_file")
+    if not file or not file.filename:
+        flash("Please select a valid backup file (.json).", "error")
+        return redirect(url_for("admin_backup"))
+
+    filename = file.filename.lower()
+    if filename.endswith(".json"):
+        import json
+        try:
+            snapshot = json.load(file.stream)
+            count = data_vault.import_vault_snapshot(snapshot)
+            flash(f"Successfully restored {count} records into database from JSON vault!", "success")
+        except Exception as e:
+            flash(f"Error restoring JSON vault: {str(e)}", "error")
+    else:
+        flash("Unsupported file format. Please upload a .json vault snapshot.", "error")
+
+    return redirect(url_for("admin_backup"))
 
 # ----------------------------------------------------
 # SABRO VISION v1.0 - PWA Manifest & Service Worker

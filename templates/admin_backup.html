@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}Data Vault & Persistence - Sabro Vision Admin{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Admin Nav Tabs -->
+    <div class="flex items-center justify-between border-b border-white/[0.08] pb-4 flex-wrap gap-4">
+        <div class="flex items-center gap-2 overflow-x-auto scrollbar-none text-xs font-bold">
+            <a href="{{ url_for('admin_dashboard') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-cyan-300"></i>
+                <span>Overview</span>
+            </a>
+            <a href="{{ url_for('admin_customers') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-users text-cyan-400"></i>
+                <span>Customers & PPPoE</span>
+            </a>
+            <a href="{{ url_for('admin_xtream') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-server text-emerald-400"></i>
+                <span>Xtream Codes API</span>
+            </a>
+            <a href="{{ url_for('admin_resellers') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-handshake text-cyan-300"></i>
+                <span>Resellers & B2B</span>
+            </a>
+            <a href="{{ url_for('admin_payments') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice-dollar text-amber-400"></i>
+                <span>Payment Queue</span>
+            </a>
+            <a href="{{ url_for('admin_packages') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-box-archive text-purple-400"></i>
+                <span>Packages</span>
+            </a>
+            <a href="{{ url_for('admin_keys') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-key text-amber-400"></i>
+                <span>Access Keys</span>
+            </a>
+            <a href="{{ url_for('admin_channels') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-tv text-sky-400"></i>
+                <span>Channels</span>
+            </a>
+            <a href="{{ url_for('admin_backup') }}" class="px-3.5 py-2 rounded-xl bg-cyan-600 text-white shadow-md shadow-cyan-600/30 flex items-center gap-2">
+                <i class="fa-solid fa-database text-white"></i>
+                <span>Data Vault & Backups</span>
+            </a>
+            <a href="{{ url_for('admin_audit') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-shield text-rose-400"></i>
+                <span>Audit & Security</span>
+            </a>
+            <a href="{{ url_for('admin_settings') }}" class="px-3.5 py-2 rounded-xl bg-obsidian-900 text-slate-300 hover:text-white border border-white/[0.08] flex items-center gap-2">
+                <i class="fa-solid fa-gear text-slate-400"></i>
+                <span>Settings</span>
+            </a>
+        </div>
+
+        <a href="{{ url_for('admin_logout') }}" class="px-3.5 py-2 rounded-xl bg-rose-950/40 text-rose-300 border border-rose-800/50 hover:bg-rose-900/60 text-xs font-semibold flex items-center gap-1.5 transition-all">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+
+    <!-- Top Hero Card -->
+    <div class="p-6 rounded-3xl bg-gradient-to-r from-obsidian-900 via-cyan-950/40 to-obsidian-900 border border-cyan-500/20 shadow-2xl relative overflow-hidden">
+        <div class="relative z-10 flex items-start justify-between gap-4 flex-wrap">
+            <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold mb-3">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 live-pulse"></span>
+                    <span>MULTI-LAYER DATA PERSISTENCE ENGINE</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                    Database & Data Vault Management
+                </h1>
+                <p class="text-sm text-slate-300 mt-1 max-w-2xl">
+                    Guarantees zero data loss across Render container restarts, cloud dyno recycles, and manual redeployments.
+                </p>
+            </div>
+
+            <!-- Quick Trigger Button -->
+            <form action="{{ url_for('admin_trigger_backup') }}" method="POST">
+                <button type="submit" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-brand-600 hover:from-cyan-400 hover:to-brand-500 text-white font-extrabold text-xs shadow-lg shadow-cyan-500/30 flex items-center gap-2 transition-all transform active:scale-95">
+                    <i class="fa-solid fa-floppy-disk text-amber-300"></i>
+                    <span>Flush WAL & Save Vault Now</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4 Metrics Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- DB Path -->
+        <div class="p-5 rounded-2xl bg-obsidian-900/80 border border-white/[0.08] backdrop-blur-xl">
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between">
+                <span>Active Database</span>
+                <i class="fa-solid fa-database text-cyan-400"></i>
+            </div>
+            <div class="text-sm font-mono font-bold text-white truncate" title="{{ db_path }}">
+                {{ db_path.split('/')[-1].split('\\')[-1] }}
+            </div>
+            <div class="text-[11px] text-slate-400 mt-1">
+                Size: <strong class="text-cyan-300 font-mono">{{ db_size_mb }} MB</strong>
+            </div>
+        </div>
+
+        <!-- Persistence Status -->
+        <div class="p-5 rounded-2xl bg-obsidian-900/80 border border-white/[0.08] backdrop-blur-xl">
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between">
+                <span>Storage Mode</span>
+                <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+            </div>
+            <div class="text-sm font-bold text-emerald-400 flex items-center gap-1.5">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>{{ storage_mode }}</span>
+            </div>
+            <div class="text-[11px] text-slate-400 mt-1">
+                Vault: <strong class="text-white">{{ "Active" if vault_exists else "Initializing" }}</strong>
+            </div>
+        </div>
+
+        <!-- Protected Entities -->
+        <div class="p-5 rounded-2xl bg-obsidian-900/80 border border-white/[0.08] backdrop-blur-xl">
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between">
+                <span>Total Entities</span>
+                <i class="fa-solid fa-users-gear text-indigo-400"></i>
+            </div>
+            <div class="text-xl font-mono font-black text-white">
+                {{ counts.key_count + counts.subscribers }}
+            </div>
+            <div class="text-[11px] text-slate-400 mt-1">
+                {{ counts.key_count }} Keys • {{ counts.subscribers }} Subscribers
+            </div>
+        </div>
+
+        <!-- Channels & Packages -->
+        <div class="p-5 rounded-2xl bg-obsidian-900/80 border border-white/[0.08] backdrop-blur-xl">
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between">
+                <span>Channels & Catalog</span>
+                <i class="fa-solid fa-tv text-amber-400"></i>
+            </div>
+            <div class="text-xl font-mono font-black text-white">
+                {{ counts.channels }}
+            </div>
+            <div class="text-[11px] text-slate-400 mt-1">
+                22 Categories • 16 Packages
+            </div>
+        </div>
+    </div>
+
+    <!-- Two Action Columns: Downloads vs Restore -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Column 1: Download Backups -->
+        <div class="p-6 rounded-3xl bg-obsidian-900/80 border border-white/[0.08] backdrop-blur-xl space-y-4">
+            <div class="flex items-center gap-2 text-white font-bold text-base">
+                <i class="fa-solid fa-cloud-arrow-down text-cyan-400"></i>
+                <span>Download Live Backups</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                Download a complete, offline copy of your IPTV server data at any time. You can safely store these backups locally or use them to migrate to any VPS or server.
+            </p>
+
+            <div class="space-y-3 pt-2">
+                <!-- Download SQLite .db -->
+                <a href="{{ url_for('admin_download_db') }}" class="p-4 rounded-2xl bg-obsidian-950/80 border border-white/[0.06] hover:border-cyan-500/40 flex items-center justify-between gap-3 transition-all group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-sm">
+                            .DB
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors">
+                                Full SQLite Database File
+                            </div>
+                            <div class="text-[11px] text-slate-400">
+                                Contains all 11,459 channels, categories, packages, keys, and settings.
+                            </div>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-download text-slate-400 group-hover:text-white transition-colors"></i>
+                </a>
+
+                <!-- Download JSON Vault -->
+                <a href="{{ url_for('admin_download_json') }}" class="p-4 rounded-2xl bg-obsidian-950/80 border border-white/[0.06] hover:border-indigo-500/40 flex items-center justify-between gap-3 transition-all group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold text-sm">
+                            JSON
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-white group-hover:text-indigo-300 transition-colors">
+                                Portable Data Vault Snapshot
+                            </div>
+                            <div class="text-[11px] text-slate-400">
+                                Lightweight JSON format with all customer keys, logins, receipts, and settings.
+                            </div>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-download text-slate-400 group-hover:text-white transition-colors"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Column 2: Upload & Restore -->
+        <div class="p-6 rounded-3xl bg-obsidian-900/80 border border-white/[0.08] backdrop-blur-xl space-y-4">
+            <div class="flex items-center gap-2 text-white font-bold text-base">
+                <i class="fa-solid fa-cloud-arrow-up text-emerald-400"></i>
+                <span>Upload & Restore Data</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                Restore subscribers, access keys, payment records, and configuration from a previously exported <code class="text-cyan-300 bg-white/5 px-1 py-0.5 rounded font-mono">.json</code> snapshot.
+            </p>
+
+            <form action="{{ url_for('admin_restore_backup') }}" method="POST" enctype="multipart/form-data" class="space-y-4 pt-2">
+                <div class="p-4 rounded-2xl bg-obsidian-950/80 border border-dashed border-white/[0.15] hover:border-cyan-500/40 text-center transition-all">
+                    <input type="file" name="backup_file" id="backup_file" required accept=".json,.db" class="hidden" onchange="document.getElementById('file-chosen').textContent = this.files[0].name">
+                    <label for="backup_file" class="cursor-pointer flex flex-col items-center justify-center gap-2 py-4">
+                        <i class="fa-solid fa-file-arrow-up text-2xl text-cyan-400"></i>
+                        <span class="text-xs font-bold text-white">Choose Backup File (.json or .db)</span>
+                        <span id="file-chosen" class="text-[11px] text-slate-400 font-mono">No file selected</span>
+                    </label>
+                </div>
+
+                <button type="submit" onclick="return confirm('Restore data from this file? Existing channels and categories will be preserved while new customers/keys are merged.');" class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>Execute Data Restore</span>
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- Render Persistence Instructions -->
+    <div class="p-6 rounded-3xl bg-obsidian-900/60 border border-white/[0.08] space-y-3">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-brands fa-cloudflare text-amber-400"></i>
+            <span>Render Cloud Deployment Persistence Guidelines</span>
+        </h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+            By default, Render Free Tier web services use ephemeral containers that refresh during restarts. Sabro Vision solves this automatically:
+        </p>
+        <ul class="text-xs text-slate-400 space-y-1.5 list-disc list-inside">
+            <li><strong class="text-white">Built-in Data Vault:</strong> All subscriber keys, logins, and settings are written into <code class="text-cyan-300 font-mono">data_vault.json</code> with WAL checkpointing on every write.</li>
+            <li><strong class="text-white">Render Persistent Disk (Recommended for Production):</strong> Attach a persistent disk mounted at <code class="text-cyan-300 font-mono">/var/data</code> and set environment variable <code class="text-cyan-300 font-mono">DATABASE_PATH=/var/data/sabro_iptv.db</code>.</li>
+            <li><strong class="text-white">GitHub Auto-Sync:</strong> If you set <code class="text-cyan-300 font-mono">GITHUB_TOKEN</code> in Render environment variables, Sabro Vision automatically commits new data snapshots back to your GitHub repository!</li>
+        </ul>
+    </div>
+
+</div>
+{% endblock %}

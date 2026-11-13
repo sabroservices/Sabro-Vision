@@ -30,6 +30,11 @@ class TestSabroIPTV(unittest.TestCase):
                 os.remove(cls.test_db_path)
             except OSError:
                 pass
+        conn = db.get_db()
+        for t in ['access_keys', 'subscribers', 'subscriptions', 'favorites', 'payment_receipts', 'reseller_inquiries', 'audit_logs', 'connection_events']:
+            conn.execute(f"DELETE FROM {t}")
+        conn.commit()
+        conn.close()
 
     def test_01_database_tables_and_seeds(self):
         """Verify categories, initial channels, and settings are seeded correctly."""
