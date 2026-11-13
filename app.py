@@ -1428,7 +1428,7 @@ def submit_payment():
 
     if request.method == "POST":
         package_id = safe_int(request.form.get("package_id"), 0, min_val=1) or None
-        amount_pkr = request.form.get("amount_pkr") or request.form.get("amount") or "250"
+        amount_pkr = request.form.get("amount_pkr") or request.form.get("amount") or "150"
         payment_method = request.form.get("payment_method", "JazzCash")
         transaction_ref = (request.form.get("transaction_ref") or request.form.get("transaction_id") or "").strip()
         sender_number = (request.form.get("sender_number") or request.form.get("sender_account") or "").strip()
@@ -1438,7 +1438,7 @@ def submit_payment():
             flash("Please enter your transaction ID / reference code.", "error")
             return render_template("payment_submit.html", subscriber=sub, packages=packages, settings=settings)
 
-        amt = safe_int(amount_pkr, 250, min_val=0)
+        amt = safe_int(amount_pkr, 150, min_val=0)
 
         db.submit_payment_receipt(
             subscriber_id=sub["id"],
