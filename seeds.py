@@ -214,7 +214,7 @@ def seed_database(force_reset=False):
         "platform_name": "SABRO VISION",
         "tagline": "Exclusive High-Speed Streaming - Powered by Sabro Networks",
         "currency": "PKR",
-        "monthly_price": "250",
+        "monthly_price": "150",
         "phone": "0300-1234567",
         "whatsapp": "923001234567",
         "jazzcash_title": "Sabro Networks",
