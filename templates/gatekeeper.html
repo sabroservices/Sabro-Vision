@@ -7,15 +7,15 @@
 
     <!-- Ambient Glowing Backdrop Lighting -->
     <div class="relative w-full max-w-lg">
-        <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-96 h-96 bg-brand-500/20 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-16 right-0 w-72 h-72 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-96 h-96 bg-orange-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-16 right-0 w-72 h-72 bg-amber-600/15 rounded-full blur-3xl pointer-events-none"></div>
 
         <!-- Cinema Direct Login Card -->
-        <div class="cinema-glass-card relative rounded-3xl p-6 sm:p-9 border border-cyan-500/20 shadow-[0_0_50px_rgba(6,182,212,0.15)] backdrop-blur-2xl bg-obsidian-900/90 overflow-hidden">
+        <div class="cinema-glass-card relative rounded-3xl p-6 sm:p-9 border border-orange-500/25 shadow-[0_0_50px_rgba(255,107,0,0.18)] backdrop-blur-2xl bg-obsidian-900/90 overflow-hidden">
             
             <!-- Live Status & Channels Pill -->
-            <div class="flex items-center justify-between mb-4 px-3 py-1.5 rounded-full bg-cyan-950/40 border border-cyan-500/20 text-[11px]">
-                <span class="inline-flex items-center gap-1.5 text-cyan-300 font-semibold">
+            <div class="flex items-center justify-between mb-4 px-3 py-1.5 rounded-full bg-orange-950/40 border border-orange-500/20 text-[11px]">
+                <span class="inline-flex items-center gap-1.5 text-orange-300 font-semibold">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 live-pulse"></span>
                     <span>11,459+ Live Channels & Movies</span>
                 </span>
@@ -24,12 +24,12 @@
 
             <!-- Sleek Top Header -->
             <div class="text-center mb-6">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-600 via-cyan-500 to-indigo-600 shadow-xl shadow-brand-500/30 mb-3 border border-white/20 transform hover:scale-105 transition-transform duration-300">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-orange-600 via-orange-500 to-amber-500 shadow-xl shadow-orange-500/30 mb-3 border border-white/20 transform hover:scale-105 transition-transform duration-300">
                     <i class="fa-solid fa-tv text-white text-2xl"></i>
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center justify-center gap-2">
                     <span>{{ settings.platform_name }}</span>
-                    <span class="px-2 py-0.5 rounded-md bg-brand-500/20 text-brand-300 text-[10px] font-mono font-bold uppercase tracking-wider border border-brand-500/30">VIP Portal</span>
+                    <span class="px-2 py-0.5 rounded-md bg-orange-500/20 text-orange-300 text-[10px] font-mono font-bold uppercase tracking-wider border border-orange-500/30">VIP Portal</span>
                 </h1>
                 <p class="text-xs text-slate-300 mt-1 font-medium">
                     {{ settings.tagline or "Exclusive High-Speed Streaming - Powered by Sabro Networks" }}
@@ -52,7 +52,7 @@
             <!-- Dual Tab Switcher -->
             <div class="flex rounded-2xl bg-obsidian-950/80 p-1 mb-6 border border-white/[0.08] shadow-inner">
                 <button type="button" onclick="switchGatekeeperTab('keyTab', this)" id="btnTabKey" 
-                        class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 bg-brand-600 text-white shadow-md shadow-brand-500/30">
+                        class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 bg-orange-600 text-white shadow-md shadow-orange-500/30">
                     <i class="fa-solid fa-bolt text-xs text-amber-300"></i>
                     <span>Put Key & Get Auto Login</span>
                 </button>
@@ -69,9 +69,9 @@
                     <div>
                         <div class="flex items-center justify-between mb-2">
                             <label for="key_code" class="text-[11px] font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                                <i class="fa-solid fa-key text-brand-400"></i> Enter Monthly Access Key
+                                <i class="fa-solid fa-key text-orange-400"></i> Enter Monthly Access Key
                             </label>
-                            <button type="button" onclick="pasteKeyFromClipboard()" class="text-[10px] font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors">
+                            <button type="button" onclick="pasteKeyFromClipboard()" class="text-[10px] font-semibold text-orange-400 hover:text-orange-300 flex items-center gap-1 transition-colors">
                                 <i class="fa-regular fa-paste"></i>
                                 <span>Paste Key</span>
                             </button>
@@ -82,7 +82,7 @@
                                    autocomplete="off"
                                    autocapitalize="characters"
                                    oninput="formatKeyCodeInput(this)"
-                                   class="w-full bg-obsidian-950/90 text-lg sm:text-xl font-mono tracking-widest text-white px-4 py-3.5 rounded-2xl border border-cyan-500/30 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 uppercase placeholder:text-slate-600 transition-all text-center font-bold shadow-inner">
+                                   class="w-full bg-obsidian-950/90 text-lg sm:text-xl font-mono tracking-widest text-white px-4 py-3.5 rounded-2xl border border-orange-500/35 focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-500/30 uppercase placeholder:text-slate-600 transition-all text-center font-bold shadow-inner">
                         </div>
                         <p class="text-[11px] text-slate-400 mt-2 text-center flex items-center justify-center gap-1.5 font-medium">
                             <i class="fa-solid fa-shield-halved text-emerald-400 text-xs"></i> 
@@ -90,7 +90,7 @@
                         </p>
                     </div>
 
-                    <button type="submit" class="btn-shimmer glow-cyan w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-brand-600 via-cyan-500 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-extrabold text-sm shadow-xl shadow-brand-500/30 flex items-center justify-center gap-2.5 transform active:scale-[0.99] transition-all">
+                    <button type="submit" class="btn-shimmer glow-orange w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white font-extrabold text-sm shadow-xl shadow-orange-500/30 flex items-center justify-center gap-2.5 transform active:scale-[0.99] transition-all">
                         <i class="fa-solid fa-circle-play text-amber-300 text-base"></i>
                         <span>Start Watching Live TV</span>
                     </button>
@@ -98,7 +98,7 @@
 
                 <div class="pt-2 text-center text-xs text-slate-400">
                     <span>Already have saved credentials?</span>
-                    <button type="button" onclick="document.getElementById('btnTabLogin').click()" class="text-cyan-400 font-bold hover:underline ml-1">
+                    <button type="button" onclick="document.getElementById('btnTabLogin').click()" class="text-orange-400 font-bold hover:underline ml-1">
                         Sign In with Saved Account
                     </button>
                 </div>
@@ -112,7 +112,7 @@
                             Username
                         </label>
                         <input type="text" name="username" id="user_username" required placeholder="e.g. sabro_98ad2b"
-                               class="w-full bg-obsidian-950/90 text-sm text-white px-4 py-3 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 transition-all">
+                                class="w-full bg-obsidian-950/90 text-sm text-white px-4 py-3 rounded-xl border border-white/[0.1] focus:outline-none focus:border-orange-400 transition-all">
                     </div>
 
                     <div>
@@ -120,10 +120,10 @@
                             Password
                         </label>
                         <input type="password" name="password" id="user_password" required placeholder="••••••••"
-                               class="w-full bg-obsidian-950/90 text-sm text-white px-4 py-3 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 transition-all">
+                                class="w-full bg-obsidian-950/90 text-sm text-white px-4 py-3 rounded-xl border border-white/[0.1] focus:outline-none focus:border-orange-400 transition-all">
                     </div>
 
-                    <button type="submit" class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-brand-600 via-sky-500 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-bold text-xs shadow-xl shadow-brand-500/25 flex items-center justify-center gap-2 transform active:scale-[0.99] transition-all">
+                    <button type="submit" class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white font-bold text-xs shadow-xl shadow-orange-500/25 flex items-center justify-center gap-2 transform active:scale-[0.99] transition-all">
                         <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
                         <span>Sign In & Load Saved Key</span>
                     </button>
@@ -132,7 +132,7 @@
                 <div class="pt-2 text-center text-xs text-slate-400 flex items-center justify-between gap-2 flex-wrap">
                     <div>
                         <span>Have an access key?</span>
-                        <button type="button" onclick="document.getElementById('btnTabKey').click()" class="text-cyan-400 font-bold hover:underline ml-1">
+                        <button type="button" onclick="document.getElementById('btnTabKey').click()" class="text-orange-400 font-bold hover:underline ml-1">
                             Put Key & Get Auto Login
                         </button>
                     </div>
