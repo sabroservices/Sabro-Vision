@@ -545,7 +545,7 @@ def get_settings():
     settings.setdefault("version", "v1.0")
     settings.setdefault("isp_partner", "Connect Communications")
     settings.setdefault("currency", "PKR")
-    settings.setdefault("monthly_price", "250")
+    settings.setdefault("monthly_price", "150")
     settings.setdefault("phone", "0300-1234567")
     settings.setdefault("whatsapp", "923001234567")
     settings.setdefault("jazzcash_title", "Sabro Networks")
@@ -561,11 +561,11 @@ def get_settings():
     settings.setdefault("sabro_isp_api_url", "")
     settings.setdefault("sabro_isp_api_key", "")
     settings.setdefault("sabro_isp_auto_verify", "1")
-    settings.setdefault("sabro_isp_free_screens", "1")
+    settings.setdefault("sabro_isp_free_screens", "2")
     settings.setdefault("sabro_isp_status", "manual_fallback")
 
     # Outside Customer & Multi-Screen Pricing Settings
-    settings.setdefault("outside_customer_default_price", "250")
+    settings.setdefault("outside_customer_default_price", "150")
     settings.setdefault("outside_customer_default_screens", "1")
     settings.setdefault("expiry_grace_period_days", "0")
     settings.setdefault("on_expiry_action", "block_stream")
