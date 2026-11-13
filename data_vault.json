@@ -1,6 +1,6 @@
 {
   "platform": "SABRO VISION",
-  "exported_at": "2026-11-14T00:18:42.720478",
+  "exported_at": "2026-11-14T00:18:52.286463",
   "version": "1.0",
   "tables": {
     "settings": [
@@ -376,6 +376,23 @@
         "notes": "",
         "package_id": 12,
         "tenant_id": 1
+      },
+      {
+        "id": 53,
+        "key_code": "SABRO-FREE-C98723-2686",
+        "user_type": "subscriber",
+        "customer_name": "Master VIP Tester",
+        "phone": "",
+        "duration_days": 30,
+        "created_at": "2026-11-14T00:18:52.085395",
+        "activated_at": "2026-11-14T00:18:52.124403",
+        "expires_at": "2026-12-14T00:18:52.124403",
+        "status": "active",
+        "max_devices": 1,
+        "device_token": "06e9f3d0-67e4-4cd9-b5d6-f7db6285531e",
+        "notes": "",
+        "package_id": 11,
+        "tenant_id": 1
       }
     ],
     "subscribers": [
@@ -620,6 +637,28 @@
         "is_sabro_isp": 0,
         "isp_status": "unlinked",
         "isp_verified_at": null
+      },
+      {
+        "id": 51,
+        "username": "sabro_c98723",
+        "password_hash": "scrypt:32768:8:1$9VpFZxoPfh9j2b2V$07582ef8597780b53d70906a733592dbefabc9beb3e562ff7e9b218f5924ed76c4e12e9422059a1d9f140f26c7712193ed7404d345386c017c3808d3a965d26b",
+        "phone": "",
+        "full_name": "Subscriber C98723",
+        "active_key_code": "SABRO-FREE-C98723-2686",
+        "created_at": "2026-11-14T00:18:52.124403",
+        "last_login_at": "2026-11-14T00:18:52.124403",
+        "plain_password": "sabro7649",
+        "pppoe_username": null,
+        "zone": null,
+        "fat_id": null,
+        "email": null,
+        "status": "active",
+        "package_id": 11,
+        "notes": null,
+        "tenant_id": 1,
+        "is_sabro_isp": 0,
+        "isp_status": "unlinked",
+        "isp_verified_at": null
       }
     ],
     "subscriptions": [
@@ -682,6 +721,16 @@
         "status": "active",
         "auto_renew": 0,
         "created_at": "2026-11-14T00:18:42.495376"
+      },
+      {
+        "id": 22,
+        "subscriber_id": 51,
+        "package_id": 11,
+        "start_date": "2026-11-14T00:18:52.124403",
+        "expiry_date": "2026-12-14T00:18:52.124403",
+        "status": "active",
+        "auto_renew": 0,
+        "created_at": "2026-11-14T00:18:52.124403"
       }
     ],
     "payment_receipts": [
