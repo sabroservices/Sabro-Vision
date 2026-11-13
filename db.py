@@ -317,6 +317,189 @@ def init_db(force_reset=False):
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_channels_health ON channels(health_status)")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_channels_active_health ON channels(is_active, health_status)")
 
+    # 15. Schema Migrations Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS schema_migrations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        version TEXT UNIQUE NOT NULL,
+        name TEXT NOT NULL,
+        applied_at TEXT NOT NULL
+    )
+    """)
+
+    # 16. Multi-Tenant SaaS: Tenants Table (Sabro Networks + White-Label ISPs)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS tenants (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        code TEXT UNIQUE NOT NULL,
+        name TEXT NOT NULL,
+        company_name TEXT,
+        service_name TEXT NOT NULL DEFAULT 'SABRO VISION',
+        tagline TEXT,
+        custom_domain TEXT UNIQUE,
+        subdomain TEXT UNIQUE,
+        logo_url TEXT,
+        brand_color_primary TEXT DEFAULT '#00f0ff',
+        brand_color_secondary TEXT DEFAULT '#6366f1',
+        contact_name TEXT,
+        email TEXT,
+        phone TEXT,
+        whatsapp TEXT,
+        welcome_message TEXT,
+        support_email TEXT,
+        support_phone TEXT,
+        status TEXT DEFAULT 'active', -- 'active', 'suspended', 'pending'
+        max_customers INTEGER DEFAULT 500,
+        max_active_subs INTEGER DEFAULT 500,
+        max_devices_per_user INTEGER DEFAULT 1,
+        allowed_features TEXT DEFAULT 'all',
+        created_at TEXT NOT NULL,
+        notes TEXT
+    )
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_tenant_code ON tenants (code)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_tenant_status ON tenants (status)")
+
+    # 17. Multi-Tenant SaaS: Reseller Administrators & Staff Users Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS reseller_users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tenant_id INTEGER NOT NULL,
+        username TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        full_name TEXT,
+        email TEXT,
+        phone TEXT,
+        role TEXT DEFAULT 'owner', -- 'owner', 'staff'
+        status TEXT DEFAULT 'active', -- 'active', 'suspended'
+        created_at TEXT NOT NULL,
+        last_login_at TEXT,
+        FOREIGN KEY(tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
+    )
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_reseller_username ON reseller_users (username)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_reseller_tenant ON reseller_users (tenant_id)")
+
+    # 18. Multi-Tenant Support Tickets Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS support_tickets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ticket_number TEXT UNIQUE NOT NULL,
+        tenant_id INTEGER DEFAULT 1,
+        subscriber_id INTEGER,
+        subject TEXT NOT NULL,
+        category TEXT DEFAULT 'general', -- 'general', 'billing', 'streaming', 'account'
+        priority TEXT DEFAULT 'medium', -- 'low', 'medium', 'high', 'urgent'
+        status TEXT DEFAULT 'open', -- 'open', 'in_progress', 'resolved', 'closed'
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY(subscriber_id) REFERENCES subscribers(id) ON DELETE CASCADE,
+        FOREIGN KEY(tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
+    )
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_tickets_tenant ON support_tickets (tenant_id)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_tickets_subscriber ON support_tickets (subscriber_id)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_tickets_status ON support_tickets (status)")
+
+    # 19. Support Ticket Messages Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ticket_messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ticket_id INTEGER NOT NULL,
+        sender_type TEXT NOT NULL, -- 'customer', 'reseller', 'admin'
+        sender_name TEXT NOT NULL,
+        message TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY(ticket_id) REFERENCES support_tickets(id) ON DELETE CASCADE
+    )
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_ticket_messages_tid ON ticket_messages (ticket_id)")
+
+    # 20. Platform & Tenant Notifications Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS notifications (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tenant_id INTEGER DEFAULT 1,
+        subscriber_id INTEGER,
+        title TEXT NOT NULL,
+        message TEXT NOT NULL,
+        type TEXT DEFAULT 'info', -- 'info', 'success', 'warning', 'danger'
+        is_read INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY(tenant_id) REFERENCES tenants(id) ON DELETE CASCADE,
+        FOREIGN KEY(subscriber_id) REFERENCES subscribers(id) ON DELETE CASCADE
+    )
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_notif_tenant ON notifications (tenant_id)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_notif_sub ON notifications (subscriber_id)")
+
+    # 21. Sabro Networks ISP Real-time Verification Cache Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS isp_verifications (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        pppoe_username TEXT UNIQUE NOT NULL,
+        phone TEXT,
+        customer_name TEXT,
+        is_active INTEGER DEFAULT 1,
+        isp_package TEXT,
+        last_verified_at TEXT NOT NULL,
+        raw_response TEXT
+    )
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_isp_pppoe ON isp_verifications (pppoe_username)")
+
+    # Multi-Tenant Column Migrations for Existing Tables
+    # A. Subscribers Table Migrations
+    cursor.execute("PRAGMA table_info(subscribers)")
+    s_cols = [c[1] for c in cursor.fetchall()]
+    if "tenant_id" not in s_cols:
+        cursor.execute("ALTER TABLE subscribers ADD COLUMN tenant_id INTEGER DEFAULT 1")
+    if "is_sabro_isp" not in s_cols:
+        cursor.execute("ALTER TABLE subscribers ADD COLUMN is_sabro_isp INTEGER DEFAULT 0")
+    if "isp_status" not in s_cols:
+        cursor.execute("ALTER TABLE subscribers ADD COLUMN isp_status TEXT DEFAULT 'unlinked'")
+    if "isp_verified_at" not in s_cols:
+        cursor.execute("ALTER TABLE subscribers ADD COLUMN isp_verified_at TEXT")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_sub_tenant ON subscribers (tenant_id)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_sub_is_isp ON subscribers (is_sabro_isp)")
+
+    # B. Packages Table Migrations
+    cursor.execute("PRAGMA table_info(packages)")
+    p_cols = [c[1] for c in cursor.fetchall()]
+    if "tenant_id" not in p_cols:
+        cursor.execute("ALTER TABLE packages ADD COLUMN tenant_id INTEGER")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_pkg_tenant ON packages (tenant_id)")
+
+    # C. Access Keys Table Migrations
+    cursor.execute("PRAGMA table_info(access_keys)")
+    ak_cols_all = [c[1] for c in cursor.fetchall()]
+    if "tenant_id" not in ak_cols_all:
+        cursor.execute("ALTER TABLE access_keys ADD COLUMN tenant_id INTEGER DEFAULT 1")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_ak_tenant ON access_keys (tenant_id)")
+
+    # D. Payment Receipts Table Migrations
+    cursor.execute("PRAGMA table_info(payment_receipts)")
+    pr_cols = [c[1] for c in cursor.fetchall()]
+    if "tenant_id" not in pr_cols:
+        cursor.execute("ALTER TABLE payment_receipts ADD COLUMN tenant_id INTEGER DEFAULT 1")
+    if "invoice_number" not in pr_cols:
+        cursor.execute("ALTER TABLE payment_receipts ADD COLUMN invoice_number TEXT")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_receipt_tenant ON payment_receipts (tenant_id)")
+
+    # Ensure Master Tenant 1 (Sabro Networks) exists
+    now_str = datetime.now().isoformat()
+    cursor.execute("""
+        INSERT OR IGNORE INTO tenants (
+            id, code, name, company_name, service_name, tagline,
+            brand_color_primary, brand_color_secondary, status, created_at, notes
+        ) VALUES (
+            1, 'sabro', 'Sabro Networks', 'Sabro Networks ISP', 'SABRO VISION',
+            'Ultra High-Definition IPTV Middleware - Sabro Networks',
+            '#00f0ff', '#6366f1', 'active', ?, 'Master platform tenant for Sabro Networks'
+        )
+    """, (now_str,))
+
+
     # Seed default packages: Everything 100% FREE for Sabro Networks Fiber users (code='basic').
     # For all outside network users: Every package is flat 250 PKR, 1 Screen.
     now_str = datetime.now().isoformat()
