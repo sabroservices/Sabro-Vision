@@ -1,0 +1,158 @@
+/**
+ * SABRO VISION - Ultra HD Cinematic Theme v2.0
+ * Obsidian Glass, Electric Cyan & Royal Indigo Modern Styling
+ */
+
+:root {
+  --sabro-cyan: #00f0ff;
+  --sabro-cyan-glow: rgba(0, 240, 255, 0.4);
+  --sabro-indigo: #6366f1;
+  --sabro-indigo-glow: rgba(99, 102, 241, 0.35);
+  --sabro-canvas: #030712;
+  --sabro-surface: #070e1e;
+  --sabro-card: #0c1427;
+  --sabro-border: rgba(255, 255, 255, 0.08);
+  --sabro-border-hover: rgba(0, 240, 255, 0.5);
+}
+
+/* Atmospheric Aurora Ambient Background */
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.aurora-orb-1 {
+  position: absolute;
+  top: -15%;
+  left: 20%;
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.12) 0%, rgba(6, 182, 212, 0.03) 60%, transparent 80%);
+  border-radius: 9999px;
+  filter: blur(140px);
+  animation: aurora-drift-1 18s ease-in-out infinite alternate;
+}
+
+.aurora-orb-2 {
+  position: absolute;
+  top: 30%;
+  right: -10%;
+  width: 650px;
+  height: 650px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.14) 0%, rgba(139, 92, 246, 0.04) 60%, transparent 80%);
+  border-radius: 9999px;
+  filter: blur(150px);
+  animation: aurora-drift-2 22s ease-in-out infinite alternate;
+}
+
+.aurora-orb-3 {
+  position: absolute;
+  bottom: -15%;
+  left: 30%;
+  width: 750px;
+  height: 750px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(6, 182, 212, 0.02) 60%, transparent 80%);
+  border-radius: 9999px;
+  filter: blur(160px);
+  animation: aurora-drift-1 25s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes aurora-drift-1 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, 30px) scale(1.08); }
+  100% { transform: translate(-30px, -20px) scale(0.95); }
+}
+
+@keyframes aurora-drift-2 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-30px, -40px) scale(1.1); }
+  100% { transform: translate(25px, 20px) scale(0.92); }
+}
+
+/* Glassmorphism 2.0 Surface Cards */
+.cinema-glass-card {
+  background: linear-gradient(180deg, rgba(14, 23, 42, 0.82) 0%, rgba(7, 14, 30, 0.94) 100%) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.8), inset 0 1px 0 0 rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.cinema-glass-card:hover {
+  border-color: rgba(0, 240, 255, 0.45) !important;
+  border-top-color: rgba(0, 240, 255, 0.8) !important;
+  box-shadow: 0 20px 50px -10px rgba(0, 240, 255, 0.25), inset 0 1px 0 0 rgba(0, 240, 255, 0.2) !important;
+}
+
+/* Glowing Neon Elements */
+.neon-glow-cyan {
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.45), 0 0 50px rgba(0, 240, 255, 0.15) !important;
+}
+
+.neon-text-glow {
+  text-shadow: 0 0 14px rgba(0, 240, 255, 0.5), 0 0 28px rgba(0, 240, 255, 0.25);
+}
+
+.neon-border-live {
+  border: 1px solid rgba(0, 240, 255, 0.4) !important;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.2), inset 0 0 10px rgba(0, 240, 255, 0.1) !important;
+}
+
+/* Interactive Channel Cards */
+.channel-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.25rem !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.channel-card:hover {
+  transform: translateY(-4px) scale(1.02) !important;
+  border-color: rgba(0, 240, 255, 0.6) !important;
+  box-shadow: 0 14px 35px -8px rgba(0, 240, 255, 0.3) !important;
+}
+
+.channel-card:active {
+  transform: translateY(-1px) scale(0.99) !important;
+}
+
+/* Modern Shimmer Lighting on Primary Buttons */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(60deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%);
+  transform: rotate(30deg) translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.btn-shimmer:hover::after {
+  transform: rotate(30deg) translateX(100%);
+}
+
+.btn-shimmer:hover {
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.5) !important;
+}
+
+/* Live Equalizer Animation */
+@keyframes eq-wave {
+  0%, 100% { height: 3px; }
+  50% { height: 14px; }
+}
+.eq-bar-1 { animation: eq-wave 0.8s ease-in-out infinite 0.1s; }
+.eq-bar-2 { animation: eq-wave 0.8s ease-in-out infinite 0.3s; }
+.eq-bar-3 { animation: eq-wave 0.8s ease-in-out infinite 0.2s; }
