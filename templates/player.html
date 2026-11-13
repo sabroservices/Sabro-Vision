@@ -8,16 +8,19 @@
 <div class="space-y-6">
 
     <!-- 1. CINEMA VIDEO PLAYER SECTION -->
-    <div class="cinema-glass-card rounded-3xl overflow-hidden shadow-2xl border border-white/[0.08] bg-black relative">
+    <div class="cinema-glass-card rounded-3xl overflow-hidden shadow-2xl border border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.16)] bg-black relative">
         <div class="relative aspect-video w-full max-h-[70vh] mx-auto flex items-center justify-center bg-black group" id="playerContainer">
             
             <!-- Native HTML5 Video element -->
             <video id="iptvVideo" class="w-full h-full object-contain cursor-pointer" playsinline autoplay controls></video>
 
             <!-- Loading Spinner Overlay -->
-            <div id="playerLoading" class="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3 z-20 pointer-events-none">
-                <div class="w-12 h-12 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-                <span class="text-xs font-semibold tracking-wider text-slate-300 uppercase">Connecting to HD Feed...</span>
+            <div id="playerLoading" class="absolute inset-0 bg-black/85 backdrop-blur-sm flex flex-col items-center justify-center gap-3 z-20 pointer-events-none">
+                <div class="w-14 h-14 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+                <span class="text-xs font-bold tracking-wider text-cyan-200 uppercase flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400 live-pulse"></span>
+                    <span>Connecting to High-Speed HD Feed...</span>
+                </span>
             </div>
 
             <!-- Error Reconnect Overlay -->
