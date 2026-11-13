@@ -1,6 +1,6 @@
 {
   "platform": "SABRO VISION",
-  "exported_at": "2026-11-13T21:48:54.490508",
+  "exported_at": "2026-11-13T21:48:59.438307",
   "version": "1.0",
   "tables": {
     "settings": [
@@ -142,6 +142,22 @@
         "device_token": null,
         "notes": "Live test from admin",
         "package_id": null
+      },
+      {
+        "id": 32,
+        "key_code": "SABRO-FREE-691C8A-A94B",
+        "user_type": "subscriber",
+        "customer_name": "Comedy Live Tester",
+        "phone": "",
+        "duration_days": 30,
+        "created_at": "2026-11-13T21:48:59.220603",
+        "activated_at": "2026-11-13T21:48:59.238428",
+        "expires_at": "2026-12-13T21:48:59.238428",
+        "status": "active",
+        "max_devices": 1,
+        "device_token": "96f97632-115e-4156-ba03-abb2e4b69565",
+        "notes": "",
+        "package_id": 12
       }
     ],
     "subscribers": [
@@ -162,9 +178,38 @@
         "status": "active",
         "package_id": null,
         "notes": null
+      },
+      {
+        "id": 26,
+        "username": "sabro_691c8a",
+        "password_hash": "scrypt:32768:8:1$AH2Hbq6rGioXx0aC$5bda2084d7982becb9e31419be143e9de6767ee1375e08869dc9e0a88e472706893b70079328972549fb9a472f3a5a1291bfe8859028c366f66e70f1bb49152d",
+        "phone": "",
+        "full_name": "Subscriber 691C8A",
+        "active_key_code": "SABRO-FREE-691C8A-A94B",
+        "created_at": "2026-11-13T21:48:59.238428",
+        "last_login_at": "2026-11-13T21:48:59.238428",
+        "plain_password": "sabro6716",
+        "pppoe_username": null,
+        "zone": null,
+        "fat_id": null,
+        "email": null,
+        "status": "active",
+        "package_id": 12,
+        "notes": null
       }
     ],
-    "subscriptions": [],
+    "subscriptions": [
+      {
+        "id": 11,
+        "subscriber_id": 26,
+        "package_id": 12,
+        "start_date": "2026-11-13T21:48:59.238428",
+        "expiry_date": "2026-12-13T21:48:59.238428",
+        "status": "active",
+        "auto_renew": 0,
+        "created_at": "2026-11-13T21:48:59.238428"
+      }
+    ],
     "payment_receipts": [],
     "reseller_inquiries": [],
     "favorites": [],
