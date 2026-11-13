@@ -1410,13 +1410,21 @@ def get_connection_events(limit=50):
 # ----------------------------------------------------
 # SABRO VISION v1.0 - Packages & Subscriptions
 # ----------------------------------------------------
-def get_packages(active_only=True):
+def get_packages(active_only=True, tenant_id=None):
     conn = get_db()
-    query = "SELECT * FROM packages"
+    clauses = []
+    params = []
     if active_only:
-        query += " WHERE is_active = 1"
-    query += " ORDER BY price_pkr ASC"
-    rows = conn.execute(query).fetchall()
+        clauses.append("is_active = 1")
+    if tenant_id is not None:
+        if tenant_id == 1:
+            clauses.append("(tenant_id = 1 OR tenant_id IS NULL)")
+        else:
+            clauses.append("(tenant_id = ? OR tenant_id IS NULL)")
+            params.append(tenant_id)
+    where_sql = (" WHERE " + " AND ".join(clauses)) if clauses else ""
+    query = f"SELECT * FROM packages{where_sql} ORDER BY price_pkr ASC"
+    rows = conn.execute(query, tuple(params)).fetchall()
     conn.close()
     return [dict(r) for r in rows]
 
@@ -1426,14 +1434,22 @@ def get_package_by_id(package_id):
     conn.close()
     return dict(row) if row else None
 
-def add_package(name, code, duration_days=30, price_pkr=250, max_connections=1, description="", allowed_categories="all"):
+def get_package_by_code(code):
+    if not code:
+        return None
+    conn = get_db()
+    row = conn.execute("SELECT * FROM packages WHERE LOWER(code) = LOWER(?)", (code.strip(),)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+def add_package(name, code, duration_days=30, price_pkr=250, max_connections=1, description="", allowed_categories="all", tenant_id=None):
     conn = get_db()
     now_str = datetime.now().isoformat()
     cursor = conn.cursor()
     cursor.execute("""
-        INSERT INTO packages (name, code, duration_days, price_pkr, max_connections, is_active, description, allowed_categories, created_at)
-        VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?)
-    """, (name, code.lower().strip(), int(duration_days), int(price_pkr), int(max_connections), description, allowed_categories or "all", now_str))
+        INSERT INTO packages (name, code, duration_days, price_pkr, max_connections, is_active, description, allowed_categories, tenant_id, created_at)
+        VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?)
+    """, (name, code.lower().strip(), int(duration_days), int(price_pkr), int(max_connections), description, allowed_categories or "all", tenant_id, now_str))
     conn.commit()
     new_id = cursor.lastrowid
     conn.close()
