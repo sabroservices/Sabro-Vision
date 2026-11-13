@@ -51,20 +51,20 @@
                 <span class="px-3.5 py-1.5 rounded-2xl bg-black/85 backdrop-blur-md border border-white/10 text-xs font-bold text-white flex items-center gap-2.5 shadow-xl">
                     <div class="flex items-end gap-0.5 h-3">
                         <span class="w-0.5 bg-brand-400 rounded-full eq-bar-1"></span>
-                        <span class="w-0.5 bg-cyan-300 rounded-full eq-bar-2"></span>
+                        <span class="w-0.5 bg-orange-400 rounded-full eq-bar-2"></span>
                         <span class="w-0.5 bg-brand-400 rounded-full eq-bar-3"></span>
                     </div>
                     <span id="activeChannelName">{{ active_channel.name if active_channel else 'Select Channel' }}</span>
                 </span>
                 {% if active_channel %}
-                <span class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 backdrop-blur-md text-[10px] font-black uppercase tracking-wider text-white shadow-lg border border-white/10" id="activeChannelCategory">
+                <span class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-brand-600 to-amber-600 backdrop-blur-md text-[10px] font-black uppercase tracking-wider text-white shadow-lg border border-white/10" id="activeChannelCategory">
                     {{ active_channel.category }}
                 </span>
                 <span class="px-2.5 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold font-mono hidden sm:inline shadow-sm">
                     1080p FHD
                 </span>
-                <span class="px-2.5 py-1.5 rounded-xl bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 text-[10px] font-bold font-mono hidden md:inline">
-                    <i class="fa-solid fa-bolt text-[9px] mr-0.5 text-cyan-400"></i> Ultra Fast
+                <span class="px-2.5 py-1.5 rounded-xl bg-orange-500/10 text-orange-300 border border-orange-500/30 text-[10px] font-bold font-mono hidden md:inline">
+                    <i class="fa-solid fa-bolt text-[9px] mr-0.5 text-orange-400"></i> Ultra Fast
                 </span>
                 {% endif %}
             </div>
