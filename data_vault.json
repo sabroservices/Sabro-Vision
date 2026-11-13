@@ -1,6 +1,6 @@
 {
   "platform": "SABRO VISION",
-  "exported_at": "2026-11-13T19:21:32.482224",
+  "exported_at": "2026-11-13T20:38:52.361843",
   "version": "1.0",
   "tables": {
     "settings": [
@@ -78,9 +78,90 @@
         "created_at": "2026-11-07T22:41:15.842424"
       }
     ],
-    "access_keys": [],
-    "subscribers": [],
-    "subscriptions": [],
+    "access_keys": [
+      {
+        "id": 24,
+        "key_code": "SABRO-FREE-6874AD-9B71",
+        "user_type": "subscriber",
+        "customer_name": "",
+        "phone": "",
+        "duration_days": 30,
+        "created_at": "2026-11-13T20:38:51.309589",
+        "activated_at": "2026-11-13T20:38:51.329190",
+        "expires_at": "2026-12-13T20:38:51.329190",
+        "status": "active",
+        "max_devices": 1,
+        "device_token": "520662f1-484c-4a44-b54d-63c378a3daf3",
+        "notes": "E2E Full Test",
+        "package_id": null
+      },
+      {
+        "id": 25,
+        "key_code": "SABRO-FREE-8B9C4C-9488",
+        "user_type": "subscriber",
+        "customer_name": "",
+        "phone": "",
+        "duration_days": 30,
+        "created_at": "2026-11-13T20:38:52.164122",
+        "activated_at": "2026-11-13T20:38:52.184080",
+        "expires_at": "2026-12-13T20:38:52.184080",
+        "status": "active",
+        "max_devices": 1,
+        "device_token": "86bee043-9153-4837-953a-d7f2d9e2e2a0",
+        "notes": "",
+        "package_id": 12
+      }
+    ],
+    "subscribers": [
+      {
+        "id": 21,
+        "username": "sabro_6874ad",
+        "password_hash": "scrypt:32768:8:1$8uNBqE7hvKM4nJ8M$f824444c334e7dd8009f4dd7eff556813d06d9e8d2853947ee6f823bc049528ef44e2f5d92feb1cf29d692650f09cd93035aef98a40950ce71526c34e7c692c9",
+        "phone": "",
+        "full_name": "Subscriber 6874AD",
+        "active_key_code": "SABRO-FREE-6874AD-9B71",
+        "created_at": "2026-11-13T20:38:51.329190",
+        "last_login_at": "2026-11-13T20:38:51.909189",
+        "plain_password": "sabro3169",
+        "pppoe_username": null,
+        "zone": null,
+        "fat_id": null,
+        "email": null,
+        "status": "active",
+        "package_id": null,
+        "notes": null
+      },
+      {
+        "id": 22,
+        "username": "sabro_8b9c4c",
+        "password_hash": "scrypt:32768:8:1$9QAyOeItONbRj4oV$7eab3ab8bb0c4bea041df69152578db61f1d04f181bebaa7e5161f035955feccc1ba581c1b4f6d9b18c49b0c07013cd66d404f0a818c6fd0618a4aace5a743f0",
+        "phone": "",
+        "full_name": "Subscriber 8B9C4C",
+        "active_key_code": "SABRO-FREE-8B9C4C-9488",
+        "created_at": "2026-11-13T20:38:52.184080",
+        "last_login_at": "2026-11-13T20:38:52.184080",
+        "plain_password": "sabro4487",
+        "pppoe_username": null,
+        "zone": null,
+        "fat_id": null,
+        "email": null,
+        "status": "active",
+        "package_id": 12,
+        "notes": null
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": 10,
+        "subscriber_id": 22,
+        "package_id": 12,
+        "start_date": "2026-11-13T20:38:52.184080",
+        "expiry_date": "2026-12-13T20:38:52.184080",
+        "status": "active",
+        "auto_renew": 0,
+        "created_at": "2026-11-13T20:38:52.184080"
+      }
+    ],
     "payment_receipts": [],
     "reseller_inquiries": [],
     "favorites": [],
