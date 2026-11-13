@@ -268,7 +268,7 @@ report("Admin Xtream Setup Guide loads (/admin/xtream)", "Xtream Codes API" in r
 
 # 7. Admin Tiered Packages
 r_adm_pkg = adm_sess.get(f"{BASE_URL}/admin/packages")
-report("Admin Tiered Packages loads (/admin/packages)", "Package & Tiered Subscriptions" in r_adm_pkg.text and "Basic Fiber Pass" in r_adm_pkg.text)
+report("Admin Tiered Packages loads (/admin/packages)", "Package & Tiered Subscriptions" in r_adm_pkg.text and "Sabro Broadband" in r_adm_pkg.text)
 
 # 8. Admin Payment Queue
 r_adm_pay = adm_sess.get(f"{BASE_URL}/admin/payments")
