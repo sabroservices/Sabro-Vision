@@ -1,6 +1,6 @@
 {
   "platform": "SABRO VISION",
-  "exported_at": "2026-11-14T03:25:43.725575",
+  "exported_at": "2026-11-14T03:25:50.299982",
   "version": "1.0",
   "tables": {
     "settings": [
@@ -161,8 +161,8 @@
         "notes": ""
       },
       {
-        "id": 70,
-        "code": "tenant_a86069",
+        "id": 80,
+        "code": "tenant_dcd7b1",
         "name": "Alpha Fiber",
         "company_name": "",
         "service_name": "Alpha TV",
@@ -184,12 +184,12 @@
         "max_active_subs": 500,
         "max_devices_per_user": 1,
         "allowed_features": "all",
-        "created_at": "2026-11-14T03:25:43.336282",
+        "created_at": "2026-11-14T03:25:49.816589",
         "notes": ""
       },
       {
-        "id": 71,
-        "code": "tenant_47c42c",
+        "id": 81,
+        "code": "tenant_86c305",
         "name": "Beta Broadband",
         "company_name": "",
         "service_name": "Beta Vision",
@@ -211,7 +211,7 @@
         "max_active_subs": 500,
         "max_devices_per_user": 1,
         "allowed_features": "all",
-        "created_at": "2026-11-14T03:25:43.364242",
+        "created_at": "2026-11-14T03:25:49.854217",
         "notes": ""
       }
     ],
@@ -243,16 +243,29 @@
         "last_login_at": null
       },
       {
-        "id": 69,
-        "tenant_id": 70,
-        "username": "admin_tenant_a86069",
-        "password_hash": "scrypt:32768:8:1$rAlI031Htmz4OAIr$57e27bbaa8d644f500aba70631524fbefa141b74a8fbf2001611800f2107a00b4370296895bbaa4331dda30dcd92272c6cfc51776b6cc61c62bb2b5a0422cb98",
+        "id": 79,
+        "tenant_id": 80,
+        "username": "admin_tenant_dcd7b1",
+        "password_hash": "scrypt:32768:8:1$EazolNS62SqEHpyk$196c42edb67c7e8164df275fe008baa49a5418dca197b573d146a560aae98c0dfbf637a1a1645d5b835a861b41d01f1801fcbc87a6fbc3524148237408b83880",
         "full_name": "",
         "email": "",
         "phone": "",
         "role": "owner",
         "status": "active",
-        "created_at": "2026-11-14T03:25:43.394575",
+        "created_at": "2026-11-14T03:25:49.885972",
+        "last_login_at": null
+      },
+      {
+        "id": 80,
+        "tenant_id": 81,
+        "username": "admin_tenant_86c305",
+        "password_hash": "scrypt:32768:8:1$C0qDZUw1s5zpiffb$e6e9a25c6fd71b3589788c85618565e5538a0ee8b411238c3dba7824aaa1ece69f7aba30c29833bcc3a662128500dde7cdc5938d6be7c193b83a9e9b9db0feea",
+        "full_name": "",
+        "email": "",
+        "phone": "",
+        "role": "owner",
+        "status": "active",
+        "created_at": "2026-11-14T03:25:50.107719",
         "last_login_at": null
       }
     ],
@@ -1184,6 +1197,28 @@
         "is_sabro_isp": 0,
         "isp_status": "unlinked",
         "isp_verified_at": null
+      },
+      {
+        "id": 78,
+        "username": "exp_a1eee1",
+        "password_hash": "scrypt:32768:8:1$OhgT0iA5zduWXGb1$aaf1ce060bf0925376680687e97e7cd12179055aa7d30ff1ede0c625df55c60d1b8023f2601ee60e762cd56468b81deb2474bd40c51379630666454cd380bdda",
+        "phone": "",
+        "full_name": "",
+        "active_key_code": null,
+        "created_at": "2026-11-14T03:25:44.094347",
+        "last_login_at": "2026-11-14T03:25:44.094347",
+        "plain_password": "Password123*",
+        "pppoe_username": "",
+        "zone": "",
+        "fat_id": "",
+        "email": "",
+        "status": "expired",
+        "package_id": null,
+        "notes": "",
+        "tenant_id": 1,
+        "is_sabro_isp": 0,
+        "isp_status": "unlinked",
+        "isp_verified_at": null
       }
     ],
     "subscriptions": [
@@ -1266,6 +1301,16 @@
         "status": "active",
         "auto_renew": 0,
         "created_at": "2026-11-14T03:25:43.211409"
+      },
+      {
+        "id": 35,
+        "subscriber_id": 78,
+        "package_id": 1,
+        "start_date": "2026-11-09T03:25:44.572355",
+        "expiry_date": "2026-11-09T03:25:44.572355",
+        "status": "expired",
+        "auto_renew": 0,
+        "created_at": "2026-11-09T03:25:44.572355"
       }
     ],
     "payment_receipts": [
