@@ -98,6 +98,84 @@
         </div>
     </div>
 
+    <!-- Live White-Label ISP SaaS Tenants -->
+    <div class="cinema-glass-card rounded-3xl p-6 border border-white/[0.08] bg-obsidian-900/80 space-y-4">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-server"></i>
+                </div>
+                <div>
+                    <h2 class="text-base font-bold text-white">Live White-Label ISP Tenants</h2>
+                    <p class="text-xs text-slate-400">Independent ISP brands operating their own IPTV service on Sabro Vision</p>
+                </div>
+            </div>
+
+            <button type="button" onclick="document.getElementById('createTenantModal').classList.remove('hidden')" class="btn-shimmer glow-cyan px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 text-white text-xs font-bold shadow-md shadow-cyan-500/25 flex items-center gap-1.5">
+                <i class="fa-solid fa-plus"></i>
+                <span>Provision New Tenant</span>
+            </button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead>
+                    <tr class="text-slate-400 border-b border-white/[0.06] text-[10px] uppercase font-bold tracking-wider">
+                        <th class="pb-3">Tenant & Code</th>
+                        <th class="pb-3">Service Name</th>
+                        <th class="pb-3">Customers / Limit</th>
+                        <th class="pb-3">Revenue (PKR)</th>
+                        <th class="pb-3">Status</th>
+                        <th class="pb-3">Portal URL</th>
+                        <th class="pb-3 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/[0.04]">
+                    {% for t in tenants %}
+                    {% set m = tenant_metrics.get(t.id, {}) %}
+                    <tr class="hover:bg-white/[0.02] transition-colors">
+                        <td class="py-3">
+                            <div class="font-bold text-white">{{ t.name }}</div>
+                            <div class="font-mono text-[10px] text-cyan-300">CODE: {{ t.code }}</div>
+                        </td>
+                        <td class="py-3">
+                            <span class="font-semibold text-slate-200">{{ t.service_name }}</span>
+                        </td>
+                        <td class="py-3">
+                            <div class="font-bold text-white">{{ m.get('total_customers', 0) }} / {{ t.max_customers }}</div>
+                            <div class="text-[10px] text-emerald-400">{{ m.get('active_subscribers', 0) }} active</div>
+                        </td>
+                        <td class="py-3 font-mono font-bold text-amber-400">
+                            {{ m.get('total_revenue_pkr', 0) }} PKR
+                        </td>
+                        <td class="py-3">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold {% if t.status == 'active' %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30{% else %}bg-rose-500/20 text-rose-300 border border-rose-500/30{% endif %}">
+                                {{ t.status|upper }}
+                            </span>
+                        </td>
+                        <td class="py-3 font-mono text-[11px] text-slate-400">
+                            <a href="{{ request.host_url }}gatekeeper?tenant={{ t.code }}" target="_blank" class="text-cyan-400 hover:underline">
+                                ?tenant={{ t.code }}
+                            </a>
+                        </td>
+                        <td class="py-3 text-right">
+                            {% if t.id != 1 %}
+                            <form action="{{ url_for('admin_toggle_tenant', tenant_id=t.id) }}" method="POST" class="inline">
+                                <button type="submit" class="px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all {% if t.status == 'active' %}bg-rose-950/40 text-rose-300 border-rose-800/50 hover:bg-rose-900/60{% else %}bg-emerald-950/40 text-emerald-300 border-emerald-800/50 hover:bg-emerald-900/60{% endif %}" title="Toggle Tenant Status">
+                                    {{ 'Suspend' if t.status == 'active' else 'Activate' }}
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="text-[10px] text-slate-500 font-semibold">Platform Root</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- Status Filter Buttons -->
     <div class="flex items-center justify-between flex-wrap gap-4">
         <div class="flex items-center gap-2 text-xs">
