@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}ISP Partner Portal Sign In - {{ (tenant and tenant.service_name) or settings.platform_name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex items-center justify-center py-10 px-4">
+    <div class="relative w-full max-w-md">
+        <div class="absolute -top-14 left-1/2 -translate-x-1/2 w-64 h-64 bg-cyan-600/15 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="cinema-glass-card relative rounded-3xl p-8 border border-white/[0.1] shadow-2xl bg-obsidian-900/90 backdrop-blur-2xl">
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-cyan-500 via-sky-500 to-indigo-600 border border-white/20 text-white mb-3 shadow-xl shadow-cyan-500/25">
+                    <i class="fa-solid fa-handshake text-xl"></i>
+                </div>
+                <h2 class="text-2xl font-black text-white tracking-tight">ISP Partner Portal</h2>
+                <p class="text-xs text-slate-400 mt-1">White-Label IPTV Management & Reseller Console</p>
+                {% if tenant and tenant.id != 1 %}
+                <div class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-[10px] font-bold">
+                    <i class="fa-solid fa-building"></i>
+                    <span>{{ tenant.name }} ({{ tenant.service_name }})</span>
+                </div>
+                {% endif %}
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="mb-4 space-y-2">
+                {% for category, message in messages %}
+                <div class="p-3 rounded-xl text-xs font-semibold {% if category == 'danger' %}bg-rose-500/20 text-rose-300 border border-rose-500/30{% else %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('reseller_login') }}" method="POST" class="space-y-4">
+                <div>
+                    <label for="username" class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">Reseller Username</label>
+                    <input type="text" name="username" id="username" required autofocus placeholder="Enter reseller account username"
+                           class="w-full bg-obsidian-950/90 text-sm text-white px-4 py-3 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 transition-all font-mono">
+                </div>
+
+                <div>
+                    <label for="password" class="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5">Password</label>
+                    <input type="password" name="password" id="password" required placeholder="••••••••"
+                           class="w-full bg-obsidian-950/90 text-sm text-white px-4 py-3 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 transition-all">
+                </div>
+
+                <button type="submit" class="btn-shimmer glow-cyan w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-cyan-500/30 flex items-center justify-center gap-2 transition-all">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <span>Sign In to Reseller Console</span>
+                </button>
+            </form>
+
+            <div class="mt-6 pt-4 border-t border-white/[0.06] text-center space-y-2">
+                <a href="{{ url_for('partner_portal') }}" class="text-xs text-cyan-400 hover:text-cyan-300 transition-colors flex items-center justify-center gap-1.5 font-semibold">
+                    <i class="fa-solid fa-handshake-angle text-[11px]"></i>
+                    <span>Apply for an ISP Reseller Account</span>
+                </a>
+                <a href="{{ url_for('gatekeeper') }}" class="text-xs text-slate-400 hover:text-white transition-colors flex items-center justify-center gap-1.5 font-semibold">
+                    <i class="fa-solid fa-arrow-left text-[10px]"></i>
+                    <span>Back to Customer Sign In</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
