@@ -1735,8 +1735,19 @@ def admin_resellers():
         "approved": sum(1 for x in all_inquiries if x.get("status") == "approved"),
         "rejected": sum(1 for x in all_inquiries if x.get("status") == "rejected"),
     }
+    tenants = db.get_tenants()
+    tenant_metrics = {t['id']: db.get_tenant_metrics(t['id']) for t in tenants}
     settings = db.get_settings()
-    return render_template("admin_resellers.html", inquiries=inquiries, stats=stats, current_status=status, pending_count=stats["pending"], settings=settings)
+    return render_template(
+        "admin_resellers.html",
+        inquiries=inquiries,
+        stats=stats,
+        current_status=status,
+        pending_count=stats["pending"],
+        tenants=tenants,
+        tenant_metrics=tenant_metrics,
+        settings=settings
+    )
 
 @app.route("/admin/resellers/status/<int:inquiry_id>", methods=["POST"])
 @admin_required
