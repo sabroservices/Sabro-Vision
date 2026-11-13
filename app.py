@@ -1594,7 +1594,7 @@ def admin_create_package():
     name = request.form.get("name", "").strip()
     code = request.form.get("code", "").strip()
     duration_days = safe_int(request.form.get("duration_days"), 30, min_val=1, max_val=3650)
-    price_pkr = safe_int(request.form.get("price_pkr"), 250, min_val=0)
+    price_pkr = safe_int(request.form.get("price_pkr"), 150, min_val=0)
     max_connections = safe_int(request.form.get("max_connections"), 1, min_val=1, max_val=20)
     allowed_categories = request.form.get("allowed_categories", "all").strip()
     description = request.form.get("description", "").strip()
@@ -1613,7 +1613,7 @@ def admin_create_package():
 def admin_update_package(pkg_id):
     name = request.form.get("name", "").strip()
     duration_days = safe_int(request.form.get("duration_days"), 30, min_val=1, max_val=3650)
-    price_pkr = safe_int(request.form.get("price_pkr"), 250, min_val=0)
+    price_pkr = safe_int(request.form.get("price_pkr"), 150, min_val=0)
     max_connections = safe_int(request.form.get("max_connections"), 1, min_val=1, max_val=20)
     is_active = safe_int(request.form.get("is_active"), 1, min_val=0, max_val=1)
     allowed_categories = request.form.get("allowed_categories", "all").strip()
