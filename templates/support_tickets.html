@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Help & Support Tickets - {{ (tenant and tenant.service_name) or settings.platform_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-8 space-y-6">
+
+    <!-- Header Banner -->
+    <div class="flex items-center justify-between pb-4 border-b border-white/[0.08] flex-wrap gap-4">
+        <div>
+            <h1 class="text-2xl font-black text-white tracking-tight">Customer Support & Helpdesk</h1>
+            <p class="text-xs text-slate-400 mt-1">Get fast technical assistance, stream troubleshooting, or billing help.</p>
+        </div>
+
+        <button type="button" onclick="document.getElementById('newTicketModal').classList.remove('hidden')" class="btn-shimmer glow-cyan px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 text-white text-xs font-bold shadow-md shadow-cyan-500/25 flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i>
+            <span>Open New Ticket</span>
+        </button>
+    </div>
+
+    <!-- Tickets List Card -->
+    <div class="cinema-glass-card rounded-3xl p-6 border border-white/[0.08] bg-obsidian-900/80">
+        {% if tickets %}
+        <div class="space-y-3">
+            {% for t in tickets %}
+            <a href="{{ url_for('customer_ticket_detail', ticket_id=t.id) }}" class="block p-4 rounded-2xl bg-obsidian-950/80 hover:bg-white/[0.03] border border-white/[0.06] hover:border-cyan-500/30 transition-all">
+                <div class="flex items-center justify-between flex-wrap gap-2 mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="font-mono text-xs font-bold text-cyan-300">{{ t.ticket_number }}</span>
+                        <span class="px-2 py-0.5 rounded-lg bg-obsidian-900 text-slate-300 border border-white/[0.08] text-[10px] uppercase font-semibold">
+                            {{ t.category }}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold {% if t.status == 'resolved' or t.status == 'closed' %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30{% elif t.status == 'in_progress' %}bg-cyan-500/20 text-cyan-300 border border-cyan-500/30{% else %}bg-amber-500/20 text-amber-300 border border-amber-500/30{% endif %}">
+                            {{ t.status|upper }}
+                        </span>
+                        <span class="text-[10px] text-slate-500 font-mono">{{ t.updated_at[:10] }}</span>
+                    </div>
+                </div>
+
+                <h3 class="text-sm font-bold text-white">{{ t.subject }}</h3>
+                <div class="text-[11px] text-slate-400 mt-1 flex items-center gap-2">
+                    <i class="fa-regular fa-comment text-[10px]"></i>
+                    <span>{{ t.message_count }} message{% if t.message_count != 1 %}s{% endif %}</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="p-10 text-center space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-headset"></i>
+            </div>
+            <h3 class="text-sm font-bold text-white">No Tickets Opened Yet</h3>
+            <p class="text-xs text-slate-400 max-w-sm mx-auto">Have a question or experiencing buffering? Open a ticket and our support team will assist you immediately.</p>
+            <button type="button" onclick="document.getElementById('newTicketModal').classList.remove('hidden')" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold shadow-md">
+                <i class="fa-solid fa-plus"></i>
+                <span>Create Support Ticket</span>
+            </button>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Open New Ticket Modal -->
+<div id="newTicketModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian-950/80 backdrop-blur-md">
+    <div class="cinema-glass-card w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-white/[0.1] bg-obsidian-900 shadow-2xl relative">
+        <div class="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-5">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-white">Open Support Ticket</h3>
+                    <p class="text-[11px] text-slate-400">Describe your inquiry or technical issue</p>
+                </div>
+            </div>
+            <button type="button" onclick="document.getElementById('newTicketModal').classList.add('hidden')" class="text-slate-400 hover:text-white p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <form action="{{ url_for('customer_create_ticket') }}" method="POST" class="space-y-4 text-xs">
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">Subject *</label>
+                <input type="text" name="subject" required placeholder="e.g. Buffering on Sports channel or Billing inquiry"
+                       class="w-full bg-obsidian-950 text-white px-3.5 py-2.5 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">Category</label>
+                    <select name="category" class="w-full bg-obsidian-950 text-white px-3.5 py-2.5 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400">
+                        <option value="streaming">Streaming & Buffering</option>
+                        <option value="billing">Billing & Payment</option>
+                        <option value="account">Account & Devices</option>
+                        <option value="general">General Inquiry</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">Priority</label>
+                    <select name="priority" class="w-full bg-obsidian-950 text-white px-3.5 py-2.5 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400">
+                        <option value="medium">Normal / Medium</option>
+                        <option value="high">High / Urgent</option>
+                        <option value="low">Low Priority</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">Message Details *</label>
+                <textarea name="message" required rows="4" placeholder="Please provide specific details so our support engineers can resolve it fast..."
+                          class="w-full bg-obsidian-950 text-white px-3.5 py-2.5 rounded-xl border border-white/[0.1] focus:outline-none focus:border-cyan-400 leading-relaxed"></textarea>
+            </div>
+
+            <div class="pt-3 flex items-center justify-end gap-2 border-t border-white/[0.08]">
+                <button type="button" onclick="document.getElementById('newTicketModal').classList.add('hidden')" class="px-4 py-2.5 rounded-xl bg-obsidian-950 text-slate-400 hover:text-white border border-white/[0.08] font-semibold">
+                    Cancel
+                </button>
+                <button type="submit" class="btn-shimmer glow-cyan px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 text-white font-bold shadow-md shadow-cyan-500/25">
+                    Submit Ticket
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
