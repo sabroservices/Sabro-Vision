@@ -1,6 +1,6 @@
 {
   "platform": "SABRO VISION",
-  "exported_at": "2026-11-14T02:29:59.339947",
+  "exported_at": "2026-11-14T03:25:43.725575",
   "version": "1.0",
   "tables": {
     "settings": [
@@ -159,6 +159,60 @@
         "allowed_features": "all",
         "created_at": "2026-11-14T02:23:13.184911",
         "notes": ""
+      },
+      {
+        "id": 70,
+        "code": "tenant_a86069",
+        "name": "Alpha Fiber",
+        "company_name": "",
+        "service_name": "Alpha TV",
+        "tagline": "",
+        "custom_domain": null,
+        "subdomain": null,
+        "logo_url": "",
+        "brand_color_primary": "#10b981",
+        "brand_color_secondary": "#6366f1",
+        "contact_name": "",
+        "email": "",
+        "phone": "",
+        "whatsapp": "",
+        "welcome_message": "",
+        "support_email": "",
+        "support_phone": "",
+        "status": "active",
+        "max_customers": 100,
+        "max_active_subs": 500,
+        "max_devices_per_user": 1,
+        "allowed_features": "all",
+        "created_at": "2026-11-14T03:25:43.336282",
+        "notes": ""
+      },
+      {
+        "id": 71,
+        "code": "tenant_47c42c",
+        "name": "Beta Broadband",
+        "company_name": "",
+        "service_name": "Beta Vision",
+        "tagline": "",
+        "custom_domain": null,
+        "subdomain": null,
+        "logo_url": "",
+        "brand_color_primary": "#f59e0b",
+        "brand_color_secondary": "#6366f1",
+        "contact_name": "",
+        "email": "",
+        "phone": "",
+        "whatsapp": "",
+        "welcome_message": "",
+        "support_email": "",
+        "support_phone": "",
+        "status": "active",
+        "max_customers": 100,
+        "max_active_subs": 500,
+        "max_devices_per_user": 1,
+        "allowed_features": "all",
+        "created_at": "2026-11-14T03:25:43.364242",
+        "notes": ""
       }
     ],
     "reseller_users": [
@@ -186,6 +240,19 @@
         "role": "owner",
         "status": "active",
         "created_at": "2026-11-14T02:23:13.450407",
+        "last_login_at": null
+      },
+      {
+        "id": 69,
+        "tenant_id": 70,
+        "username": "admin_tenant_a86069",
+        "password_hash": "scrypt:32768:8:1$rAlI031Htmz4OAIr$57e27bbaa8d644f500aba70631524fbefa141b74a8fbf2001611800f2107a00b4370296895bbaa4331dda30dcd92272c6cfc51776b6cc61c62bb2b5a0422cb98",
+        "full_name": "",
+        "email": "",
+        "phone": "",
+        "role": "owner",
+        "status": "active",
+        "created_at": "2026-11-14T03:25:43.394575",
         "last_login_at": null
       }
     ],
@@ -1073,6 +1140,50 @@
         "is_sabro_isp": 0,
         "isp_status": "unlinked",
         "isp_verified_at": null
+      },
+      {
+        "id": 76,
+        "username": "sub_sabro_user_906f8b",
+        "password_hash": "scrypt:32768:8:1$uAL58ZE5Q7YaCXIi$2aad08c071497425355364fcae79851a6b1a529998ce919d86d141829160dea79991215020c4ee9de653337479f5936d8a9e410e2624043783ce5e42f6221e06",
+        "phone": "",
+        "full_name": "",
+        "active_key_code": null,
+        "created_at": "2026-11-14T03:25:42.189363",
+        "last_login_at": "2026-11-14T03:25:42.189363",
+        "plain_password": "Password786*",
+        "pppoe_username": "sabro_user_906f8b",
+        "zone": "",
+        "fat_id": "",
+        "email": "",
+        "status": "active",
+        "package_id": null,
+        "notes": "",
+        "tenant_id": 1,
+        "is_sabro_isp": 1,
+        "isp_status": "unlinked",
+        "isp_verified_at": null
+      },
+      {
+        "id": 77,
+        "username": "outside_b9cb0f",
+        "password_hash": "scrypt:32768:8:1$7r9bKPts8T9RQNSj$85ba186d31d903a553702c095c6c05135f7bd6cc3553e22721c4ec456b08686e7a606944f44dfb380a148914825763e7482d72ff087dd440289f0fc7519fa432",
+        "phone": "0312-7654321",
+        "full_name": "Commercial Outside User",
+        "active_key_code": null,
+        "created_at": "2026-11-14T03:25:42.877635",
+        "last_login_at": "2026-11-14T03:25:42.877635",
+        "plain_password": "OutsidePass123*",
+        "pppoe_username": null,
+        "zone": null,
+        "fat_id": null,
+        "email": null,
+        "status": "active",
+        "package_id": 231,
+        "notes": null,
+        "tenant_id": 1,
+        "is_sabro_isp": 0,
+        "isp_status": "unlinked",
+        "isp_verified_at": null
       }
     ],
     "subscriptions": [
@@ -1145,6 +1256,16 @@
         "status": "active",
         "auto_renew": 0,
         "created_at": "2026-11-14T02:29:59.056982"
+      },
+      {
+        "id": 34,
+        "subscriber_id": 77,
+        "package_id": 231,
+        "start_date": "2026-11-14T03:25:43.211409",
+        "expiry_date": "2026-12-14T03:25:43.211409",
+        "status": "active",
+        "auto_renew": 0,
+        "created_at": "2026-11-14T03:25:43.211409"
       }
     ],
     "payment_receipts": [
@@ -1181,6 +1302,23 @@
         "created_at": "2026-11-14T02:23:08.392638",
         "tenant_id": 1,
         "invoice_number": "SABRO-INV-2611-F7FC"
+      },
+      {
+        "id": 4,
+        "subscriber_id": 77,
+        "package_id": 231,
+        "amount_pkr": 150,
+        "payment_method": "JazzCash",
+        "transaction_ref": "JC069EF4CB",
+        "sender_number": "03001234567",
+        "proof_image": "",
+        "status": "approved",
+        "reviewer_admin": "ahmedbaloch",
+        "reviewed_at": "2026-11-14T03:25:43.209101",
+        "notes": "",
+        "created_at": "2026-11-14T03:25:43.179659",
+        "tenant_id": 1,
+        "invoice_number": "SABRO-INV-2611-3C0E"
       }
     ],
     "support_tickets": [],
@@ -1205,6 +1343,16 @@
         "type": "success",
         "is_read": 0,
         "created_at": "2026-11-14T02:23:08.503808"
+      },
+      {
+        "id": 4,
+        "tenant_id": 1,
+        "subscriber_id": 77,
+        "title": "Payment Approved! 🎉",
+        "message": "Your payment of PKR 150 (JazzCash) has been verified. Your subscription is now active!",
+        "type": "success",
+        "is_read": 0,
+        "created_at": "2026-11-14T03:25:43.260342"
       }
     ],
     "isp_verifications": [
@@ -1247,6 +1395,16 @@
         "isp_package": "50Mbps Unlimited",
         "last_verified_at": "2026-11-14T02:23:06.470556",
         "raw_response": "{}"
+      },
+      {
+        "id": 5,
+        "pppoe_username": "sabro_user_906f8b",
+        "phone": "03009999999",
+        "customer_name": "Sabro Fiber Subscriber",
+        "is_active": 1,
+        "isp_package": "50Mbps Unlimited",
+        "last_verified_at": "2026-11-14T03:25:42.172957",
+        "raw_response": "{}"
       }
     ],
     "schema_migrations": [],
@@ -1276,6 +1434,14 @@
         "details": "Approved payment receipt #3 for PKR 250 (JazzCash)",
         "ip_address": "",
         "created_at": "2026-11-14T02:23:08.541629"
+      },
+      {
+        "id": 8,
+        "admin_user": "ahmedbaloch",
+        "action": "APPROVE_PAYMENT",
+        "details": "Approved payment receipt #4 for PKR 150 (JazzCash)",
+        "ip_address": "",
+        "created_at": "2026-11-14T03:25:43.293889"
       }
     ]
   }
