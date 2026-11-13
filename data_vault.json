@@ -1,6 +1,6 @@
 {
   "platform": "SABRO VISION",
-  "exported_at": "2026-11-14T03:26:02.235827",
+  "exported_at": "2026-11-14T03:26:12.764102",
   "version": "1.0",
   "tables": {
     "settings": [
@@ -699,6 +699,40 @@
         "notes": "Live test from admin",
         "package_id": null,
         "tenant_id": 1
+      },
+      {
+        "id": 78,
+        "key_code": "SABRO-FREE-649B5B-E460",
+        "user_type": "subscriber",
+        "customer_name": "Comedy Live Tester",
+        "phone": "",
+        "duration_days": 30,
+        "created_at": "2026-11-14T03:26:06.257607",
+        "activated_at": "2026-11-14T03:26:06.288850",
+        "expires_at": "2026-12-14T03:26:06.288850",
+        "status": "active",
+        "max_devices": 1,
+        "device_token": "713f310a-f3c6-4ac5-8af0-4db1d7714bbb",
+        "notes": "",
+        "package_id": 12,
+        "tenant_id": 1
+      },
+      {
+        "id": 79,
+        "key_code": "SABRO-FREE-E78B22-C422",
+        "user_type": "subscriber",
+        "customer_name": "Master VIP Tester",
+        "phone": "",
+        "duration_days": 30,
+        "created_at": "2026-11-14T03:26:12.516544",
+        "activated_at": "2026-11-14T03:26:12.568991",
+        "expires_at": "2026-12-14T03:26:12.568991",
+        "status": "active",
+        "max_devices": 1,
+        "device_token": "a7fb391f-91a2-4b28-b0a5-ed07de808608",
+        "notes": "",
+        "package_id": 11,
+        "tenant_id": 1
       }
     ],
     "subscribers": [
@@ -1229,6 +1263,50 @@
         "is_sabro_isp": 0,
         "isp_status": "unlinked",
         "isp_verified_at": null
+      },
+      {
+        "id": 82,
+        "username": "sabro_649b5b",
+        "password_hash": "scrypt:32768:8:1$3HW6YipN5Cz3WDWK$3a02f898cc1600b275dbbe8e858945154cd45be41c4580202d53ade30d1faaac43976220c3ed8fe256c19b9f17d82975a81a163c251402dd591e734f780a0d5d",
+        "phone": "",
+        "full_name": "Subscriber 649B5B",
+        "active_key_code": "SABRO-FREE-649B5B-E460",
+        "created_at": "2026-11-14T03:26:06.288850",
+        "last_login_at": "2026-11-14T03:26:06.288850",
+        "plain_password": "sabro7948",
+        "pppoe_username": null,
+        "zone": null,
+        "fat_id": null,
+        "email": null,
+        "status": "active",
+        "package_id": 12,
+        "notes": null,
+        "tenant_id": 1,
+        "is_sabro_isp": 0,
+        "isp_status": "unlinked",
+        "isp_verified_at": null
+      },
+      {
+        "id": 83,
+        "username": "sabro_e78b22",
+        "password_hash": "scrypt:32768:8:1$m05qzxF1wyOIBTsB$43b8ec7d9380f73b2cc5f2381cf49b801ed7326c5375577b8d0b9f6565e093daaf55639a08baa6ec7773f3dc68e5a42e244f1c1e326241129a30ac71b6313270",
+        "phone": "",
+        "full_name": "Subscriber E78B22",
+        "active_key_code": "SABRO-FREE-E78B22-C422",
+        "created_at": "2026-11-14T03:26:12.568991",
+        "last_login_at": "2026-11-14T03:26:12.568991",
+        "plain_password": "sabro9081",
+        "pppoe_username": null,
+        "zone": null,
+        "fat_id": null,
+        "email": null,
+        "status": "active",
+        "package_id": 11,
+        "notes": null,
+        "tenant_id": 1,
+        "is_sabro_isp": 0,
+        "isp_status": "unlinked",
+        "isp_verified_at": null
       }
     ],
     "subscriptions": [
@@ -1321,6 +1399,26 @@
         "status": "expired",
         "auto_renew": 0,
         "created_at": "2026-11-09T03:25:44.572355"
+      },
+      {
+        "id": 36,
+        "subscriber_id": 82,
+        "package_id": 12,
+        "start_date": "2026-11-14T03:26:06.288850",
+        "expiry_date": "2026-12-14T03:26:06.288850",
+        "status": "active",
+        "auto_renew": 0,
+        "created_at": "2026-11-14T03:26:06.288850"
+      },
+      {
+        "id": 37,
+        "subscriber_id": 83,
+        "package_id": 11,
+        "start_date": "2026-11-14T03:26:12.568991",
+        "expiry_date": "2026-12-14T03:26:12.568991",
+        "status": "active",
+        "auto_renew": 0,
+        "created_at": "2026-11-14T03:26:12.568991"
       }
     ],
     "payment_receipts": [
