@@ -1,6 +1,6 @@
 {
   "platform": "SABRO VISION",
-  "exported_at": "2026-11-14T00:17:05.430907",
+  "exported_at": "2026-11-14T00:17:06.834476",
   "version": "1.0",
   "tables": {
     "settings": [
@@ -161,8 +161,8 @@
         "notes": ""
       },
       {
-        "id": 30,
-        "code": "tenant_b42325",
+        "id": 32,
+        "code": "tenant_ee396d",
         "name": "Alpha Fiber",
         "company_name": "",
         "service_name": "Alpha TV",
@@ -184,12 +184,12 @@
         "max_active_subs": 500,
         "max_devices_per_user": 1,
         "allowed_features": "all",
-        "created_at": "2026-11-14T00:17:04.921719",
+        "created_at": "2026-11-14T00:17:05.856797",
         "notes": ""
       },
       {
-        "id": 31,
-        "code": "tenant_65ff9e",
+        "id": 33,
+        "code": "tenant_5a9597",
         "name": "Beta Broadband",
         "company_name": "",
         "service_name": "Beta Vision",
@@ -211,7 +211,7 @@
         "max_active_subs": 500,
         "max_devices_per_user": 1,
         "allowed_features": "all",
-        "created_at": "2026-11-14T00:17:04.943382",
+        "created_at": "2026-11-14T00:17:05.906760",
         "notes": ""
       }
     ],
@@ -243,29 +243,29 @@
         "last_login_at": null
       },
       {
-        "id": 29,
-        "tenant_id": 30,
-        "username": "admin_tenant_b42325",
-        "password_hash": "scrypt:32768:8:1$DaXCAzuhojesLkb9$5085218a15b1d99d11a88957c47aaa1457661ba6bc3b9ef1868fa71fe884ae05e79ac27054f8a0ad3fd21919ab63c15391aa0ac3b28b53c1179bf87c20235dde",
+        "id": 31,
+        "tenant_id": 32,
+        "username": "admin_tenant_ee396d",
+        "password_hash": "scrypt:32768:8:1$zjny5SOKZQnRHERg$154341345ec8ba1b765c60bbc0298c7c1f0331afc09d4d0c486f7ec3ebc3eb658723d9c09d07fbd515c7daafc3f3b0d4bf4d4e1030ce20d816920e46aa6a2422",
         "full_name": "",
         "email": "",
         "phone": "",
         "role": "owner",
         "status": "active",
-        "created_at": "2026-11-14T00:17:04.963179",
+        "created_at": "2026-11-14T00:17:05.957346",
         "last_login_at": null
       },
       {
-        "id": 30,
-        "tenant_id": 31,
-        "username": "admin_tenant_65ff9e",
-        "password_hash": "scrypt:32768:8:1$1llLG9R6VeQza91S$49efa024db3cd37661e43b07f37b9214dc28e722579b19022d65f046f910b8c4887b533b4b3c3e71d2784ad28b0aad82948eab43895efc3188d8763b02cf5326",
+        "id": 32,
+        "tenant_id": 33,
+        "username": "admin_tenant_5a9597",
+        "password_hash": "scrypt:32768:8:1$xaW9DaC7VN9sbvoS$2a91cdc296d16d1c442ec60c852a77a31b118805ea562d647f405029713e608e403b0ed5ce78799e74df8140859316c395bbd548c0a822991e76ef55b6d1aaa7",
         "full_name": "",
         "email": "",
         "phone": "",
         "role": "owner",
         "status": "active",
-        "created_at": "2026-11-14T00:17:05.190338",
+        "created_at": "2026-11-14T00:17:06.372109",
         "last_login_at": null
       }
     ],
