@@ -30,10 +30,17 @@ VAULT_FILE = os.path.join(VAULT_DIR, "data_vault.json")
 DYNAMIC_TABLES = [
     "settings",
     "admin_users",
+    "tenants",
+    "reseller_users",
     "access_keys",
     "subscribers",
     "subscriptions",
     "payment_receipts",
+    "support_tickets",
+    "ticket_messages",
+    "notifications",
+    "isp_verifications",
+    "schema_migrations",
     "reseller_inquiries",
     "favorites",
     "audit_logs"
