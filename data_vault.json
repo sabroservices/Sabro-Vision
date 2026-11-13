@@ -1,6 +1,6 @@
 {
   "platform": "SABRO VISION",
-  "exported_at": "2026-11-14T00:20:10.053807",
+  "exported_at": "2026-11-14T00:20:19.451818",
   "version": "1.0",
   "tables": {
     "settings": [
@@ -219,7 +219,7 @@
         "expires_at": "2026-11-29T00:20:09.642440",
         "status": "active",
         "max_devices": 1,
-        "device_token": "c1e692cb-e32b-4e0a-acb8-00094845eef1",
+        "device_token": "cf89f09c-c8e0-494d-892c-42ec55c662e0",
         "notes": "",
         "package_id": null,
         "tenant_id": 1
@@ -240,6 +240,40 @@
         "notes": "",
         "package_id": null,
         "tenant_id": 1
+      },
+      {
+        "id": 57,
+        "key_code": "SABRO-FREE-9B0B4A-03FE",
+        "user_type": "subscriber",
+        "customer_name": "Admin Generated Live User",
+        "phone": "03009988776",
+        "duration_days": 30,
+        "created_at": "2026-11-14T00:20:13.360202",
+        "activated_at": null,
+        "expires_at": null,
+        "status": "unused",
+        "max_devices": 1,
+        "device_token": null,
+        "notes": "Live test from admin",
+        "package_id": null,
+        "tenant_id": 1
+      },
+      {
+        "id": 58,
+        "key_code": "SABRO-FREE-61AC2B-0627",
+        "user_type": "subscriber",
+        "customer_name": "Comedy Live Tester",
+        "phone": "",
+        "duration_days": 30,
+        "created_at": "2026-11-14T00:20:19.233032",
+        "activated_at": "2026-11-14T00:20:19.264275",
+        "expires_at": "2026-12-14T00:20:19.264275",
+        "status": "active",
+        "max_devices": 1,
+        "device_token": "d74ca40c-caec-4630-87f9-a66afe8d57b6",
+        "notes": "",
+        "package_id": 12,
+        "tenant_id": 1
       }
     ],
     "subscribers": [
@@ -251,7 +285,7 @@
         "full_name": "Subscriber 9B40A0",
         "active_key_code": "SABRO-FREE-3FEFBB-D140",
         "created_at": "2026-11-14T00:20:09.041789",
-        "last_login_at": "2026-11-14T00:20:10.037085",
+        "last_login_at": "2026-11-14T00:20:10.426536",
         "plain_password": "sabro4424",
         "pppoe_username": null,
         "zone": null,
@@ -264,9 +298,42 @@
         "is_sabro_isp": 0,
         "isp_status": "unlinked",
         "isp_verified_at": null
+      },
+      {
+        "id": 53,
+        "username": "sabro_61ac2b",
+        "password_hash": "scrypt:32768:8:1$9qAysGCsctx7DWJ3$6268d5ef582ae8499b8981d1bd62dbb142cf7def8790cb3bfe76bb6373b8c377e18f93debea5994ea512ed012e711d8b44983643d0d0f02c356cbe0cecd02e11",
+        "phone": "",
+        "full_name": "Subscriber 61AC2B",
+        "active_key_code": "SABRO-FREE-61AC2B-0627",
+        "created_at": "2026-11-14T00:20:19.264275",
+        "last_login_at": "2026-11-14T00:20:19.264275",
+        "plain_password": "sabro3393",
+        "pppoe_username": null,
+        "zone": null,
+        "fat_id": null,
+        "email": null,
+        "status": "active",
+        "package_id": 12,
+        "notes": null,
+        "tenant_id": 1,
+        "is_sabro_isp": 0,
+        "isp_status": "unlinked",
+        "isp_verified_at": null
       }
     ],
-    "subscriptions": [],
+    "subscriptions": [
+      {
+        "id": 23,
+        "subscriber_id": 53,
+        "package_id": 12,
+        "start_date": "2026-11-14T00:20:19.264275",
+        "expiry_date": "2026-12-14T00:20:19.264275",
+        "status": "active",
+        "auto_renew": 0,
+        "created_at": "2026-11-14T00:20:19.264275"
+      }
+    ],
     "payment_receipts": [],
     "support_tickets": [],
     "ticket_messages": [],
