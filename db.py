@@ -500,47 +500,32 @@ def init_db(force_reset=False):
     """, (now_str,))
 
 
-    # Seed default packages: Everything 100% FREE for Sabro Networks Fiber users (code='basic').
-    # For all outside network users: Every package is flat 250 PKR, 1 Screen.
+    # Seed strictly 2 official packages:
+    # 1. Sabro Broadband All-Access Pass: 0 PKR, all categories, 2 screens (code='basic')
+    # 2. Sabro Vision Commercial Pass: 150 PKR, all categories, 1 screen (code='all_in_one')
     now_str = datetime.now().isoformat()
-    default_pkgs = [
-        ("Basic Fiber Pass", "basic", 30, 0, 1, 1, "Complimentary 100% FREE with Sabro Networks Fiber Broadband. 1 Screen. Everything Unlocked with zero charges.", "all"),
-        ("Sabro All-in-One Super Pass", "all_in_one", 30, 250, 1, 1, "All-in-One Super Pass: Includes EACH and EVERYTHING! 100% unrestricted access to all 11,459+ channels across all categories. 1 Screen. Flat 250 PKR for outsiders.", "all"),
-        ("Sabro All-Access Master VIP", "master_vip", 30, 250, 1, 1, "The Ultimate Master VIP Pass. 100% unrestricted access to every single channel (all 11,459+ channels across 22 categories) with 1 screen. Flat 250 PKR.", "all"),
-        ("Sports & News Pass", "sports", 30, 250, 1, 1, "Bufferless Sports & News HD streams. 1 Screen. Flat 250 PKR.", "Sports,News"),
-        ("VIP Premium Cinema Pass", "vip", 30, 250, 1, 1, "Full 11,400+ channel catalog, movies & international feeds. 1 Screen. Flat 250 PKR.", "all"),
-        ("Sabro Comedy Club Pass", "pkg_comedy", 30, 250, 1, 1, "Dedicated Standup & Comedy Pass: 145+ Non-stop Comedy, Laughs & Sitcom channels. 1 Screen. Flat 250 PKR.", "Comedy"),
-        ("Sabro Sports Elite Pass", "pkg_sports", 30, 250, 1, 1, "Live Sports & Stadium Pass: 476+ Live Sports, Football, Cricket, WWE & Racing feeds in HD. 1 Screen. Flat 250 PKR.", "Sports"),
-        ("Sabro News & Information Pass", "pkg_information", 30, 250, 1, 1, "Global News & Current Affairs: 1,388+ Breaking News, Financial Markets & Political channels. 1 Screen. Flat 250 PKR.", "News,Business,Legislative,Public,Weather"),
-        ("Sabro Cinema & Movies Pass", "pkg_cinema", 30, 250, 1, 1, "Cinema & Blockbusters: 856+ Movies & Classic cinema feeds. 1 Screen. Flat 250 PKR.", "Movies,Classic"),
-        ("Sabro Kids & Education Pass", "pkg_kids", 30, 250, 1, 1, "Safe Kids & Cartoons: 784+ Animated, Toon & Educational learning channels. 1 Screen. Flat 250 PKR.", "Kids,Education"),
-        ("Sabro Islamic & Spiritual Pass", "pkg_islamic", 30, 250, 1, 1, "Spiritual Guidance & Quran: 779+ Live Makkah, Madinah, Hajj, Bayan & Islamic TV feeds. 1 Screen. Flat 250 PKR.", "Islamic"),
-        ("Sabro Entertainment & Serials Pass", "pkg_entertainment", 30, 250, 1, 1, "Mega Entertainment Hub: 5,686+ Drama, Reality TV, Lifestyle & Cultural channels. 1 Screen. Flat 250 PKR.", "Entertainment,Culture,Lifestyle,Cooking"),
-        ("Sabro Documentary & Science Pass", "pkg_documentary", 30, 250, 1, 1, "Science & Exploration: 435+ Wildlife, History, Discovery & Science documentaries. 1 Screen. Flat 250 PKR.", "Documentary,Auto,Outdoor"),
-        ("Sabro Music Beats Pass", "pkg_music", 30, 250, 1, 1, "Non-stop Music & Hits: 833+ Live Pop, Rock, Classical & Chillout streams. 1 Screen. Flat 250 PKR.", "Music,Relax"),
-        ("Quarterly Family Pass", "quarterly", 90, 250, 1, 1, "90-Day VIP Access for 1 Screen. Flat 250 PKR Special.", "all"),
-        ("Annual Ultra Pass", "annual", 365, 250, 1, 1, "Full 365 days access for 1 Screen. Flat 250 PKR Special.", "all")
+    official_pkgs = [
+        ("Sabro Broadband All-Access Pass", "basic", 30, 0, 2, 1, "Complimentary 100% FREE with Sabro Networks Fiber Broadband. 2 Screens. All 11,459+ channels unlocked with zero charges.", "all"),
+        ("Sabro Vision Commercial Pass", "all_in_one", 30, 150, 1, 1, "Commercial All-Access Pass for outside customers. Stream all 11,459+ live channels, sports, and movies in 1080p Full HD on 1 screen. Flat 150 PKR.", "all")
     ]
 
-    for p in default_pkgs:
+    for p in official_pkgs:
         cursor.execute("""
             INSERT INTO packages (name, code, duration_days, price_pkr, max_connections, is_active, description, allowed_categories, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(code) DO UPDATE SET
+                name = excluded.name,
                 price_pkr = excluded.price_pkr,
                 max_connections = excluded.max_connections,
                 allowed_categories = excluded.allowed_categories,
-                description = excluded.description
+                description = excluded.description,
+                is_active = 1
         """, (p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], now_str))
 
-    # Synchronize all outsider packages to 250 PKR flat, 1 Screen
-    cursor.execute("UPDATE packages SET price_pkr = 250, max_connections = 1 WHERE code != 'basic'")
-    cursor.execute("UPDATE packages SET price_pkr = 0, allowed_categories = 'all', max_connections = 1 WHERE code = 'basic'")
-
-    # Ensure existing packages have their allowed_categories populated if empty
-    cursor.execute("UPDATE packages SET allowed_categories = 'all' WHERE code = 'basic' AND (allowed_categories IS NULL OR allowed_categories = '')")
-    cursor.execute("UPDATE packages SET allowed_categories = 'Sports,News' WHERE code = 'sports' AND (allowed_categories IS NULL OR allowed_categories = '')")
-    cursor.execute("UPDATE packages SET allowed_categories = 'all' WHERE code IN ('vip', 'quarterly', 'annual') AND (allowed_categories IS NULL OR allowed_categories = '')")
+    # Deactivate all legacy packages so ONLY the 2 official packages remain active
+    cursor.execute("UPDATE packages SET is_active = 0 WHERE code NOT IN ('basic', 'all_in_one')")
+    cursor.execute("UPDATE packages SET name = 'Sabro Vision Commercial Pass', price_pkr = 150, allowed_categories = 'all', max_connections = 1, is_active = 1 WHERE code = 'all_in_one'")
+    cursor.execute("UPDATE packages SET name = 'Sabro Broadband All-Access Pass', price_pkr = 0, allowed_categories = 'all', max_connections = 2, is_active = 1 WHERE code = 'basic'")
 
     conn.commit()
     conn.close()
