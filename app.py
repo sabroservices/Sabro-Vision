@@ -669,6 +669,37 @@ def index():
     if not active_channel and channels:
         active_channel = channels[0]
 
+    # Netflix System: Prepare curated category rails for home view
+    is_home_rails = (selected_category == "All" and not search_query and not fav_only)
+    top10_channels = []
+    sports_channels = []
+    movies_channels = []
+    news_channels = []
+    entertainment_channels = []
+    kids_channels = []
+    documentary_channels = []
+    music_channels = []
+    hero_channel = None
+
+    if is_home_rails:
+        top10_channels = db.get_channels(limit=10, health_status=health_filter, allowed_categories=allowed_filter)
+        sports_channels = db.get_channels(category="Sports", limit=16, health_status=health_filter, allowed_categories=allowed_filter)
+        movies_channels = db.get_channels(category="Movies", limit=16, health_status=health_filter, allowed_categories=allowed_filter)
+        news_channels = db.get_channels(category="News", limit=16, health_status=health_filter, allowed_categories=allowed_filter)
+        entertainment_channels = db.get_channels(category="Entertainment", limit=16, health_status=health_filter, allowed_categories=allowed_filter)
+        kids_channels = db.get_channels(category="Kids", limit=16, health_status=health_filter, allowed_categories=allowed_filter)
+        documentary_channels = db.get_channels(category="Documentary", limit=16, health_status=health_filter, allowed_categories=allowed_filter)
+        music_channels = db.get_channels(category="Music", limit=16, health_status=health_filter, allowed_categories=allowed_filter)
+        
+        if active_channel:
+            hero_channel = active_channel
+        elif sports_channels:
+            hero_channel = sports_channels[0]
+        elif top10_channels:
+            hero_channel = top10_channels[0]
+        elif channels:
+            hero_channel = channels[0]
+
     return render_template(
         "player.html",
         categories=categories,
@@ -683,7 +714,17 @@ def index():
         fav_only=fav_only,
         package_name=pkg_name,
         is_all_access=is_all,
-        allowed_categories_list=list(allowed_cats)
+        allowed_categories_list=list(allowed_cats),
+        is_home_rails=is_home_rails,
+        top10_channels=top10_channels,
+        sports_channels=sports_channels,
+        movies_channels=movies_channels,
+        news_channels=news_channels,
+        entertainment_channels=entertainment_channels,
+        kids_channels=kids_channels,
+        documentary_channels=documentary_channels,
+        music_channels=music_channels,
+        hero_channel=hero_channel
     )
 
 @app.route("/watch/<int:channel_id>")
