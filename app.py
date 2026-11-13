@@ -2177,7 +2177,7 @@ def reseller_create_package():
     allowed_cats = request.form.get("allowed_categories", "all").strip()
     description = request.form.get("description", "").strip()
 
-    db.add_package(name, code, duration_days=duration, price_pkr=price, max_connections=max_conn, description=description, allowed_categories=allowed_cats)
+    db.add_package(name, code, duration_days=duration, price_pkr=price, max_connections=max_conn, description=description, allowed_categories=allowed_cats, tenant_id=tenant_id)
     flash(f"Custom package '{name}' created successfully!", "success")
     return redirect(url_for("reseller_packages"))
 
